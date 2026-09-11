@@ -13,8 +13,12 @@ export const site = {
 
 export type Mode = {
   name: string
+  slug: string
   tier: "Core" | "Full service"
   description: string
+  detail: string
+  equipment: string[]
+  typicalLoads: string[]
 }
 
 export const modesIntro = {
@@ -27,44 +31,84 @@ export const modesIntro = {
 export const modes: Mode[] = [
   {
     name: "Flatbed",
+    slug: "flatbed",
     tier: "Core",
     description: "Step deck, RGN, conestoga. Tarped, chained, and permitted when it needs to be.",
+    detail:
+      "Open-deck freight is where we started. We spec the right trailer for the dimensions and weight, secure it to standard, and permit the load when it runs over legal. Tarping, chaining, and dunnage are planned before the truck shows up, not figured out at the dock.",
+    equipment: ["48' & 53' flatbed", "Step deck", "Double drop / RGN", "Conestoga", "Stretch & multi-axle"],
+    typicalLoads: ["Structural steel & pipe", "Machinery & equipment", "Building materials", "Coils & plate"],
   },
   {
     name: "Expedited",
+    slug: "expedited",
     tier: "Core",
     description: "Team drivers, dedicated trucks, and an answer within the hour, day or night.",
+    detail:
+      "When the clock is the constraint, we run team drivers and dedicated equipment straight through. You get a committed pickup, a hard ETA, and a coordinator who calls you before you have to call us.",
+    equipment: ["Sprinter & cargo van", "Straight truck", "Team-driver dry van", "Dedicated power"],
+    typicalLoads: ["Line-down parts", "AOG & critical spares", "Turnaround freight", "Time-definite deliveries"],
   },
   {
     name: "Drayage",
+    slug: "drayage",
     tier: "Core",
     description: "Port of Houston and Gulf terminals. Chassis, LFD tracking, and demurrage avoidance.",
+    detail:
+      "We run containers in and out of the Port of Houston and Gulf terminals with our own dispatch discipline: chassis lined up, last-free-day tracked, and appointments booked so boxes move before demurrage and per-diem start stacking up.",
+    equipment: ["20' & 40' chassis", "Tri-axle chassis", "Transload capacity", "Bonded moves"],
+    typicalLoads: ["Import / export containers", "Transload to over-the-road", "Port-to-warehouse", "FCL drayage"],
   },
   {
     name: "Hotshot",
+    slug: "hotshot",
     tier: "Core",
     description: "Gooseneck and one-ton capacity across Texas and the Gulf for the part that can't wait.",
+    detail:
+      "One-ton and gooseneck capacity staged across Texas and the Gulf for the load that can't wait for a full truck. Fast to dispatch, cheaper than a full flatbed, and ideal for the single skid or piece of equipment holding up a job.",
+    equipment: ["One-ton dually", "Gooseneck trailer", "40' hotshot deck", "Tilt-deck"],
+    typicalLoads: ["Oilfield parts", "Single skids & pallets", "Small equipment", "Field-service freight"],
   },
   {
     name: "Box truck",
+    slug: "box-truck",
     tier: "Core",
     description: "Liftgate, inside delivery, and final-mile into live facilities.",
+    detail:
+      "Final-mile and inside delivery into live facilities where a 53' can't dock. Liftgate, pallet jack, and drivers who know a delivery into an occupied building is different from a warehouse drop.",
+    equipment: ["26' box w/ liftgate", "Straight truck", "Pallet jack", "White-glove option"],
+    typicalLoads: ["Inside deliveries", "Final-mile freight", "Live-site drops", "Retail & office"],
   },
   {
     name: "Oversize & heavy haul",
+    slug: "oversize-heavy-haul",
     tier: "Core",
     description: "Permits, escorts, and route surveys for transformers, vessels, and modules.",
+    detail:
+      "Over-dimensional and superload freight, planned from the route backward. We handle state permits, pilot cars and police escorts, pole trucks, and route surveys for the moves where a bridge clearance or a turn radius decides the schedule.",
+    equipment: ["Multi-axle RGN", "Perimeter / stretch", "Dual-lane & Goldhofer", "Beam & jeep"],
+    typicalLoads: ["Transformers & switchgear", "Pressure vessels", "Modules & skids", "Turbines & generators"],
   },
   {
     name: "Ocean",
+    slug: "ocean",
     tier: "Core",
     description: "FCL and LCL through the largest global carriers, with drayage on both ends.",
+    detail:
+      "FCL and LCL through the largest and most efficient global carriers, with drayage handled on both ends of the water. The same network that moves containers for global motorsport series and top e-commerce brands handles your freight.",
+    equipment: ["FCL 20' / 40' / 40'HC", "LCL consolidation", "Breakbulk & RoRo", "Door-to-door drayage"],
+    typicalLoads: ["Import / export ocean", "Project cargo", "Global container moves", "Port-to-door"],
   },
   {
     name: "LTL",
+    slug: "ltl",
     tier: "Core",
     description:
       "Volume and standard LTL, plus flatbed LTL, with the carriers that still hit appointment times.",
+    detail:
+      "Standard, volume, and flatbed LTL routed through the carriers that still honor appointment windows. We class it right, book it right, and watch it through the terminal network so a partial doesn't get lost in transit.",
+    equipment: ["Standard LTL", "Volume / partial", "Flatbed LTL", "Guaranteed & expedited LTL"],
+    typicalLoads: ["Palletized freight", "Partial truckloads", "Volume LTL", "Open-deck partials"],
   },
 ]
 
@@ -193,11 +237,11 @@ export const heroSpec: { label: string; value: string }[] = [
 ]
 
 export const navLinks = [
-  { href: "#who-we-serve", label: "Who We Serve" },
-  { href: "#modes", label: "Modes" },
-  { href: "#method", label: "How We Run" },
-  { href: "#reliability", label: "Reliability" },
-  { href: "#network", label: "Network" },
+  { href: "/#who-we-serve", label: "Who We Serve" },
+  { href: "/modes", label: "Modes" },
+  { href: "/#method", label: "How We Run" },
+  { href: "/#reliability", label: "Reliability" },
+  { href: "/#network", label: "Network" },
 ]
 
 export const whoWeServe = {

@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useActionState, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, Check } from "lucide-react"
+import { ArrowRight, Check, TriangleAlert } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { submitRequestCapacity, type RequestState } from "@/app/actions/request-capacity"
 
 const modes = [
   "Flatbed",
@@ -22,22 +23,14 @@ const inputClass =
   "h-11 w-full rounded-md border border-border bg-card/50 px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary"
 const labelClass = "mb-2 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground"
 
-function ticketId() {
-  const n = Math.floor(1000 + Math.random() * 9000)
-  return `RC-${n}`
-}
+const initialState: RequestState = { status: "idle" }
 
 export function RequestCapacityForm() {
-  const [submitted, setSubmitted] = useState<string | null>(null)
+  const [state, formAction, pending] = useActionState(submitRequestCapacity, initialState)
   const [mode, setMode] = useState(modes[0])
   const [cadence, setCadence] = useState(cadences[0])
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setSubmitted(ticketId())
-  }
-
-  if (submitted) {
+  if (state.status === "success") {
     return (
       <div className="rounded-xl border border-border bg-card/50 p-8">
         <div className="flex items-center gap-3">
@@ -46,23 +39,16 @@ export function RequestCapacityForm() {
           </span>
           <div>
             <div className="font-mono text-xs uppercase tracking-wider text-primary">Request logged</div>
-            <div className="text-sm text-muted-foreground">Ticket {submitted} is in the control tower queue.</div>
+            <div className="text-sm text-muted-foreground">Ticket {state.ticket} is in the control tower queue.</div>
           </div>
         </div>
         <p className="mt-6 text-pretty leading-relaxed text-muted-foreground">
-          A dispatch coordinator will confirm capacity and pricing within one business hour. Every
-          request is tracked against the same five-nines SLA as live freight.
+          A dispatch coordinator will confirm capacity and pricing within one business hour. Every request is tracked
+          against the same five-nines SLA as live freight.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Button render={<Link href="/" />} nativeButton={false} variant="outline" className="font-medium">
             Back to home
-          </Button>
-          <Button
-            onClick={() => setSubmitted(null)}
-            variant="ghost"
-            className="font-mono text-xs uppercase tracking-wider"
-          >
-            Submit another
           </Button>
         </div>
       </div>
@@ -70,7 +56,9 @@ export function RequestCapacityForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-border bg-card/50 p-6 sm:p-8">
+    <form action={formAction} className="rounded-xl border border-border bg-card/50 p-6 sm:p-8">
+      <input type="hidden" name="mode" value={mode} />
+      <input type="hidden" name="cadence" value={cadence} />
       <div className="flex flex-col gap-5">
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
@@ -180,9 +168,19 @@ export function RequestCapacityForm() {
           />
         </div>
 
-        <Button type="submit" size="lg" className="mt-1 font-medium">
-          Submit capacity request
-          <ArrowRight className="size-4" data-icon="inline-end" />
+        {state.status === "error" && (
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-md border border-primary/40 bg-primary/10 px-3 py-2.5 text-sm text-foreground"
+          >
+            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-primary" />
+            <span>{state.message}</span>
+          </div>
+        )}
+
+        <Button type="submit" size="lg" disabled={pending} className="mt-1 font-medium">
+          {pending ? "Submitting…" : "Submit capacity request"}
+          {!pending && <ArrowRight className="size-4" data-icon="inline-end" />}
         </Button>
         <p className="text-center font-mono text-[11px] tracking-wide text-muted-foreground/70">
           Response within one business hour · 24/7/365 control tower

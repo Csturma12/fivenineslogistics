@@ -1,7 +1,7 @@
 import { SiteHeader } from "@/components/site-header"
 import { Hero } from "@/components/hero"
 import { WhoWeServe } from "@/components/who-we-serve"
-import { Modes } from "@/components/modes"
+import { ModesTeaser } from "@/components/modes-teaser"
 import { Method } from "@/components/method"
 import { Reliability } from "@/components/reliability"
 import { DedicatedFleet } from "@/components/dedicated-fleet"
@@ -15,7 +15,7 @@ export default function Page() {
       <SiteHeader />
       <Hero />
       <WhoWeServe />
-      <Modes />
+      <ModesTeaser />
       <Method />
       <Reliability />
       <DedicatedFleet />
