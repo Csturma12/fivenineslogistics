@@ -32,9 +32,9 @@ export function NetworkCta() {
               ))}
             </div>
 
-            <div id="request-capacity" className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <Button
-                render={<Link href="mailto:dispatch@fivenines.freight" />}
+                render={<Link href="/request-capacity" />}
                 nativeButton={false}
                 size="lg"
                 className="font-medium"
@@ -43,7 +43,7 @@ export function NetworkCta() {
                 <ArrowRight className="size-4" data-icon="inline-end" />
               </Button>
               <Button
-                render={<Link href="mailto:dispatch@fivenines.freight" />}
+                render={<Link href="mailto:dispatch@fivenineslogistics.com" />}
                 nativeButton={false}
                 size="lg"
                 variant="outline"

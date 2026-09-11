@@ -1,5 +1,6 @@
 import { SiteHeader } from "@/components/site-header"
 import { Hero } from "@/components/hero"
+import { WhoWeServe } from "@/components/who-we-serve"
 import { Services } from "@/components/services"
 import { Reliability } from "@/components/reliability"
 import { NetworkCta } from "@/components/network-cta"
@@ -10,6 +11,7 @@ export default function Page() {
     <main>
       <SiteHeader />
       <Hero />
+      <WhoWeServe />
       <Services />
       <Reliability />
       <NetworkCta />

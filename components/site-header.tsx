@@ -30,7 +30,7 @@ export function SiteHeader() {
         </nav>
 
         <Button
-          render={<Link href="#request-capacity" />}
+          render={<Link href="/request-capacity" />}
           nativeButton={false}
           size="sm"
           className="font-medium"

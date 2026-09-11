@@ -96,8 +96,61 @@ export const hubs = [
 ]
 
 export const navLinks = [
+  { href: "#who-we-serve", label: "Who We Serve" },
   { href: "#network", label: "Network" },
   { href: "#services", label: "Services" },
   { href: "#reliability", label: "Reliability" },
-  { href: "#company", label: "Company" },
+]
+
+export const whoWeServe = {
+  eyebrow: "Who we serve",
+  heading: "The operations we serve. One tolerance for failure.",
+  intro:
+    "We don't chase every load. We work for the teams whose delivery date is written into a commissioning schedule, a shutdown window, or a go-live. These are a few of them — the standard is the same for every one.",
+}
+
+export type Sector = {
+  code: string
+  title: string
+  description: string
+  points: string[]
+}
+
+export const sectors: Sector[] = [
+  {
+    code: "Data centers",
+    title: "Long-lead gear, delivered to the day",
+    description:
+      "Switchgear, generators, and transformers are ordered months out and installed in a window measured in hours. We stage, sequence, and deliver against your look-ahead, with a written method of procedure for every live-site drop.",
+    points: [
+      "Switchgear and PDUs",
+      "Generators and UPS systems",
+      "Transformers and busway",
+      "Rack-and-stack inbound",
+    ],
+  },
+  {
+    code: "Oil and gas",
+    title: "Turnaround and hotshot freight that shows up",
+    description:
+      "Ship Channel refineries, chemical plants, and field operations run on schedules with no slack. We move the part that keeps a unit down, and the flatbed loads that get a project restarted.",
+    points: [
+      "Turnaround and shutdown parts",
+      "Valves, pumps, and rotating equipment",
+      "Pipe, spools, and structural",
+      "Same-day hotshot, any hour",
+    ],
+  },
+  {
+    code: "Mission-critical contractors",
+    title: "Job-site freight for the builds that can't slip",
+    description:
+      "General and electrical contractors on hospital, utility, telecom, and industrial work get one point of contact, a plan for every delivery, and a straight answer when something moves.",
+    points: [
+      "Owner-furnished equipment (OFCI)",
+      "Laydown-yard staging",
+      "Oversize and permitted moves",
+      "Crane-coordinated deliveries",
+    ],
+  },
 ]
