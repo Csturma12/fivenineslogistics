@@ -24,12 +24,12 @@ export default function RequestCapacityPage() {
                 </span>
               </div>
               <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl">
-                Request capacity.
+                Tell us what can&apos;t be late.
               </h1>
               <p className="mt-5 max-w-md text-pretty text-base leading-relaxed text-muted-foreground">
-                Tell us the lane and the window. A dispatch coordinator confirms capacity and pricing
-                within one business hour — and it's tracked against the same five-nines SLA as live
-                freight from the moment you submit.
+                Give us the lane, the mode, and the window. A dispatcher confirms capacity and
+                pricing within one business hour, around the clock — and it&apos;s tracked against
+                the same five-nines SLA as live freight from the moment you submit.
               </p>
 
               <dl className="mt-10 flex flex-col gap-6 border-t border-border pt-8">

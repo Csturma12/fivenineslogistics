@@ -5,7 +5,17 @@ import Link from "next/link"
 import { ArrowRight, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-const modes = ["Full Truckload", "Drayage & Intermodal", "Expedited", "Warehousing & Cross-Dock"]
+const modes = [
+  "Flatbed",
+  "Expedited",
+  "Drayage",
+  "Hotshot",
+  "Box truck",
+  "Oversize & heavy haul",
+  "Ocean",
+  "LTL",
+  "Not sure yet",
+]
 const cadences = ["One-time", "Weekly", "Daily", "Dedicated capacity"]
 
 const inputClass =

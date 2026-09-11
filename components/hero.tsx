@@ -12,18 +12,18 @@ export function Hero() {
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
               <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                SLA-Grade Freight Operations
+                99.999% availability &middot; five minutes of downtime a year
               </span>
             </div>
 
             <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Freight reliability, measured to five nines.
+              Freight held to the standard your facility runs on.
             </h1>
 
             <p className="mt-5 max-w-lg text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Five Nines Logistics applies infrastructure-grade monitoring and SLA discipline to
-              physical freight. Every lane is instrumented, every exception is caught early, and
-              every load is held to 99.999% — so it arrives on schedule, without exception.
+              Five nines is the availability target a data center is engineered to. A refinery
+              turnaround runs on the same math. We built a Houston freight brokerage around it:
+              every load planned like it can&apos;t fail, because for our customers it can&apos;t.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -56,15 +56,15 @@ export function Hero() {
               </div>
               <div>
                 <dt className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Coverage
+                  Dispatch
                 </dt>
-                <dd className="mt-1 font-mono text-xl font-semibold text-foreground">24/7/365</dd>
+                <dd className="mt-1 font-mono text-xl font-semibold text-foreground">24/7</dd>
               </div>
               <div>
                 <dt className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Lanes
+                  Coverage
                 </dt>
-                <dd className="mt-1 font-mono text-xl font-semibold text-foreground">2,400+</dd>
+                <dd className="mt-1 font-mono text-xl font-semibold text-foreground">48 STATES</dd>
               </div>
             </dl>
           </div>

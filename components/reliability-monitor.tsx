@@ -66,6 +66,9 @@ export function ReliabilityMonitor() {
             />
           ))}
         </div>
+        <p className="mt-3 font-mono text-[11px] text-muted-foreground">
+          A year at five nines: 525,600 min up, 5.26 down.
+        </p>
       </div>
 
       {/* Live lane feed */}

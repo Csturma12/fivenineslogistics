@@ -1,50 +1,133 @@
 export const site = {
   name: "Five Nines Logistics",
   short: "5N",
-  tagline: "Reliability measured to five nines.",
+  tagline: "Freight held to the standard your facility runs on.",
   domain: "fivenineslogistics.com",
+  agentOf: "An agent of Primary Freight LLC",
+  location: "Houston, TX",
+  quotesEmail: "quotes@fivenineslogistics.com",
+  dispatchEmail: "dispatch@fivenineslogistics.com",
 }
 
-export type Service = {
-  code: string
+export type Mode = {
+  name: string
+  tier: "Core" | "Full service"
+  description: string
+}
+
+export const modesIntro = {
+  eyebrow: "Modes",
+  heading: "Deep in five. Capable across all of it.",
+  intro:
+    "Our team spent years running flatbed, expedited, drayage, hotshot, and box truck freight before this company had a name. Everything else we handle through partners we've moved thousands of loads with.",
+}
+
+export const modes: Mode[] = [
+  {
+    name: "Flatbed",
+    tier: "Core",
+    description: "Step deck, RGN, conestoga. Tarped, chained, and permitted when it needs to be.",
+  },
+  {
+    name: "Expedited",
+    tier: "Core",
+    description: "Team drivers, dedicated trucks, and an answer within the hour, day or night.",
+  },
+  {
+    name: "Drayage",
+    tier: "Core",
+    description: "Port of Houston and Gulf terminals. Chassis, LFD tracking, and demurrage avoidance.",
+  },
+  {
+    name: "Hotshot",
+    tier: "Core",
+    description: "Gooseneck and one-ton capacity across Texas and the Gulf for the part that can't wait.",
+  },
+  {
+    name: "Box truck",
+    tier: "Core",
+    description: "Liftgate, inside delivery, and final-mile into live facilities.",
+  },
+  {
+    name: "Oversize & heavy haul",
+    tier: "Full service",
+    description: "Permits, escorts, and route surveys for transformers, vessels, and modules.",
+  },
+  {
+    name: "Ocean",
+    tier: "Full service",
+    description: "FCL and LCL through the largest global carriers, with drayage on both ends.",
+  },
+  {
+    name: "LTL",
+    tier: "Full service",
+    description: "Volume and standard LTL with the carriers that still hit appointment times.",
+  },
+]
+
+export type MethodStep = {
+  n: string
   title: string
   description: string
-  metricLabel: string
-  metricValue: string
 }
 
-export const services: Service[] = [
+export const methodIntro = {
+  eyebrow: "How we run a critical load",
+  heading: "The same four steps, every time.",
+  intro:
+    "Reliability isn't a promise. It's a procedure. This is what happens between your call and your dock.",
+}
+
+export const methodSteps: MethodStep[] = [
   {
-    code: "FTL",
-    title: "Full Truckload",
+    n: "STEP 1",
+    title: "Plan",
     description:
-      "Dry van and reefer capacity dispatched from a vetted carrier network and monitored dock to dock, not just tendered and forgotten.",
-    metricLabel: "TRANSIT VARIANCE",
-    metricValue: "±4 MIN",
+      "We write a method of procedure for the move: dimensions, equipment, site access, crane windows, permits, and a fallback if the primary truck has a problem.",
   },
   {
-    code: "INT",
-    title: "Drayage & Intermodal",
+    n: "STEP 2",
+    title: "Source",
     description:
-      "Port and rail drayage timed to vessel and rail windows, with appointment tracking that catches slippage before it becomes a miss.",
-    metricLabel: "APPOINTMENT HIT RATE",
-    metricValue: "98.9%",
+      "First call goes to our sister asset carriers, Just Drive Transportation and Primary Transportation. Then to a vetted bench we've run for years. No load boards for critical freight.",
   },
   {
-    code: "EXP",
-    title: "Expedited",
+    n: "STEP 3",
+    title: "Track",
     description:
-      "Hot-shot and team-driver dispatch for zero-slack freight, held to the same five-nines SLA as every other lane on the network.",
-    metricLabel: "DISPATCH RESPONSE",
-    metricValue: "<30 MIN",
+      "Live location on every load, check calls at every milestone, and a person who calls you before you have to call us.",
   },
   {
-    code: "WHC",
-    title: "Warehousing & Cross-Dock",
+    n: "STEP 4",
+    title: "Report",
     description:
-      "Monitored dock-to-dock transfer and short-term storage with the same instrumentation that governs our line-haul network.",
-    metricLabel: "INVENTORY ACCURACY",
-    metricValue: "99.98%",
+      "On-time percentage, claims, and tender acceptance, monthly, unasked. You measure your facility in nines. Measure us the same way.",
+  },
+]
+
+export type CapacityBlock = {
+  title: string
+  description: string
+  partners: string[]
+}
+
+export const capacityIntro = {
+  eyebrow: "Capacity",
+  heading: "Assets we control. Partners we've proven.",
+}
+
+export const capacityBlocks: CapacityBlock[] = [
+  {
+    title: "Sister asset carriers",
+    description:
+      "Five Nines operates as an agent of Primary Freight LLC. That puts two asset-based carriers at the front of our dispatch list: Just Drive Transportation and Primary Transportation. When a load can't go to the open market, it doesn't.",
+    partners: ["Just Drive Transportation", "Primary Transportation", "Primary Freight LLC"],
+  },
+  {
+    title: "Global ocean & drayage",
+    description:
+      "Through partnerships with the largest and most efficient global shipping companies, our network moves containers for global motorsport series, athletic and retail brands, and the biggest names in e-commerce. The same lanes, terminals, and people handle your freight.",
+    partners: ["Port of Houston", "Gulf Coast terminals", "Global ocean carriers"],
   },
 ]
 
@@ -64,7 +147,7 @@ export const ninesLadder: NinesRow[] = [
 
 export const reliabilityStats = [
   { value: "99.999%", label: "On-time arrival, trailing 90 days" },
-  { value: "<5 min", label: "Average dispatch response" },
+  { value: "<1 hr", label: "Answer from dispatch, any hour" },
   { value: "24/7/365", label: "Control tower coverage" },
   { value: "0", label: "Missed SLA windows, this quarter" },
 ]
@@ -77,29 +160,30 @@ export type Lane = {
 }
 
 export const lanes: Lane[] = [
-  { id: "LN-2291", route: "CHI → DAL", status: "ON SCHEDULE", eta: "ETA 14:20" },
-  { id: "LN-1187", route: "ATL → MIA", status: "ON SCHEDULE", eta: "ETA 09:05" },
-  { id: "LN-3402", route: "LAX → PHX", status: "ARRIVING", eta: "ETA 6 MIN" },
-  { id: "LN-0876", route: "SEA → DEN", status: "ON SCHEDULE", eta: "ETA 21:40" },
-  { id: "LN-4519", route: "EWR → BOS", status: "MONITORING", eta: "ETA 11:52" },
+  { id: "LN-2291", route: "HOU → DFW", status: "ON SCHEDULE", eta: "ETA 14:20" },
+  { id: "LN-1187", route: "HOU → BTR", status: "ON SCHEDULE", eta: "ETA 09:05" },
+  { id: "LN-3402", route: "PORT → HOU", status: "ARRIVING", eta: "ETA 6 MIN" },
+  { id: "LN-0876", route: "HOU → MID", status: "ON SCHEDULE", eta: "ETA 21:40" },
+  { id: "LN-4519", route: "HOU → NOLA", status: "MONITORING", eta: "ETA 11:52" },
 ]
 
 export const hubs = [
-  { code: "ORD", city: "Chicago" },
+  { code: "HOU", city: "Houston" },
   { code: "DFW", city: "Dallas" },
-  { code: "ATL", city: "Atlanta" },
-  { code: "LAX", city: "Los Angeles" },
-  { code: "EWR", city: "Newark" },
-  { code: "SEA", city: "Seattle" },
-  { code: "MIA", city: "Miami" },
-  { code: "DEN", city: "Denver" },
+  { code: "SAT", city: "San Antonio" },
+  { code: "PORT", city: "Port of Houston" },
+  { code: "BTR", city: "Baton Rouge" },
+  { code: "NOLA", city: "New Orleans" },
+  { code: "MID", city: "Midland" },
+  { code: "MOB", city: "Mobile" },
 ]
 
 export const navLinks = [
   { href: "#who-we-serve", label: "Who We Serve" },
-  { href: "#network", label: "Network" },
-  { href: "#services", label: "Services" },
+  { href: "#modes", label: "Modes" },
+  { href: "#method", label: "How We Run" },
   { href: "#reliability", label: "Reliability" },
+  { href: "#network", label: "Network" },
 ]
 
 export const whoWeServe = {
