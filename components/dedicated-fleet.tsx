@@ -22,7 +22,7 @@ const stats = [
 
 export function DedicatedFleet() {
   return (
-    <section id="fleet" className="border-t border-border bg-secondary/40">
+    <section id="fleet" className="border-t border-border bg-secondary/80">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
           <div>
