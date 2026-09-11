@@ -52,7 +52,7 @@ export function SiteFooter() {
         <div className="mt-12 flex flex-col gap-2 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-1 font-mono">
             <span>© {new Date().getFullYear()} Five Nines Logistics LLC · Houston, Texas</span>
-            <span>An agent of Primary Freight LLC · MC 000000 · USDOT 0000000</span>
+            <span>An agent of Primary Freight LLC · MC# 841023</span>
           </div>
           <p className="font-mono text-foreground/80">99.999% is a standard, not a slogan.</p>
         </div>

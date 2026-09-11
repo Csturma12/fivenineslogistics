@@ -4,6 +4,8 @@ export const site = {
   tagline: "Freight held to the standard your facility runs on.",
   domain: "fivenineslogistics.com",
   agentOf: "An agent of Primary Freight LLC",
+  authority: "Primary Freight LLC",
+  mc: "MC# 841023",
   location: "Houston, TX",
   quotesEmail: "quotes@fivenineslogistics.com",
   dispatchEmail: "dispatch@fivenineslogistics.com",
@@ -50,18 +52,19 @@ export const modes: Mode[] = [
   },
   {
     name: "Oversize & heavy haul",
-    tier: "Full service",
+    tier: "Core",
     description: "Permits, escorts, and route surveys for transformers, vessels, and modules.",
   },
   {
     name: "Ocean",
-    tier: "Full service",
+    tier: "Core",
     description: "FCL and LCL through the largest global carriers, with drayage on both ends.",
   },
   {
     name: "LTL",
-    tier: "Full service",
-    description: "Volume and standard LTL with the carriers that still hit appointment times.",
+    tier: "Core",
+    description:
+      "Volume and standard LTL, plus flatbed LTL, with the carriers that still hit appointment times.",
   },
 ]
 
@@ -176,6 +179,15 @@ export const hubs = [
   { code: "NOLA", city: "New Orleans" },
   { code: "MID", city: "Midland" },
   { code: "MOB", city: "Mobile" },
+]
+
+export const heroSpec: { label: string; value: string }[] = [
+  { label: "Base", value: "Houston, Texas" },
+  { label: "Coverage", value: "48 states, Gulf ports, global ocean" },
+  { label: "Core modes", value: "Flatbed · Expedited · Drayage · Hotshot" },
+  { label: "Also core", value: "Box truck · Oversize · Ocean · LTL" },
+  { label: "Authority", value: "Primary Freight LLC, MC# 841023" },
+  { label: "Dispatch", value: "24 hours, every day" },
 ]
 
 export const navLinks = [

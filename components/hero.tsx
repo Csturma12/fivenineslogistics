@@ -21,7 +21,7 @@ export function Hero() {
             </h1>
 
             <p className="mt-5 max-w-lg text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Five nines is the availability target a data center is engineered to. A refinery
+              Five nines is the uptime target a data center is engineered to. A refinery
               turnaround runs on the same math. We built a Houston freight brokerage around it:
               every load planned like it can&apos;t fail, because for our customers it can&apos;t.
             </p>
