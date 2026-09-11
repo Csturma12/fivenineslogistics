@@ -1,3 +1,6 @@
+import Link from "next/link"
+import { ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { whoWeServe, sectors } from "@/lib/site"
 
 export function WhoWeServe() {
@@ -41,6 +44,19 @@ export function WhoWeServe() {
               </ul>
             </div>
           ))}
+        </div>
+
+        <div className="mt-8">
+          <Button
+            render={<Link href="/who-we-serve" />}
+            nativeButton={false}
+            size="lg"
+            variant="outline"
+            className="font-medium"
+          >
+            See how we serve each sector
+            <ArrowRight className="size-4" data-icon="inline-end" />
+          </Button>
         </div>
       </div>
     </section>

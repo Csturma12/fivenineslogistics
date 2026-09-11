@@ -6,15 +6,23 @@ export const site = {
   agentOf: "An agent of Primary Freight LLC",
   authority: "Primary Freight LLC",
   mc: "MC# 841023",
+  // PLACEHOLDER — swap for the real USDOT number when available.
+  usdot: "USDOT# pending",
+  // PLACEHOLDER — 555-01xx is a reserved fictional range. Replace display + href with the real dispatch line.
+  phone: "(713) 555-0199",
+  phoneHref: "tel:+17135550199",
+  // PLACEHOLDER — confirm actual coverage limits with your certificate of insurance.
+  insurance: "$1M auto liability · $100K cargo",
   location: "Houston, TX",
   quotesEmail: "quotes@fivenineslogistics.com",
   dispatchEmail: "dispatch@fivenineslogistics.com",
+  carriersEmail: "carriers@fivenineslogistics.com",
 }
 
 export type Mode = {
   name: string
   slug: string
-  tier: "Core" | "Full service"
+  tier: "In-house" | "Partner network"
   description: string
   detail: string
   equipment: string[]
@@ -32,7 +40,7 @@ export const modes: Mode[] = [
   {
     name: "Flatbed",
     slug: "flatbed",
-    tier: "Core",
+    tier: "In-house",
     description: "Step deck, RGN, conestoga. Tarped, chained, and permitted when it needs to be.",
     detail:
       "Open-deck freight is where we started. We spec the right trailer for the dimensions and weight, secure it to standard, and permit the load when it runs over legal. Tarping, chaining, and dunnage are planned before the truck shows up, not figured out at the dock.",
@@ -42,7 +50,7 @@ export const modes: Mode[] = [
   {
     name: "Expedited",
     slug: "expedited",
-    tier: "Core",
+    tier: "In-house",
     description: "Team drivers, dedicated trucks, and an answer within the hour, day or night.",
     detail:
       "When the clock is the constraint, we run team drivers and dedicated equipment straight through. You get a committed pickup, a hard ETA, and a coordinator who calls you before you have to call us.",
@@ -52,7 +60,7 @@ export const modes: Mode[] = [
   {
     name: "Drayage",
     slug: "drayage",
-    tier: "Core",
+    tier: "In-house",
     description: "Port of Houston and Gulf terminals. Chassis, LFD tracking, and demurrage avoidance.",
     detail:
       "We run containers in and out of the Port of Houston and Gulf terminals with our own dispatch discipline: chassis lined up, last-free-day tracked, and appointments booked so boxes move before demurrage and per-diem start stacking up.",
@@ -62,7 +70,7 @@ export const modes: Mode[] = [
   {
     name: "Hotshot",
     slug: "hotshot",
-    tier: "Core",
+    tier: "In-house",
     description: "Gooseneck and one-ton capacity across Texas and the Gulf for the part that can't wait.",
     detail:
       "One-ton and gooseneck capacity staged across Texas and the Gulf for the load that can't wait for a full truck. Fast to dispatch, cheaper than a full flatbed, and ideal for the single skid or piece of equipment holding up a job.",
@@ -72,7 +80,7 @@ export const modes: Mode[] = [
   {
     name: "Box truck",
     slug: "box-truck",
-    tier: "Core",
+    tier: "In-house",
     description: "Liftgate, inside delivery, and final-mile into live facilities.",
     detail:
       "Final-mile and inside delivery into live facilities where a 53' can't dock. Liftgate, pallet jack, and drivers who know a delivery into an occupied building is different from a warehouse drop.",
@@ -82,7 +90,7 @@ export const modes: Mode[] = [
   {
     name: "Oversize & heavy haul",
     slug: "oversize-heavy-haul",
-    tier: "Core",
+    tier: "Partner network",
     description: "Permits, escorts, and route surveys for transformers, vessels, and modules.",
     detail:
       "Over-dimensional and superload freight, planned from the route backward. We handle state permits, pilot cars and police escorts, pole trucks, and route surveys for the moves where a bridge clearance or a turn radius decides the schedule.",
@@ -92,7 +100,7 @@ export const modes: Mode[] = [
   {
     name: "Ocean",
     slug: "ocean",
-    tier: "Core",
+    tier: "Partner network",
     description: "FCL and LCL through the largest global carriers, with drayage on both ends.",
     detail:
       "FCL and LCL through the largest and most efficient global carriers, with drayage handled on both ends of the water. The same network that moves containers for global motorsport series and top e-commerce brands handles your freight.",
@@ -102,7 +110,7 @@ export const modes: Mode[] = [
   {
     name: "LTL",
     slug: "ltl",
-    tier: "Core",
+    tier: "Partner network",
     description:
       "Volume and standard LTL, plus flatbed LTL, with the carriers that still hit appointment times.",
     detail:
@@ -237,11 +245,21 @@ export const heroSpec: { label: string; value: string }[] = [
 ]
 
 export const navLinks = [
-  { href: "/#who-we-serve", label: "Who We Serve" },
+  { href: "/who-we-serve", label: "Who We Serve" },
   { href: "/modes", label: "Modes" },
+  { href: "/carriers", label: "Carriers" },
+  { href: "/company", label: "Company" },
+]
+
+export const footerLinks = [
+  { href: "/who-we-serve", label: "Who We Serve" },
+  { href: "/modes", label: "Modes" },
+  { href: "/carriers", label: "Carriers" },
+  { href: "/company", label: "Company" },
   { href: "/#method", label: "How We Run" },
   { href: "/#reliability", label: "Reliability" },
   { href: "/#network", label: "Network" },
+  { href: "/request-capacity", label: "Request Capacity" },
 ]
 
 export const whoWeServe = {
@@ -296,3 +314,105 @@ export const sectors: Sector[] = [
     ],
   },
 ]
+
+/* ---------- Who We Serve page ---------- */
+
+export const whoWeServePage = {
+  eyebrow: "Who we serve",
+  heading: "Freight for operations that measure downtime in dollars per minute.",
+  intro:
+    "Every shipper says their freight is important. The teams we work for can name the exact cost of a missed window, because it's already written into a commissioning schedule, a turnaround plan, or a launch date. That is the freight we're built for.",
+  closing: {
+    heading: "One tolerance for failure, whatever you move.",
+    body: "We don't run a different playbook by industry. Whether it's a transformer for a data hall or a valve for a refinery turnaround, the same method of procedure, the same asset-first sourcing, and the same reporting apply to every load.",
+  },
+}
+
+/* ---------- Company / About page ---------- */
+
+export const companyPage = {
+  eyebrow: "Company",
+  heading: "We ran critical freight for years before we put a name on it.",
+  intro:
+    "Five Nines Logistics is the freight brand for operators who treat a delivery date the way an engineer treats uptime. We operate as an agent of Primary Freight LLC, with asset-based sister carriers on speed dial and a global partner network behind them.",
+}
+
+export type CompanyValue = {
+  title: string
+  body: string
+}
+
+export const companyStory: CompanyValue[] = [
+  {
+    title: "Where we come from",
+    body: "Our team spent years dispatching flatbed, expedited, drayage, hotshot, and box-truck freight across Texas and the Gulf before this company had a name. Five Nines is that experience, organized around a single promise: the load arrives when we said it would.",
+  },
+  {
+    title: "How we're structured",
+    body: "We operate as an agent of Primary Freight LLC. That gives us two asset-based sister carriers, Just Drive Transportation and Primary Transportation, at the front of every dispatch decision, backed by a vetted partner network for the modes and lanes we don't run ourselves.",
+  },
+  {
+    title: "Why 'five nines'",
+    body: "99.999% uptime is the standard mission-critical facilities hold their own systems to. It's the standard your freight partner should meet too. We borrowed the language on purpose, and we report against it every month.",
+  },
+]
+
+export type Credential = {
+  label: string
+  value: string
+}
+
+export const credentials: Credential[] = [
+  { label: "Operating authority", value: "Primary Freight LLC" },
+  { label: "MC number", value: "MC# 841023" },
+  { label: "USDOT", value: "USDOT# pending" },
+  { label: "Insurance", value: "$1M auto liability · $100K cargo" },
+  { label: "Base of operations", value: "Houston, Texas" },
+  { label: "Dispatch coverage", value: "24 hours, every day" },
+]
+
+/* ---------- Carriers / Haul for us page ---------- */
+
+export const carriersPage = {
+  eyebrow: "Carriers",
+  heading: "Haul for Five Nines.",
+  intro:
+    "We move critical freight for shippers who don't tolerate surprises, which means we need carriers who run the same way. If you keep your equipment tight, your communication tighter, and you show up when you said you would, we want you on the bench.",
+}
+
+export type CarrierBenefit = {
+  title: string
+  body: string
+}
+
+export const carrierBenefits: CarrierBenefit[] = [
+  {
+    title: "Freight worth the deadhead",
+    body: "We book asset carriers first and keep them loaded. Steady, planned freight on the lanes you already run, not a load board race to the bottom.",
+  },
+  {
+    title: "Dispatch that answers",
+    body: "One point of contact who picks up, day or night. No sitting on hold, no chasing a rate con, no guessing where your next load is coming from.",
+  },
+  {
+    title: "Rates that respect the work",
+    body: "Fair, up-front pricing for the service we ask for. When a load runs hot or takes extra handling, that's in the rate, not a fight after delivery.",
+  },
+  {
+    title: "Quick pay & factoring-friendly",
+    body: "We work with your factoring company and offer quick-pay options so you're not financing our freight while you wait on a check.",
+  },
+]
+
+export const carrierRequirements: string[] = [
+  "Active operating authority (MC/DOT) in good standing",
+  "$1M auto liability & $100K cargo insurance minimum",
+  "Satisfactory or unrated FMCSA safety rating",
+  "ELD-compliant and able to send tracking / check calls",
+  "W-9 and signed carrier packet on file before first load",
+]
+
+export const carrierPartners = {
+  heading: "Partnerships are the point.",
+  body: "Our best lanes run on carriers we've hauled with for years. Get on the bench once, prove you run clean, and you become a first call, not a last resort. That's how we've built every relationship that matters to this company.",
+}

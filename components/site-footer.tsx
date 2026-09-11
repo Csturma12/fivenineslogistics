@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { FiveNinesMark } from "@/components/five-nines-mark"
-import { navLinks } from "@/lib/site"
+import { footerLinks, site } from "@/lib/site"
 
 export function SiteFooter() {
   return (
@@ -27,7 +27,7 @@ export function SiteFooter() {
                 Company
               </span>
               <ul className="mt-3 space-y-2 text-sm">
-                {navLinks.map((link) => (
+                {footerLinks.map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} className="text-navy-foreground/70 hover:text-navy-foreground">
                       {link.label}
@@ -42,8 +42,18 @@ export function SiteFooter() {
               </span>
               <ul className="mt-3 space-y-2 text-sm text-navy-foreground/70">
                 <li>
-                  <a href="mailto:dispatch@fivenineslogistics.com" className="hover:text-navy-foreground">
-                    dispatch@fivenineslogistics.com
+                  <a href={site.phoneHref} className="font-mono hover:text-navy-foreground">
+                    {site.phone}
+                  </a>
+                </li>
+                <li>
+                  <a href={`mailto:${site.dispatchEmail}`} className="hover:text-navy-foreground">
+                    {site.dispatchEmail}
+                  </a>
+                </li>
+                <li>
+                  <a href={`mailto:${site.carriersEmail}`} className="hover:text-navy-foreground">
+                    {site.carriersEmail}
                   </a>
                 </li>
                 <li>Control tower: 24/7/365</li>
