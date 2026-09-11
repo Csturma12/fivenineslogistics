@@ -53,7 +53,7 @@ export function ReliabilityMonitor() {
       <div className="px-5 py-5">
         <div className="mb-2 flex items-center justify-between">
           <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-            90-day uptime record
+            90-day reliability record
           </span>
           <span className="font-mono text-[11px] text-muted-foreground">1 flagged / {DAYS}</span>
         </div>

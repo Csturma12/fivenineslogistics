@@ -59,7 +59,7 @@ export const ninesLadder: NinesRow[] = [
   { level: "99%", downtimePerYear: "3 days, 15 hours", tier: "Uncommitted freight" },
   { level: "99.9%", downtimePerYear: "8 hours, 45 minutes", tier: "Premium carriers" },
   { level: "99.99%", downtimePerYear: "52 minutes, 34 seconds", tier: "Managed logistics" },
-  { level: "99.999%", downtimePerYear: "5 minutes, 15 seconds", tier: "Five Nines", highlight: true },
+  { level: "99.999%", downtimePerYear: "5 minutes, 15 seconds", tier: "Five Nines SLA", highlight: true },
 ]
 
 export const reliabilityStats = [

@@ -7,9 +7,9 @@ const _geistSans = Geist({ subsets: ['latin'] })
 const _geistMono = Geist_Mono({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Five Nines | Freight Held to 99.999% Reliability',
+  title: 'Five Nines Logistics | Freight Held to 99.999% Reliability',
   description:
-    'Five Nines runs freight operations with infrastructure-grade discipline — instrumented, monitored, and held to 99.999% on-time reliability. Full truckload, drayage, expedited, and warehousing.',
+    'Five Nines Logistics runs freight operations with infrastructure-grade discipline — instrumented, monitored, and held to 99.999% on-time reliability. Full truckload, drayage, expedited, and warehousing.',
   generator: 'v0.app',
   icons: {
     icon: [

@@ -38,7 +38,7 @@ export function CoverageMap() {
         <span className="font-mono text-xs uppercase tracking-wider text-primary">8 hubs live</span>
       </div>
 
-      <svg viewBox="0 0 100 100" className="w-full flex-1" role="img" aria-label="Five Nines gateway network map">
+      <svg viewBox="0 0 100 100" className="w-full flex-1" role="img" aria-label="Five Nines Logistics gateway network map">
         {links.map(([a, b]) => {
           const from = positions[a]
           const to = positions[b]

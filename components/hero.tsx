@@ -17,13 +17,13 @@ export function Hero() {
             </div>
 
             <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Freight reliability, measured like uptime.
+              Freight reliability, measured to five nines.
             </h1>
 
             <p className="mt-5 max-w-lg text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Five Nines applies infrastructure-grade monitoring and SLA discipline to physical
-              freight. Every lane is instrumented, every exception is caught early, and every
-              load is held to 99.999% — so it arrives on schedule, without exception.
+              Five Nines Logistics applies infrastructure-grade monitoring and SLA discipline to
+              physical freight. Every lane is instrumented, every exception is caught early, and
+              every load is held to 99.999% — so it arrives on schedule, without exception.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">

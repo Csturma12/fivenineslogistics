@@ -10,10 +10,10 @@ export function Reliability() {
             The math behind the name.
           </h2>
           <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-            &ldquo;Five nines&rdquo; is SLA vocabulary borrowed from data-center uptime — 99.999%
-            availability, the highest tier a system can commit to. We hold physical freight to
-            the same standard: over a full year, that&apos;s just over five minutes where a load
-            is unaccounted for.
+            &ldquo;Five nines&rdquo; is SLA vocabulary borrowed from infrastructure availability
+            targets — 99.999% reliability, the highest tier a system can commit to. We hold
+            physical freight to the same standard: over a full year, that&apos;s just over five
+            minutes where a load is unaccounted for.
           </p>
         </div>
 

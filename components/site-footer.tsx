@@ -8,9 +8,9 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
           <div className="max-w-xs">
-            <Link href="/" className="flex items-center gap-2.5" aria-label="Five Nines home">
+            <Link href="/" className="flex items-center gap-2.5" aria-label="Five Nines Logistics home">
               <FiveNinesMark className="h-7 w-7 shrink-0" />
-              <span className="text-sm font-semibold tracking-tight text-foreground">FIVE NINES</span>
+              <span className="text-sm font-semibold tracking-tight text-foreground">FIVE NINES LOGISTICS</span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Freight operations engineered to 99.999% reliability. Instrumented, monitored, and
@@ -39,8 +39,8 @@ export function SiteFooter() {
               </span>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <a href="mailto:dispatch@fivenines.freight" className="hover:text-foreground">
-                    dispatch@fivenines.freight
+                  <a href="mailto:dispatch@fivenineslogistics.com" className="hover:text-foreground">
+                    dispatch@fivenineslogistics.com
                   </a>
                 </li>
                 <li>Control tower: 24/7/365</li>
