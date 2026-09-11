@@ -13,8 +13,11 @@ export function SiteFooter() {
               <span className="text-sm font-semibold tracking-tight text-foreground">FIVE NINES LOGISTICS</span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              A Houston freight brokerage built around the 99.999% availability standard. Every
-              load planned like it can&apos;t fail — because for our customers, it can&apos;t.
+              Five Nines operates as the mission-critical agency of Primary Freight LLC. Backed by
+              assets and tier-five partners, we run on the same clock our customers do — 24/7/365.
+              When a load can&apos;t go to the open market, it doesn&apos;t. Built around the 99.999%
+              availability standard: every load planned like it can&apos;t fail — because for our
+              customers, it can&apos;t.
             </p>
           </div>
 
