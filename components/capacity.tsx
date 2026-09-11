@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { capacityBlocks, capacityIntro } from "@/lib/site"
 
 export function Capacity() {
@@ -12,6 +13,26 @@ export function Capacity() {
             {capacityIntro.heading}
           </h2>
         </div>
+
+        <figure className="relative mt-12 overflow-hidden rounded-xl border border-border">
+          <Image
+            src="/images/long-haul.png"
+            alt="A long-haul semi truck running an interstate at dusk"
+            width={1600}
+            height={720}
+            className="h-48 w-full object-cover sm:h-64 lg:h-80"
+            priority={false}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+          <figcaption className="absolute bottom-0 left-0 p-5 sm:p-6">
+            <span className="font-mono text-xs uppercase tracking-wider text-primary">
+              Long haul
+            </span>
+            <p className="mt-1 max-w-md text-pretty text-sm leading-relaxed text-foreground/90">
+              48-state coverage on dedicated and one-way lanes — planned like it can&apos;t fail.
+            </p>
+          </figcaption>
+        </figure>
 
         <div className="mt-12 grid gap-px overflow-hidden rounded-xl border border-border bg-border lg:grid-cols-2">
           {capacityBlocks.map((block) => (
