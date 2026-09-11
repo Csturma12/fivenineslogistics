@@ -4,15 +4,15 @@ import { navLinks } from "@/lib/site"
 
 export function SiteFooter() {
   return (
-    <footer id="company" className="border-t border-border">
+    <footer id="company" className="bg-navy text-navy-foreground">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
           <div className="max-w-xs">
             <Link href="/" className="flex items-center gap-2.5" aria-label="Five Nines Logistics home">
               <FiveNinesMark className="h-7 w-7 shrink-0" />
-              <span className="text-sm font-semibold tracking-tight text-foreground">FIVE NINES LOGISTICS</span>
+              <span className="text-sm font-semibold tracking-tight text-navy-foreground">FIVE NINES LOGISTICS</span>
             </Link>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-4 text-sm leading-relaxed text-navy-foreground/70">
               Five Nines operates as the mission-critical agency of Primary Freight LLC. Backed by
               assets and tier-five partners, we run on the same clock our customers do — 24/7/365.
               When a load can&apos;t go to the open market, it doesn&apos;t. Built around the 99.999%
@@ -23,13 +23,13 @@ export function SiteFooter() {
 
           <div className="flex flex-wrap gap-10 sm:gap-16">
             <div>
-              <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-navy-foreground/60">
                 Company
               </span>
               <ul className="mt-3 space-y-2 text-sm">
                 {navLinks.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="text-muted-foreground hover:text-foreground">
+                    <Link href={link.href} className="text-navy-foreground/70 hover:text-navy-foreground">
                       {link.label}
                     </Link>
                   </li>
@@ -37,12 +37,12 @@ export function SiteFooter() {
               </ul>
             </div>
             <div>
-              <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-navy-foreground/60">
                 Contact
               </span>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <ul className="mt-3 space-y-2 text-sm text-navy-foreground/70">
                 <li>
-                  <a href="mailto:dispatch@fivenineslogistics.com" className="hover:text-foreground">
+                  <a href="mailto:dispatch@fivenineslogistics.com" className="hover:text-navy-foreground">
                     dispatch@fivenineslogistics.com
                   </a>
                 </li>
@@ -52,12 +52,12 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-end sm:justify-between">
+        <div className="mt-12 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-navy-foreground/60 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-1 font-mono">
             <span>© {new Date().getFullYear()} Five Nines Logistics LLC · Houston, Texas</span>
             <span>An agent of Primary Freight LLC · MC# 841023</span>
           </div>
-          <p className="font-mono text-foreground/80">99.999% is a standard, not a slogan.</p>
+          <p className="font-mono text-navy-foreground/80">99.999% is a standard, not a slogan.</p>
         </div>
       </div>
     </footer>
