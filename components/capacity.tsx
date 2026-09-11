@@ -23,12 +23,12 @@ export function Capacity() {
             className="h-48 w-full object-cover sm:h-64 lg:h-80"
             priority={false}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10" />
           <figcaption className="absolute bottom-0 left-0 p-5 sm:p-6">
             <span className="font-mono text-xs uppercase tracking-wider text-primary">
               Long haul
             </span>
-            <p className="mt-1 max-w-md text-pretty text-sm leading-relaxed text-foreground/90">
+            <p className="mt-1 max-w-md text-pretty text-sm leading-relaxed text-white/90">
               48-state coverage on dedicated and one-way lanes — planned like it can&apos;t fail.
             </p>
           </figcaption>
