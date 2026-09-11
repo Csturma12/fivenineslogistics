@@ -184,8 +184,10 @@ export const hubs = [
 export const heroSpec: { label: string; value: string }[] = [
   { label: "Base", value: "Houston, Texas" },
   { label: "Coverage", value: "48 states, Gulf ports, global ocean" },
-  { label: "Core modes", value: "Flatbed · Expedited · Drayage · Hotshot" },
-  { label: "Also core", value: "Box truck · Oversize · Ocean · LTL" },
+  {
+    label: "Core modes",
+    value: "Flatbed · Expedited · Drayage · Hotshot · Box truck · Oversize · Ocean · LTL",
+  },
   { label: "Authority", value: "Primary Freight LLC, MC# 841023" },
   { label: "Dispatch", value: "24 hours, every day" },
 ]
