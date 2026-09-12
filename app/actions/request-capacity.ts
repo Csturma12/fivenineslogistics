@@ -2,9 +2,12 @@
 
 import { Resend } from "resend"
 
+// Where production leads should land once the domain is verified.
+const PRODUCTION_LEAD_INBOX = "sturma@blbxcritical.com"
+
 // TEMP (testing): until fivenineslogistics.com is verified in Resend, the sandbox sender
 // (onboarding@resend.dev) can ONLY deliver to the Resend account owner's address.
-// Once the domain is verified, change this back to "sturma@blbxcritical.com".
+// GO-LIVE: after the domain is verified, set `LEAD_INBOX = PRODUCTION_LEAD_INBOX`.
 const LEAD_INBOX = "chriss@primarycompanies.com"
 
 export type RequestState = {
