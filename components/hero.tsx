@@ -64,7 +64,7 @@ export function Hero() {
                 <dt className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
                   Coverage
                 </dt>
-                <dd className="mt-1 font-mono text-xl font-semibold text-foreground">48 STATES</dd>
+                <dd className="mt-1 font-mono text-xl font-semibold text-foreground">50 STATES + MX/CA</dd>
               </div>
             </dl>
           </div>

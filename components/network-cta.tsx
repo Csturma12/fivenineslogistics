@@ -12,12 +12,14 @@ export function NetworkCta() {
           <div>
             <span className="font-mono text-xs uppercase tracking-wider text-primary">Network</span>
             <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Coverage that holds up coast to coast.
+              Coverage that holds up coast to coast — and across both borders.
             </h2>
             <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-              Eight regional gateways feed a network of 2,400+ monitored lanes. Every hub reports
-              into the same control tower, so capacity requests get routed against real-time
-              carrier availability — not a spreadsheet.
+              Regional gateways feed a network of 2,400+ monitored lanes across all 50 states, with
+              cross-border operations into Mexico and Canada — including the Santa Teresa and border
+              gateways that keep maquiladora and Canadian freight moving. Every hub reports into the
+              same control tower, so capacity requests get routed against real-time carrier
+              availability — not a spreadsheet.
             </p>
 
             <div className="mt-8 grid grid-cols-4 gap-3 sm:grid-cols-4">

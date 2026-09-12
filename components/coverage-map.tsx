@@ -5,6 +5,8 @@ import { hubs } from "@/lib/site"
 const positions: Record<string, { x: number; y: number }> = {
   SEA: { x: 10, y: 10 },
   LAX: { x: 11, y: 52 },
+  PHX: { x: 22, y: 60 },
+  STR: { x: 33, y: 72 },
   MID: { x: 39, y: 67 },
   HSL: { x: 44, y: 55 },
   DFW: { x: 51, y: 63 },
@@ -14,7 +16,11 @@ const positions: Record<string, { x: number; y: number }> = {
   BTR: { x: 67, y: 73 },
   NOLA: { x: 71, y: 80 },
   MOB: { x: 76, y: 71 },
-  MEM: { x: 64, y: 49 },
+  MAR: { x: 59, y: 44 },
+  BYH: { x: 63, y: 40 },
+  MEM: { x: 64, y: 50 },
+  CHI: { x: 70, y: 28 },
+  SDF: { x: 75, y: 39 },
   ORF: { x: 89, y: 43 },
   EWR: { x: 91, y: 29 },
 }
@@ -22,8 +28,9 @@ const positions: Record<string, { x: number; y: number }> = {
 const links: [string, string][] = [
   ["SEA", "LAX"],
   ["SEA", "DFW"],
-  ["LAX", "MID"],
-  ["LAX", "DFW"],
+  ["LAX", "PHX"],
+  ["PHX", "STR"],
+  ["STR", "DFW"],
   ["MID", "DFW"],
   ["HSL", "DFW"],
   ["DFW", "HOU"],
@@ -34,9 +41,15 @@ const links: [string, string][] = [
   ["BTR", "NOLA"],
   ["NOLA", "MOB"],
   ["MOB", "MEM"],
+  ["MEM", "MAR"],
+  ["MEM", "BYH"],
+  ["MEM", "SDF"],
+  ["SDF", "CHI"],
+  ["DFW", "CHI"],
+  ["CHI", "EWR"],
+  ["SDF", "ORF"],
   ["MEM", "ORF"],
   ["ORF", "EWR"],
-  ["DFW", "ORF"],
 ]
 
 export function CoverageMap() {

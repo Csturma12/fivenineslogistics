@@ -224,6 +224,8 @@ export const lanes: Lane[] = [
 export const hubs = [
   { code: "SEA", city: "Seattle" },
   { code: "LAX", city: "Los Angeles" },
+  { code: "PHX", city: "Phoenix" },
+  { code: "STR", city: "Santa Teresa" },
   { code: "MID", city: "Midland" },
   { code: "HSL", city: "Haslet" },
   { code: "DFW", city: "Dallas" },
@@ -233,14 +235,18 @@ export const hubs = [
   { code: "BTR", city: "Baton Rouge" },
   { code: "NOLA", city: "New Orleans" },
   { code: "MOB", city: "Mobile" },
+  { code: "MAR", city: "Marion" },
+  { code: "BYH", city: "Blytheville" },
   { code: "MEM", city: "Memphis" },
+  { code: "CHI", city: "Chicago" },
+  { code: "SDF", city: "Louisville" },
   { code: "ORF", city: "Norfolk" },
   { code: "EWR", city: "Newark" },
 ]
 
 export const heroSpec: { label: string; value: string }[] = [
   { label: "Base", value: "Houston, Texas" },
-  { label: "Coverage", value: "48 states, Gulf ports, global ocean" },
+  { label: "Coverage", value: "50 states, cross-border Mexico & Canada, Gulf ports" },
   {
     label: "Core modes",
     value: "Flatbed · Expedited · Drayage · Hotshot · Box truck · Oversize · Ocean · LTL",
