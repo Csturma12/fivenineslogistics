@@ -8,11 +8,10 @@ export const site = {
   mc: "MC# 841023",
   // PLACEHOLDER — swap for the real USDOT number when available.
   usdot: "USDOT# pending",
-  // PLACEHOLDER — 555-01xx is a reserved fictional range. Replace display + href with the real dispatch line.
-  phone: "(713) 555-0199",
-  phoneHref: "tel:+17135550199",
-  // PLACEHOLDER — confirm actual coverage limits with your certificate of insurance.
-  insurance: "$1M auto liability · $100K cargo",
+  phone: "(205) 842-3755",
+  phoneHref: "tel:+12058423755",
+  // Verified from Primary Freight LLC ACORD 25 certificate (Cottingham & Butler), policy period 4/12/2026–4/12/2027.
+  insurance: "$1M auto liability · $1M/$2M general liability · $4M umbrella · $150K contingent cargo",
   location: "Houston, TX",
   quotesEmail: "quotes@fivenineslogistics.com",
   dispatchEmail: "dispatch@fivenineslogistics.com",
@@ -366,7 +365,7 @@ export const credentials: Credential[] = [
   { label: "Operating authority", value: "Primary Freight LLC" },
   { label: "MC number", value: "MC# 841023" },
   { label: "USDOT", value: "USDOT# pending" },
-  { label: "Insurance", value: "$1M auto liability · $100K cargo" },
+  { label: "Insurance", value: "$1M auto · $1M/$2M general · $4M umbrella · $150K contingent cargo" },
   { label: "Base of operations", value: "Houston, Texas" },
   { label: "Dispatch coverage", value: "24 hours, every day" },
 ]
