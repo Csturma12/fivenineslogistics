@@ -1,14 +1,17 @@
-const BLADE_ANGLES = [0, 72, 144, 216, 288]
+/* Five orbital ellipses at 36deg increments (an ellipse repeats every 180deg,
+   so 5 evenly-spaced orbits = 36deg apart) form an atom-style rosette. Five
+   orbits = five nines; the nucleus hub = mechanical precision. Single-color
+   stroke: themes off --primary, scales down, and reproduces one-color on a
+   decal, embroidery, or invoice. */
+const ORBIT_ANGLES = [0, 36, 72, 108, 144]
 
-/**
- * Five Nines mark — five "9" glyphs arranged as a rotor.
- * Each blade is literally a 9 (loop at the tip, tail sweeping toward the hub),
- * so the mark spells the brand: five nines. The shared tail sweep reads as
- * rotation (freight in motion); the center hub reads as mechanical precision.
- * Single-color stroke: themes off --primary, scales down, and reproduces
- * one-color on a decal, embroidery, or invoice.
- */
-export function FiveNinesMark({ className }: { className?: string }) {
+export function FiveNinesMark({
+  className,
+  animated = false,
+}: {
+  className?: string
+  animated?: boolean
+}) {
   return (
     <svg
       viewBox="0 0 32 32"
@@ -17,24 +20,25 @@ export function FiveNinesMark({ className }: { className?: string }) {
       aria-label="Five Nines"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g
-        className="stroke-primary"
-        fill="none"
-        strokeWidth={2.3}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {BLADE_ANGLES.map((angle) => (
-          <g key={angle} transform={`rotate(${angle} 16 16)`}>
-            {/* loop of the 9, at the outer tip */}
-            <circle cx="16" cy="5.9" r="3.3" />
-            {/* long, mostly-straight tail descending toward the hub with a
-                slight clockwise lean, so each blade reads as a numeral 9 */}
-            <path d="M19.3 6.7 C 19.9 10.5, 18.9 13, 16.7 14.6" />
-          </g>
-        ))}
+      <g className={animated ? "animate-index-spin" : undefined}>
+        <g
+          className="stroke-primary"
+          fill="none"
+          strokeWidth={1.4}
+        >
+          {ORBIT_ANGLES.map((angle) => (
+            <ellipse
+              key={angle}
+              cx="16"
+              cy="16"
+              rx="13"
+              ry="5"
+              transform={`rotate(${angle} 16 16)`}
+            />
+          ))}
+        </g>
       </g>
-      <circle cx="16" cy="16" r="1.7" className="fill-primary" />
+      <circle cx="16" cy="16" r="2.4" className="fill-primary" />
     </svg>
   )
 }

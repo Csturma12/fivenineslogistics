@@ -117,8 +117,45 @@
     }
   }
 
+  /* Spin-stop-spin: index 72deg at a time (the mark's five-fold symmetry),
+     holding at each stop so it reads as a mechanical rotor clicking through
+     positions rather than a continuous spin. Each stop lands on an identical
+     pose because the rosette repeats every 72deg. */
+  .animate-index-spin {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: index-spin 6s cubic-bezier(0.7, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes index-spin {
+    0%,
+    12% {
+      transform: rotate(0deg);
+    }
+    20%,
+    32% {
+      transform: rotate(72deg);
+    }
+    40%,
+    52% {
+      transform: rotate(144deg);
+    }
+    60%,
+    72% {
+      transform: rotate(216deg);
+    }
+    80%,
+    92% {
+      transform: rotate(288deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .animate-marquee {
+    .animate-marquee,
+    .animate-index-spin {
       animation: none;
     }
   }
