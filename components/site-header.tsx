@@ -18,7 +18,7 @@ export function SiteHeader() {
               FIVE NINES LOGISTICS
             </span>
             <span className="hidden font-mono text-[10px] uppercase tracking-wider text-muted-foreground sm:inline">
-              {site.agentOf} &middot; {site.location}
+              {site.agentOf}, {site.location}
             </span>
           </span>
         </Link>
