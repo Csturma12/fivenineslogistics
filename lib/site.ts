@@ -222,14 +222,20 @@ export const lanes: Lane[] = [
 ]
 
 export const hubs = [
-  { code: "HOU", city: "Houston" },
+  { code: "SEA", city: "Seattle" },
+  { code: "LAX", city: "Los Angeles" },
+  { code: "MID", city: "Midland" },
+  { code: "HSL", city: "Haslet" },
   { code: "DFW", city: "Dallas" },
   { code: "SAT", city: "San Antonio" },
+  { code: "HOU", city: "Houston" },
   { code: "PORT", city: "Port of Houston" },
   { code: "BTR", city: "Baton Rouge" },
   { code: "NOLA", city: "New Orleans" },
-  { code: "MID", city: "Midland" },
   { code: "MOB", city: "Mobile" },
+  { code: "MEM", city: "Memphis" },
+  { code: "ORF", city: "Norfolk" },
+  { code: "EWR", city: "Newark" },
 ]
 
 export const heroSpec: { label: string; value: string }[] = [

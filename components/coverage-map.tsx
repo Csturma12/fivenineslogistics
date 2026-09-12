@@ -3,29 +3,40 @@ import { hubs } from "@/lib/site"
 // Approximate relative positions (percent of viewBox) for each hub, arranged
 // to read as a stylized US network map without depending on real geo data.
 const positions: Record<string, { x: number; y: number }> = {
-  SEA: { x: 12, y: 14 },
-  LAX: { x: 14, y: 62 },
-  DEN: { x: 40, y: 46 },
-  DFW: { x: 46, y: 72 },
-  ORD: { x: 62, y: 34 },
-  ATL: { x: 74, y: 62 },
-  MIA: { x: 84, y: 86 },
-  EWR: { x: 90, y: 28 },
+  SEA: { x: 10, y: 10 },
+  LAX: { x: 11, y: 52 },
+  MID: { x: 39, y: 67 },
+  HSL: { x: 44, y: 55 },
+  DFW: { x: 51, y: 63 },
+  SAT: { x: 50, y: 83 },
+  HOU: { x: 57, y: 76 },
+  PORT: { x: 61, y: 83 },
+  BTR: { x: 67, y: 73 },
+  NOLA: { x: 71, y: 80 },
+  MOB: { x: 76, y: 71 },
+  MEM: { x: 64, y: 49 },
+  ORF: { x: 89, y: 43 },
+  EWR: { x: 91, y: 29 },
 }
 
 const links: [string, string][] = [
-  ["SEA", "DEN"],
   ["SEA", "LAX"],
-  ["LAX", "DEN"],
+  ["SEA", "DFW"],
+  ["LAX", "MID"],
   ["LAX", "DFW"],
-  ["DEN", "ORD"],
-  ["DEN", "DFW"],
-  ["DFW", "ATL"],
-  ["ORD", "EWR"],
-  ["ORD", "ATL"],
-  ["ATL", "MIA"],
-  ["ATL", "EWR"],
-  ["EWR", "MIA"],
+  ["MID", "DFW"],
+  ["HSL", "DFW"],
+  ["DFW", "HOU"],
+  ["DFW", "MEM"],
+  ["HOU", "SAT"],
+  ["HOU", "PORT"],
+  ["HOU", "BTR"],
+  ["BTR", "NOLA"],
+  ["NOLA", "MOB"],
+  ["MOB", "MEM"],
+  ["MEM", "ORF"],
+  ["ORF", "EWR"],
+  ["DFW", "ORF"],
 ]
 
 export function CoverageMap() {
@@ -35,7 +46,7 @@ export function CoverageMap() {
         <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
           Gateway Network
         </span>
-        <span className="font-mono text-xs uppercase tracking-wider text-primary">8 hubs live</span>
+        <span className="font-mono text-xs uppercase tracking-wider text-primary">{hubs.length} hubs live</span>
       </div>
 
       <svg viewBox="0 0 100 100" className="w-full flex-1" role="img" aria-label="Five Nines Logistics gateway network map">
