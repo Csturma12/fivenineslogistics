@@ -30,9 +30,9 @@ export type Mode = {
 
 export const modesIntro = {
   eyebrow: "Modes",
-  heading: "Deep in five. Capable across all of it.",
+  heading: "Deep in six. Capable across all of it.",
   intro:
-    "Our team spent years running flatbed, expedited, drayage, hotshot, and box truck freight before this company had a name. Everything else we handle through partners we've moved thousands of loads with.",
+    "Our team spent years running flatbed, dry van, expedited, drayage, hotshot, and box truck freight before this company had a name. Everything else we handle through partners we've moved thousands of loads with.",
 }
 
 export const modes: Mode[] = [
@@ -45,6 +45,16 @@ export const modes: Mode[] = [
       "Open-deck freight is where we started. We spec the right trailer for the dimensions and weight, secure it to standard, and permit the load when it runs over legal. Tarping, chaining, and dunnage are planned before the truck shows up, not figured out at the dock.",
     equipment: ["48' & 53' flatbed", "Step deck", "Double drop / RGN", "Conestoga", "Stretch & multi-axle"],
     typicalLoads: ["Structural steel & pipe", "Machinery & equipment", "Building materials", "Coils & plate"],
+  },
+  {
+    name: "Dry van",
+    slug: "dry-van",
+    tier: "In-house",
+    description: "53' and 48' vans for general freight, palletized goods, furniture, and home goods.",
+    detail:
+      "Our workhorse mode. Enclosed, weather-protected capacity for general commodities, palletized freight, furniture, and home goods — floor-loaded or on pallets. We match the trailer and load securement to the product so it arrives the way it left, whether it's a full truckload of retail goods or protected equipment.",
+    equipment: ["53' dry van", "48' dry van", "Air-ride suspension", "Logistics posts & load bars", "Blanket-wrap option"],
+    typicalLoads: ["General & retail freight", "Palletized goods", "Furniture & home goods", "Packaged equipment"],
   },
   {
     name: "Expedited",
@@ -277,7 +287,7 @@ export const heroSpec: { label: string; value: string }[] = [
   { label: "Coverage", value: "50 states, cross-border Mexico & Canada, Gulf ports" },
   {
     label: "Core modes",
-    value: "Flatbed · Expedited · Drayage · Hotshot · Box truck · Oversize · Ocean · LTL",
+    value: "Flatbed · Dry van · Expedited · Drayage · Hotshot · Box truck · Oversize · Ocean · LTL",
   },
   { label: "Authority", value: "Primary Freight LLC, MC# 841023" },
   { label: "Insured", value: "$1M auto · $4M umbrella · $150K contingent cargo" },

@@ -10,7 +10,7 @@ import { modes, site, warehousing } from "@/lib/site"
 export const metadata: Metadata = {
   title: "Modes & Services | Five Nines Logistics",
   description:
-    "Flatbed, expedited, drayage, hotshot, box truck, oversize & heavy haul, ocean, and LTL — eight modes run to a five-nines reliability standard out of Houston, TX.",
+    "Flatbed, dry van, expedited, drayage, hotshot, box truck, oversize & heavy haul, ocean, and LTL — nine modes run to a five-nines reliability standard out of Houston, TX.",
 }
 
 export default function ModesPage() {
@@ -24,10 +24,10 @@ export default function ModesPage() {
               Modes &amp; Services
             </span>
             <h1 className="mt-4 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl">
-              Eight modes. One tolerance for failure.
+              Nine modes. One tolerance for failure.
             </h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-              We ran flatbed, expedited, drayage, hotshot, and box truck freight for years before this
+              We ran flatbed, dry van, expedited, drayage, hotshot, and box truck freight for years before this
               company had a name — then built the rest of the network around the same standard. Every
               mode below is planned, sourced, tracked, and reported the same way.
             </p>
