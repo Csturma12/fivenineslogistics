@@ -1,8 +1,8 @@
 import { heroSpec, site } from "@/lib/site"
 
-// Deterministic 90-day status strip. One flagged day out of 90 keeps the
-// "five nines" claim honest (a real 99.999% record has near-zero incidents,
-// not a suspiciously perfect one) without ever landing on a hand-picked seed.
+// Illustrative strip of the standard we run to — not a measured trailing record.
+// One flagged cell represents the kind of exception we plan for and flag before
+// it reaches the customer; the rest is the on-time bar we hold every load to.
 function buildDayStatuses(days: number) {
   const flaggedIndex = Math.floor(days * 0.62)
   return Array.from({ length: days }, (_, i) => (i === flaggedIndex ? "watch" : "ok"))
@@ -33,7 +33,7 @@ export function ReliabilityMonitor() {
           </span>
         </div>
         <p className="mt-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">
-          On-time reliability &middot; trailing 90 days
+          On-time reliability &middot; the standard we run to
         </p>
       </div>
 
@@ -55,9 +55,9 @@ export function ReliabilityMonitor() {
       <div className="px-5 py-5">
         <div className="mb-2 flex items-center justify-between">
           <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-            90-day reliability record
+            How we hold five nines
           </span>
-          <span className="font-mono text-[11px] text-muted-foreground">1 flagged / {DAYS}</span>
+          <span className="font-mono text-[11px] text-muted-foreground">exceptions flagged, not hidden</span>
         </div>
         <div className="grid gap-[3px]" style={{ gridTemplateColumns: "repeat(30, minmax(0, 1fr))" }}>
           {dayStatuses.map((status, i) => (
@@ -69,7 +69,8 @@ export function ReliabilityMonitor() {
           ))}
         </div>
         <p className="mt-3 font-mono text-[11px] text-muted-foreground">
-          A year at five nines: 525,600 min up, 5.26 down.
+          A year at five nines is 5 min 15 sec of exposure. We plan for zero &mdash; and flag the
+          rare exception before you have to ask.
         </p>
       </div>
     </div>

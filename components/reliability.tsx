@@ -46,8 +46,16 @@ export function Reliability() {
           ))}
         </div>
 
-        {/* Stat row */}
-        <dl className="mt-16 grid grid-cols-2 gap-8 border-t border-border pt-10 sm:grid-cols-4">
+        {/* Commitments */}
+        <div className="mt-16 border-t border-border pt-10">
+          <span className="font-mono text-xs uppercase tracking-wider text-primary">
+            The commitments we run to
+          </span>
+          <p className="mt-2 max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground">
+            These are the standards we hold ourselves to on every load &mdash; the targets and
+            tolerances we run to and report against monthly, not numbers dressed up after the fact.
+          </p>
+          <dl className="mt-8 grid grid-cols-2 gap-8 sm:grid-cols-4">
           {reliabilityStats.map((stat) => (
             <div key={stat.label}>
               <dt className="font-mono text-2xl font-semibold text-foreground sm:text-3xl">
@@ -56,7 +64,8 @@ export function Reliability() {
               <dd className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{stat.label}</dd>
             </div>
           ))}
-        </dl>
+          </dl>
+        </div>
       </div>
     </section>
   )

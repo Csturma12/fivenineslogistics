@@ -3,10 +3,10 @@ import { lanes } from "@/lib/site"
 type TickerItem = { label: string; value: string; accent?: boolean }
 
 const signals: TickerItem[] = [
-  { label: "On-time reliability, trailing 90 days", value: "99.999%", accent: true },
+  { label: "On-time reliability, our standard", value: "99.999%", accent: true },
   { label: "Answer from dispatch, any hour", value: "< 1 hr" },
   { label: "Control tower coverage", value: "24 / 7 / 365" },
-  { label: "Missed SLA windows, this quarter", value: "0" },
+  { label: "Tolerance for a quiet miss", value: "0" },
   { label: "Downtime per year at five nines", value: "5 min 15 sec" },
 ]
 

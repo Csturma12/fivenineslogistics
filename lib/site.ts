@@ -200,10 +200,10 @@ export const ninesLadder: NinesRow[] = [
 ]
 
 export const reliabilityStats = [
-  { value: "99.999%", label: "On-time arrival, trailing 90 days" },
+  { value: "99.999%", label: "On-time arrival — the standard we run every load to" },
   { value: "<1 hr", label: "Answer from dispatch, any hour" },
   { value: "24/7/365", label: "Control tower coverage" },
-  { value: "0", label: "Missed SLA windows, this quarter" },
+  { value: "0", label: "Tolerance for a quietly missed window" },
 ]
 
 export type Lane = {
@@ -334,6 +334,36 @@ export const whoWeServePage = {
   },
 }
 
+export type WhoWeServeInput = {
+  label: string
+  body: string
+}
+
+export const whoWeServeInputs = {
+  eyebrow: "What makes a load hit",
+  heading: "Give us these, and we plan backward from your window.",
+  intro:
+    "The gap between on-time and 'the truck is here but the crane already left' is information. On critical freight we ask for these up front, so the plan is built before the wheels turn.",
+  items: [
+    {
+      label: "The real delivery window",
+      body: "The appointment, commissioning slot, or turnaround window the load is written into — not just a calendar date. We schedule to the constraint that actually matters.",
+    },
+    {
+      label: "Site access & contacts",
+      body: "Gate hours, dock or laydown-yard location, security or escort requirements, and who signs on arrival. We confirm it before dispatch, not at the fence line.",
+    },
+    {
+      label: "Handling at destination",
+      body: "Crane, forklift, liftgate, or inside delivery — what's waiting when the truck backs in. The right equipment gets staged to the trailer we send.",
+    },
+    {
+      label: "Dimensions & weight",
+      body: "Real numbers up front, so we spec the trailer, routing, and permits before the load moves instead of discovering a problem on the shoulder.",
+    },
+  ] as WhoWeServeInput[],
+}
+
 /* ---------- Company / About page ---------- */
 
 export const companyPage = {
@@ -341,6 +371,11 @@ export const companyPage = {
   heading: "We ran critical freight for years before we put a name on it.",
   intro:
     "Five Nines Logistics is the freight brand for operators who treat a delivery date the way an engineer treats uptime. We operate as an agent of Primary Freight LLC, with asset-based sister carriers on speed dial and a global partner network behind them.",
+}
+
+export const companyModel = {
+  heading: "What 'agent of Primary Freight' means for your freight",
+  body: "It means asset-based capacity sits at the front of every dispatch decision, under established operating authority and insurance you can verify before you tender a load. You get the responsiveness of a dedicated specialist desk with the backing of carriers that own the trucks — not a broker reselling whatever the load board turns up.",
 }
 
 export type CompanyValue = {

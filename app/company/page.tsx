@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { NetworkCta } from "@/components/network-cta"
-import { companyPage, companyStory, credentials, site } from "@/lib/site"
+import { companyPage, companyStory, companyModel, credentials, site } from "@/lib/site"
 
 export const metadata: Metadata = {
   title: "Company | Five Nines Logistics",
@@ -90,6 +90,19 @@ export default function CompanyPage() {
                 </div>
               ))}
             </dl>
+          </div>
+        </section>
+
+        <section className="border-b border-border">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+            <div className="rounded-xl border border-border bg-secondary/60 p-8 sm:p-12">
+              <h2 className="max-w-2xl text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                {companyModel.heading}
+              </h2>
+              <p className="mt-4 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
+                {companyModel.body}
+              </p>
+            </div>
           </div>
         </section>
 

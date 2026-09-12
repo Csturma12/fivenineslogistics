@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { NetworkCta } from "@/components/network-cta"
-import { sectors, whoWeServePage, site } from "@/lib/site"
+import { sectors, whoWeServePage, whoWeServeInputs, site } from "@/lib/site"
 
 export const metadata: Metadata = {
   title: "Who We Serve | Five Nines Logistics",
@@ -101,6 +101,35 @@ export default function WhoWeServePage() {
               <p className="mt-4 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
                 {whoWeServePage.closing.body}
               </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-border bg-card/30">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+            <span className="font-mono text-xs uppercase tracking-wider text-primary">
+              {whoWeServeInputs.eyebrow}
+            </span>
+            <h2 className="mt-3 max-w-2xl text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+              {whoWeServeInputs.heading}
+            </h2>
+            <p className="mt-4 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
+              {whoWeServeInputs.intro}
+            </p>
+            <div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2">
+              {whoWeServeInputs.items.map((item, i) => (
+                <div key={item.label} className="bg-card p-6 sm:p-8">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="font-mono text-[11px] uppercase tracking-wider text-primary">
+                      {item.label}
+                    </h3>
+                  </div>
+                  <p className="mt-3 text-pretty leading-relaxed text-muted-foreground">{item.body}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
