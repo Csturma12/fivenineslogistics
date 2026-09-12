@@ -240,6 +240,7 @@ export const heroSpec: { label: string; value: string }[] = [
     value: "Flatbed · Expedited · Drayage · Hotshot · Box truck · Oversize · Ocean · LTL",
   },
   { label: "Authority", value: "Primary Freight LLC, MC# 841023" },
+  { label: "Insured", value: "$1M auto · $4M umbrella · $150K contingent cargo" },
   { label: "Dispatch", value: "24 hours, every day" },
 ]
 

@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
+import { ShieldCheck } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { RequestCapacityForm } from "@/components/request-capacity-form"
+import { site } from "@/lib/site"
 
 export const metadata: Metadata = {
   title: "Request Capacity — Five Nines Logistics",
@@ -52,6 +54,19 @@ export default function RequestCapacityPage() {
                   <dd className="font-mono text-lg font-semibold text-primary">99.999%</dd>
                 </div>
               </dl>
+
+              <div className="mt-8 rounded-xl border border-border bg-card p-5">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="size-4 text-primary" aria-hidden="true" />
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-foreground">
+                    Authorized &amp; insured
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  Operating as an agent of {site.authority} ({site.mc}). Backed by{" "}
+                  {site.insurance}.
+                </p>
+              </div>
             </div>
 
             <RequestCapacityForm />
