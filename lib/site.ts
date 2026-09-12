@@ -119,6 +119,34 @@ export const modes: Mode[] = [
   },
 ]
 
+export const warehousing = {
+  eyebrow: "Warehousing & customs",
+  heading: "Space to stage it, cleared to move it.",
+  intro:
+    "Trucking is only half of a critical supply chain. We hold warehouse contracts with managed inventory in five key markets, backed by vetted partner space across the country — plus in-bond trucking and a customs broker on call so international freight never stalls at the border.",
+  locations: [
+    { city: "Charleston, SC", note: "East Coast port distribution" },
+    { city: "Houston, TX", note: "Gulf gateway & project staging" },
+    { city: "Savannah, GA", note: "Southeast import consolidation" },
+    { city: "Los Angeles, CA", note: "West Coast port drayage & transload" },
+    { city: "Indianapolis, IN", note: "Midwest inventory & distribution" },
+  ],
+  capabilities: [
+    {
+      title: "Contract warehousing & inventory management",
+      body: "Dedicated and shared space in five markets with managed inventory — receiving, put-away, cycle counts, and outbound staging — plus a vetted partner network for overflow and coverage in every other region.",
+    },
+    {
+      title: "In-bond trucking",
+      body: "We move freight in-bond under CBP bond, so imported cargo can travel from port to an inland destination or bonded facility before it clears — keeping boxes off demurrage without rushing clearance.",
+    },
+    {
+      title: "Customs clearance",
+      body: "Partnered with a licensed customs broker to handle entry, duties, and clearance on both borders, so drayage, warehousing, and the paperwork all run under one coordinator instead of three.",
+    },
+  ],
+}
+
 export type MethodStep = {
   n: string
   title: string

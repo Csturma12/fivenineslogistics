@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { NetworkCta } from "@/components/network-cta"
-import { modes, site } from "@/lib/site"
+import { modes, site, warehousing } from "@/lib/site"
 
 export const metadata: Metadata = {
   title: "Modes & Services | Five Nines Logistics",
@@ -106,6 +106,48 @@ export default function ModesPage() {
                       </div>
                     </div>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-border">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+            <span className="font-mono text-xs uppercase tracking-wider text-primary">
+              {warehousing.eyebrow}
+            </span>
+            <h2 className="mt-4 max-w-3xl text-balance text-3xl font-semibold leading-[1.1] tracking-tight text-foreground sm:text-4xl">
+              {warehousing.heading}
+            </h2>
+            <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
+              {warehousing.intro}
+            </p>
+
+            <div className="mt-10">
+              <h3 className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                Warehouse markets
+              </h3>
+              <div className="mt-4 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-5">
+                {warehousing.locations.map((loc) => (
+                  <div key={loc.city} className="bg-card p-5">
+                    <p className="text-sm font-semibold text-foreground">{loc.city}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{loc.note}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                + vetted partner space nationwide
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-border bg-border lg:grid-cols-3">
+              {warehousing.capabilities.map((cap) => (
+                <div key={cap.title} className="bg-card p-6 sm:p-8">
+                  <h3 className="text-lg font-semibold tracking-tight text-foreground">{cap.title}</h3>
+                  <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
+                    {cap.body}
+                  </p>
                 </div>
               ))}
             </div>
