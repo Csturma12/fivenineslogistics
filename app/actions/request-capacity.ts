@@ -2,13 +2,8 @@
 
 import { Resend } from "resend"
 
-// Where production leads should land once the domain is verified.
-const PRODUCTION_LEAD_INBOX = "sturma@blbxcritical.com"
-
-// TEMP (testing): until fivenineslogistics.com is verified in Resend, the sandbox sender
-// (onboarding@resend.dev) can ONLY deliver to the Resend account owner's address.
-// GO-LIVE: after the domain is verified, set `LEAD_INBOX = PRODUCTION_LEAD_INBOX`.
-const LEAD_INBOX = "chriss@primarycompanies.com"
+// Where production leads land now that the domain is verified.
+const LEAD_INBOX = "sturma@blbxcritical.com"
 
 export type RequestState = {
   status: "idle" | "success" | "error"
@@ -60,10 +55,7 @@ export async function submitRequestCapacity(
 
   const ticket = ticketId()
   const resend = new Resend(process.env.RESEND_API_KEY)
-  // TEMP: fivenineslogistics.com is not yet verified in Resend, so sends from it 403.
-  // Using Resend's pre-verified sandbox sender so leads work today. Once the domain is
-  // verified at resend.com/domains, revert to: `Five Nines Dispatch <dispatch@${process.env.RESEND_EMAIL_DOMAIN}>`
-  const from = "Five Nines Dispatch <onboarding@resend.dev>"
+  const from = `Five Nines Dispatch <dispatch@${process.env.RESEND_EMAIL_DOMAIN}>`
 
   const rows: Array<[string, string]> = [
     ["Ticket", ticket],
