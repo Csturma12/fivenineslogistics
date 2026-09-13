@@ -59,7 +59,7 @@ export function CoverageMap() {
         <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
           Gateway Network
         </span>
-        <span className="font-mono text-xs uppercase tracking-wider text-primary">{hubs.length} hubs live</span>
+        <span className="font-mono text-xs uppercase tracking-wider text-status-ok">{hubs.length} hubs live</span>
       </div>
 
       <svg viewBox="0 0 100 100" className="w-full flex-1" role="img" aria-label="Five Nines Logistics gateway network map">
