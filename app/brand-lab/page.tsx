@@ -15,7 +15,7 @@ const marks = [
     id: "A",
     name: "Signal Five",
     tag: "Full signal, always up",
-    note: "Five ascending bars — the fifth (the ninth nine) runs Signal red. It counts to five, reads as a full signal, and holds up as a 16px favicon or a decal on a trailer door.",
+    note: "Five ascending bars — the fifth (the ninth nine) runs signal green. It counts to five, reads as a full signal at nominal, and holds up as a 16px favicon or a decal on a trailer door.",
     render: (size: string) => <SignalFiveMark className={`${size} text-foreground`} />,
   },
   {
@@ -29,14 +29,40 @@ const marks = [
     id: "C",
     name: "5N Spec Plate",
     tag: "The rating nameplate",
-    note: "A stamped monogram tile with a red corner notch — like the rating plate on a transformer or mill motor. Works as an app icon, doc header, and truck-door mark.",
+    note: "A stamped monogram tile with a green corner notch — like the rating plate on a transformer or mill motor. Works as an app icon, doc header, and truck-door mark.",
     render: (size: string) => <FiveNTile className={size} textClassName="text-[42cqw]" />,
   },
 ]
 
+/* Green-on-light exploration palette, scoped to this lab only via inline token
+   overrides so the live site's Signal-red identity is untouched. Control-room
+   green ("all systems nominal") on a clean professional near-white background,
+   with the deep control-tower panel kept for contrast. */
+const greenLightTheme = {
+  "--background": "oklch(0.99 0.005 160)",
+  "--foreground": "oklch(0.24 0.03 190)",
+  "--card": "oklch(1 0 0)",
+  "--card-foreground": "oklch(0.24 0.03 190)",
+  "--popover": "oklch(1 0 0)",
+  "--popover-foreground": "oklch(0.24 0.03 190)",
+  "--primary": "oklch(0.56 0.13 155)",
+  "--primary-foreground": "oklch(0.99 0.01 150)",
+  "--secondary": "oklch(0.96 0.01 160)",
+  "--secondary-foreground": "oklch(0.24 0.03 190)",
+  "--muted": "oklch(0.96 0.008 160)",
+  "--muted-foreground": "oklch(0.46 0.03 185)",
+  "--accent": "oklch(0.56 0.13 155)",
+  "--accent-foreground": "oklch(0.99 0.01 150)",
+  "--border": "oklch(0.24 0.04 200 / 12%)",
+  "--input": "oklch(0.24 0.04 200 / 14%)",
+  "--ring": "oklch(0.56 0.13 155)",
+  "--navy": "oklch(0.21 0.04 200)",
+  "--navy-foreground": "oklch(0.96 0.006 160)",
+} as React.CSSProperties
+
 export default function BrandLabPage() {
   return (
-    <main>
+    <main style={greenLightTheme} className="bg-background">
       <SiteHeader />
 
       <section className="border-t border-border bg-grid-technical">
@@ -51,10 +77,11 @@ export default function BrandLabPage() {
             Marks &amp; portal directions.
           </h1>
           <p className="mt-5 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground">
-            My take on the identity and the login — built in the real Signal-red brand on the live
-            dark theme, not a mockup. Three mark candidates, then a working &quot;one door, two
-            roles&quot; sign-in and the dashboards behind it. Nothing here is wired into the public
-            site yet.
+            My take on the identity and the login, in a green-on-light direction — control-room
+            &quot;all systems nominal&quot; green on the clean professional background you like, not a
+            mockup. Three mark candidates, then a working &quot;one door, two roles&quot; sign-in and
+            the dashboards behind it. This palette is scoped to the lab only; the live site&apos;s
+            red is untouched, and nothing here is wired into the public site yet.
           </p>
         </div>
       </section>
