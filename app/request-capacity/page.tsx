@@ -63,8 +63,9 @@ export default function RequestCapacityPage() {
                   </span>
                 </div>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  Operating as an agent of {site.authority} ({site.mc}). Backed by{" "}
-                  {site.insurance}.
+                  Operating as an agent of {site.authority} ({site.mc}) — fully authorized and
+                  insured. Need a certificate of insurance, or to be added as a certificate holder?
+                  Just ask your coordinator and we&apos;ll send it over.
                 </p>
               </div>
             </div>

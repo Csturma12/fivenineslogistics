@@ -289,7 +289,7 @@ export const heroSpec: { label: string; value: string }[] = [
     value: "Flatbed · Dry van · Expedited · Drayage · Hotshot · Box truck · Oversize · Ocean · LTL",
   },
   { label: "Authority", value: "Primary Freight LLC, MC# 841023" },
-  { label: "Insured", value: "$1M auto · $4M umbrella · $150K contingent cargo" },
+  { label: "Insured", value: "Fully insured — COI on request" },
   { label: "Dispatch", value: "24 hours, every day" },
 ]
 
@@ -450,7 +450,7 @@ export const credentials: Credential[] = [
   { label: "Model", value: "Freight brokerage & agency" },
   { label: "Broker authority", value: "Primary Freight LLC" },
   { label: "MC number", value: "MC# 841023" },
-  { label: "Insurance", value: "$1M auto · $1M/$2M general · $4M umbrella · $150K contingent cargo" },
+  { label: "Insurance", value: "Certificate of insurance available on request" },
   { label: "Base of operations", value: "Houston, Texas" },
   { label: "Dispatch coverage", value: "24 hours, every day" },
 ]
