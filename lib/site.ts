@@ -413,9 +413,9 @@ export const whoWeServeInputs = {
 
 export const companyPage = {
   eyebrow: "Company",
-  heading: "We ran critical freight for years before we put a name on it.",
+  heading: "Eight years moving critical freight. Now it has a name.",
   intro:
-    "Five Nines Logistics is the freight brand for operators who treat a delivery date the way an engineer treats uptime. We operate as an agent of Primary Freight LLC, with asset-based sister carriers on speed dial and a global partner network behind them.",
+    "Five Nines Logistics is the freight brand for operators who treat a delivery date the way an engineer treats uptime. The name is new; the desk behind it isn't. We've spent the better part of a decade running critical freight for the same shippers — and they're moving with us. We operate as an agent of Primary Freight LLC, with asset-based sister carriers on speed dial and a global partner network behind them.",
 }
 
 export const companyModel = {
@@ -431,7 +431,7 @@ export type CompanyValue = {
 export const companyStory: CompanyValue[] = [
   {
     title: "Where we come from",
-    body: "Our team spent years dispatching flatbed, expedited, drayage, hotshot, and box-truck freight across Texas and the Gulf before this company had a name. Five Nines is that experience, organized around a single promise: the load arrives when we said it would.",
+    body: "For eight years we've dispatched flatbed, expedited, drayage, hotshot, and box-truck freight across Texas and the Gulf for a book of shippers who kept calling back. Five Nines is that relationship, organized under one name and one promise: the load arrives when we said it would. The customers who know our work are moving with us.",
   },
   {
     title: "How we're structured",
@@ -439,7 +439,7 @@ export const companyStory: CompanyValue[] = [
   },
   {
     title: "Why 'five nines'",
-    body: "99.999% uptime is the standard mission-critical facilities hold their own systems to. It's the standard your freight partner should meet too. We borrowed the language on purpose, and we report against it every month.",
+    body: "99.999% uptime is the standard mission-critical facilities hold their own systems to. It's the standard your freight partner should meet too. We borrowed the language on purpose — it's the bar we hold every load to, and we'll report against it in the open.",
   },
 ]
 
