@@ -29,40 +29,43 @@ const marks = [
     id: "C",
     name: "5N Spec Plate",
     tag: "The rating nameplate",
-    note: "A stamped monogram tile with a green corner notch — like the rating plate on a transformer or mill motor. Works as an app icon, doc header, and truck-door mark.",
+    note: "A stamped monogram tile with a navy corner notch — like the rating plate on a transformer or mill motor. Works as an app icon, doc header, and truck-door mark.",
     render: (size: string) => <FiveNTile className={size} textClassName="text-[42cqw]" />,
   },
 ]
 
-/* Green-on-light exploration palette, scoped to this lab only via inline token
-   overrides so the live site's Signal-red identity is untouched. Control-room
-   green ("all systems nominal") on a clean professional near-white background,
-   with the deep control-tower panel kept for contrast. */
-const greenLightTheme = {
-  "--background": "oklch(0.99 0.005 160)",
-  "--foreground": "oklch(0.24 0.03 190)",
+/* Navy-on-light exploration palette, scoped to this lab only via inline token
+   overrides so the live site's Signal-red identity is untouched. A confident
+   navy/azure accent on the clean professional cool-white background you like —
+   paired with GRAPHITE GUNMETAL dark surfaces (a cool near-black, not blue) so
+   the navy accent stays the star and never dissolves into the dark panels. */
+const navyLightTheme = {
+  "--background": "oklch(0.99 0.004 250)",
+  "--foreground": "oklch(0.23 0.02 255)",
   "--card": "oklch(1 0 0)",
-  "--card-foreground": "oklch(0.24 0.03 190)",
+  "--card-foreground": "oklch(0.23 0.02 255)",
   "--popover": "oklch(1 0 0)",
-  "--popover-foreground": "oklch(0.24 0.03 190)",
-  "--primary": "oklch(0.56 0.13 155)",
-  "--primary-foreground": "oklch(0.99 0.01 150)",
-  "--secondary": "oklch(0.96 0.01 160)",
-  "--secondary-foreground": "oklch(0.24 0.03 190)",
-  "--muted": "oklch(0.96 0.008 160)",
-  "--muted-foreground": "oklch(0.46 0.03 185)",
-  "--accent": "oklch(0.56 0.13 155)",
-  "--accent-foreground": "oklch(0.99 0.01 150)",
-  "--border": "oklch(0.24 0.04 200 / 12%)",
-  "--input": "oklch(0.24 0.04 200 / 14%)",
-  "--ring": "oklch(0.56 0.13 155)",
-  "--navy": "oklch(0.21 0.04 200)",
-  "--navy-foreground": "oklch(0.96 0.006 160)",
+  "--popover-foreground": "oklch(0.23 0.02 255)",
+  "--primary": "oklch(0.47 0.14 256)",
+  "--primary-foreground": "oklch(0.99 0.01 250)",
+  "--secondary": "oklch(0.96 0.008 250)",
+  "--secondary-foreground": "oklch(0.23 0.02 255)",
+  "--muted": "oklch(0.96 0.006 250)",
+  "--muted-foreground": "oklch(0.45 0.02 255)",
+  "--accent": "oklch(0.47 0.14 256)",
+  "--accent-foreground": "oklch(0.99 0.01 250)",
+  "--border": "oklch(0.23 0.03 255 / 12%)",
+  "--input": "oklch(0.23 0.03 255 / 14%)",
+  "--ring": "oklch(0.47 0.14 256)",
+  /* dark surfaces (footer, control-tower panels): cool graphite gunmetal,
+     distinct from the navy accent, with a luminous azure for on-dark accents */
+  "--navy": "oklch(0.19 0.008 255)",
+  "--navy-foreground": "oklch(0.95 0.006 250)",
 } as React.CSSProperties
 
 export default function BrandLabPage() {
   return (
-    <main style={greenLightTheme} className="bg-background">
+    <main style={navyLightTheme} className="bg-background">
       <SiteHeader />
 
       <section className="border-t border-border bg-grid-technical">
@@ -77,11 +80,12 @@ export default function BrandLabPage() {
             Marks &amp; portal directions.
           </h1>
           <p className="mt-5 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground">
-            My take on the identity and the login, in a green-on-light direction — control-room
-            &quot;all systems nominal&quot; green on the clean professional background you like, not a
-            mockup. Three mark candidates, then a working &quot;one door, two roles&quot; sign-in and
-            the dashboards behind it. This palette is scoped to the lab only; the live site&apos;s
-            red is untouched, and nothing here is wired into the public site yet.
+            My take on the identity and the login, in a navy-on-light direction — a confident navy
+            accent on the clean professional background you like, paired with graphite gunmetal dark
+            surfaces (a cool near-black, not blue) so the navy stays the star. Three mark candidates,
+            then a working &quot;one door, two roles&quot; sign-in and the dashboards behind it. This
+            palette is scoped to the lab only; the live site&apos;s red is untouched, and nothing
+            here is wired into the public site yet.
           </p>
         </div>
       </section>
