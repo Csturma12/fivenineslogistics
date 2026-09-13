@@ -40,6 +40,12 @@
   --color-background: var(--background);
   --color-navy: var(--navy);
   --color-navy-foreground: var(--navy-foreground);
+  --color-status-ok: var(--status-ok);
+  --color-status-ok-dark: var(--status-ok-dark);
+  --color-status-warn: var(--status-warn);
+  --color-status-warn-dark: var(--status-warn-dark);
+  --color-status-alert: var(--status-alert);
+  --color-signal: var(--signal);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
