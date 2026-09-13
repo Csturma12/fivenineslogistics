@@ -1,9 +1,16 @@
-/* Five orbital ellipses at 36deg increments (an ellipse repeats every 180deg,
-   so 5 evenly-spaced orbits = 36deg apart) form an atom-style rosette. Five
-   orbits = five nines; the nucleus hub = mechanical precision. Single-color
-   stroke: themes off --primary, scales down, and reproduces one-color on a
-   decal, embroidery, or invoice. */
-const ORBIT_ANGLES = [0, 36, 72, 108, 144]
+/* SIGNAL FIVE. Five ascending bars — the fifth (the "ninth nine") runs signal
+   green, the rest inherit currentColor. It counts to five, reads as a full
+   signal at nominal ("always up"), and holds up as a 16px favicon or a decal on
+   a trailer door. The green bar is the one place the control-room status color
+   lives inside the identity: navy is the brand, green means up. */
+const BARS = [
+  { x: 2, h: 8 },
+  { x: 8, h: 13 },
+  { x: 14, h: 18 },
+  { x: 20, h: 23 },
+  { x: 26, h: 28 },
+]
+const BASELINE = 30
 
 export function FiveNinesMark({
   className,
@@ -20,25 +27,24 @@ export function FiveNinesMark({
       aria-label="Five Nines"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g className={animated ? "animate-index-spin" : undefined}>
-        <g
-          className="stroke-primary"
-          fill="none"
-          strokeWidth={1.4}
-        >
-          {ORBIT_ANGLES.map((angle) => (
-            <ellipse
-              key={angle}
-              cx="16"
-              cy="16"
-              rx="13"
-              ry="5"
-              transform={`rotate(${angle} 16 16)`}
-            />
-          ))}
-        </g>
-      </g>
-      <circle cx="16" cy="16" r="2.4" className="fill-primary" />
+      {BARS.map((b, i) => {
+        const isSignal = i === BARS.length - 1
+        return (
+          <rect
+            key={b.x}
+            x={b.x}
+            y={BASELINE - b.h}
+            width={4}
+            height={b.h}
+            rx={1}
+            className={
+              isSignal
+                ? `fill-status-ok-dark${animated ? " animate-pulse motion-reduce:animate-none" : ""}`
+                : "fill-current"
+            }
+          />
+        )
+      })}
     </svg>
   )
 }

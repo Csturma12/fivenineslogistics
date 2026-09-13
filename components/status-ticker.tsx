@@ -1,9 +1,9 @@
 import { lanes } from "@/lib/site"
 
-type TickerItem = { label: string; value: string; accent?: boolean }
+type TickerItem = { label: string; value: string; tone?: "brand" | "warn" }
 
 const signals: TickerItem[] = [
-  { label: "On-time reliability, our standard", value: "99.999%", accent: true },
+  { label: "On-time reliability, our standard", value: "99.999%", tone: "brand" },
   { label: "Answer from dispatch, any hour", value: "< 1 hr" },
   { label: "Control tower coverage", value: "24 / 7 / 365" },
   { label: "Tolerance for a quiet miss", value: "0" },
@@ -13,7 +13,7 @@ const signals: TickerItem[] = [
 const laneItems: TickerItem[] = lanes.map((lane) => ({
   label: `${lane.id} · ${lane.route}`,
   value: lane.status === "ON SCHEDULE" ? lane.eta : `${lane.status} · ${lane.eta}`,
-  accent: lane.status !== "ON SCHEDULE",
+  tone: lane.status !== "ON SCHEDULE" ? "warn" : undefined,
 }))
 
 const items: TickerItem[] = [...signals, ...laneItems]
@@ -25,7 +25,15 @@ function TickerRow() {
         <div key={`${item.label}-${i}`} className="flex items-center">
           <span className="flex items-center gap-2 whitespace-nowrap px-5 font-mono text-[11px] uppercase tracking-wider">
             <span className="text-muted-foreground">{item.label}</span>
-            <span className={item.accent ? "font-semibold text-primary" : "text-foreground"}>
+            <span
+              className={
+                item.tone === "warn"
+                  ? "font-semibold text-status-warn"
+                  : item.tone === "brand"
+                    ? "font-semibold text-primary"
+                    : "text-foreground"
+              }
+            >
               {item.value}
             </span>
           </span>
@@ -46,8 +54,8 @@ export function StatusTicker() {
       <div className="flex items-center">
         <div className="z-10 flex shrink-0 items-center gap-2 border-r border-border/60 bg-background px-4 py-2">
           <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-70" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-status-ok opacity-70" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-status-ok" />
           </span>
           <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-foreground">
             Dispatch Live
