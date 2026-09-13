@@ -307,7 +307,7 @@ export const footerLinks = [
   { href: "/company", label: "Company" },
   { href: "/#method", label: "How We Run" },
   { href: "/#reliability", label: "Reliability" },
-  { href: "/#network", label: "Network" },
+  { href: "/portal", label: "Portal" },
   { href: "/request-capacity", label: "Request Capacity" },
 ]
 
