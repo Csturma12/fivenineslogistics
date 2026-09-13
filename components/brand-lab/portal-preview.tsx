@@ -41,8 +41,8 @@ export function PortalPreview() {
                 <dd
                   className={cn(
                     "tracking-wider",
-                    load.tone === "primary" && "text-primary",
-                    load.tone === "warn" && "text-navy-foreground",
+                    load.tone === "primary" && "text-[color:var(--status-ok-dark)]",
+                    load.tone === "warn" && "text-[color:var(--status-warn-dark)]",
                     load.tone === "muted" && "text-navy-foreground/60",
                   )}
                 >
@@ -159,7 +159,7 @@ export function DashboardPreview() {
           <h4 className="font-mono text-xs uppercase tracking-wider text-foreground">
             Customer · Gulfstream Fab
           </h4>
-          <span className="font-mono text-[11px] uppercase tracking-wider text-primary">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-[color:var(--status-ok)]">
             On-time 100% · 90d
           </span>
         </div>
@@ -185,7 +185,9 @@ export function DashboardPreview() {
               key={load.id}
               className={cn(
                 "flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 font-mono text-[11px]",
-                load.tone === "warn" ? "border-primary/40 bg-primary/5" : "border-border",
+                load.tone === "warn"
+                  ? "border-[color:var(--status-warn)]/40 bg-[color:var(--status-warn)]/8"
+                  : "border-border",
               )}
             >
               <span className="tracking-wider text-foreground">
@@ -194,8 +196,8 @@ export function DashboardPreview() {
               <span
                 className={cn(
                   "tracking-wider",
-                  load.tone === "primary" && "text-primary",
-                  load.tone === "warn" && "text-primary",
+                  load.tone === "primary" && "text-[color:var(--status-ok)]",
+                  load.tone === "warn" && "text-[color:var(--status-warn)]",
                   load.tone === "muted" && "text-muted-foreground",
                 )}
               >
@@ -219,7 +221,7 @@ export function DashboardPreview() {
       <div className="flex flex-col gap-5 rounded-xl border border-navy/40 bg-navy p-6 text-navy-foreground">
         <div className="flex items-baseline justify-between gap-4">
           <h4 className="font-mono text-xs uppercase tracking-wider">Carrier · Hardline Transport</h4>
-          <span className="font-mono text-[11px] uppercase tracking-wider text-primary">Setup complete</span>
+          <span className="font-mono text-[11px] uppercase tracking-wider text-[color:var(--status-ok-dark)]">Setup complete</span>
         </div>
 
         <div>
@@ -234,7 +236,7 @@ export function DashboardPreview() {
                   <div className="font-mono text-[11px] tracking-wider">{o.lane}</div>
                   <div className="mt-0.5 truncate text-[11px] text-navy-foreground/55">{o.note}</div>
                 </div>
-                <div className="font-mono text-sm font-semibold text-primary">{o.pay}</div>
+                <div className="font-mono text-sm font-semibold text-[color:var(--status-ok-dark)]">{o.pay}</div>
               </div>
             ))}
           </div>
@@ -244,7 +246,7 @@ export function DashboardPreview() {
           <p className="font-mono text-[10px] uppercase tracking-wider text-navy-foreground/50">Settlements</p>
           <div className="mt-2 flex items-center justify-between gap-3 rounded-lg border border-navy-foreground/15 px-3 py-2.5 font-mono text-[11px]">
             <span className="tracking-wider">LN-1187 · POD received</span>
-            <span className="tracking-wider text-primary">Pays Fri · $2,050</span>
+            <span className="tracking-wider text-[color:var(--status-ok-dark)]">Pays Fri · $2,050</span>
           </div>
         </div>
 

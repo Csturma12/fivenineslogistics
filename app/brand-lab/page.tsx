@@ -34,13 +34,15 @@ const marks = [
   },
 ]
 
-/* Navy-on-light exploration palette, scoped to this lab only via inline token
-   overrides so the live site's Signal-red identity is untouched. A confident
-   navy/azure accent on the clean professional cool-white background you like —
-   paired with GRAPHITE GUNMETAL dark surfaces (a cool near-black, not blue) so
-   the navy accent stays the star and never dissolves into the dark panels. */
+/* Two-signal system, scoped to this lab only via inline token overrides so the
+   live site's Signal-red identity is untouched. NAVY is the BRAND color (logo,
+   buttons, links, identity) on a slightly dimmed professional background, paired
+   with GRAPHITE GUNMETAL dark surfaces (a cool near-black, not blue) so navy
+   stays the star. A separate FUNCTIONAL status scale carries live state the way
+   a real control room is coded: green = nominal/on-plan, amber = monitoring,
+   red = exception. Brand and status never fight because they're different jobs. */
 const navyLightTheme = {
-  "--background": "oklch(0.99 0.004 250)",
+  "--background": "oklch(0.975 0.004 250)",
   "--foreground": "oklch(0.23 0.02 255)",
   "--card": "oklch(1 0 0)",
   "--card-foreground": "oklch(0.23 0.02 255)",
@@ -48,9 +50,9 @@ const navyLightTheme = {
   "--popover-foreground": "oklch(0.23 0.02 255)",
   "--primary": "oklch(0.47 0.14 256)",
   "--primary-foreground": "oklch(0.99 0.01 250)",
-  "--secondary": "oklch(0.96 0.008 250)",
+  "--secondary": "oklch(0.955 0.008 250)",
   "--secondary-foreground": "oklch(0.23 0.02 255)",
-  "--muted": "oklch(0.96 0.006 250)",
+  "--muted": "oklch(0.955 0.006 250)",
   "--muted-foreground": "oklch(0.45 0.02 255)",
   "--accent": "oklch(0.47 0.14 256)",
   "--accent-foreground": "oklch(0.99 0.01 250)",
@@ -58,9 +60,15 @@ const navyLightTheme = {
   "--input": "oklch(0.23 0.03 255 / 14%)",
   "--ring": "oklch(0.47 0.14 256)",
   /* dark surfaces (footer, control-tower panels): cool graphite gunmetal,
-     distinct from the navy accent, with a luminous azure for on-dark accents */
+     distinct from the navy accent */
   "--navy": "oklch(0.19 0.008 255)",
   "--navy-foreground": "oklch(0.95 0.006 250)",
+  /* functional status scale — live state, not brand */
+  "--status-ok": "oklch(0.6 0.14 152)",
+  "--status-ok-dark": "oklch(0.72 0.16 152)",
+  "--status-warn": "oklch(0.7 0.14 70)",
+  "--status-warn-dark": "oklch(0.8 0.15 75)",
+  "--status-alert": "oklch(0.57 0.2 25)",
 } as React.CSSProperties
 
 export default function BrandLabPage() {
@@ -80,13 +88,28 @@ export default function BrandLabPage() {
             Marks &amp; portal directions.
           </h1>
           <p className="mt-5 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground">
-            My take on the identity and the login, in a navy-on-light direction — a confident navy
-            accent on the clean professional background you like, paired with graphite gunmetal dark
-            surfaces (a cool near-black, not blue) so the navy stays the star. Three mark candidates,
-            then a working &quot;one door, two roles&quot; sign-in and the dashboards behind it. This
-            palette is scoped to the lab only; the live site&apos;s red is untouched, and nothing
-            here is wired into the public site yet.
+            A two-signal system. <span className="text-primary">Navy is the brand</span> — logo,
+            buttons, links, identity — on a slightly dimmed professional background with graphite
+            gunmetal dark surfaces. A separate functional scale carries live state the way a control
+            room is coded, so brand and status never fight. Three mark candidates, then a working
+            &quot;one door, two roles&quot; sign-in and the dashboards behind it. Scoped to the lab
+            only; the live site&apos;s red is untouched.
           </p>
+
+          <ul className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+            <li className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-primary" aria-hidden="true" /> Navy · brand
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[color:var(--status-ok)]" aria-hidden="true" /> Green · nominal
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[color:var(--status-warn)]" aria-hidden="true" /> Amber · monitoring
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[color:var(--status-alert)]" aria-hidden="true" /> Red · exception
+            </li>
+          </ul>
         </div>
       </section>
 
