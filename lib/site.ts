@@ -6,8 +6,6 @@ export const site = {
   agentOf: "An agent of Primary Freight LLC",
   authority: "Primary Freight LLC",
   mc: "MC# 841023",
-  // PLACEHOLDER — swap for the real USDOT number when available.
-  usdot: "USDOT# pending",
   phone: "(205) 842-3755",
   phoneHref: "tel:+12058423755",
   // Verified from Primary Freight LLC ACORD 25 certificate (Cottingham & Butler), policy period 4/12/2026–4/12/2027.
@@ -415,12 +413,12 @@ export const companyPage = {
   eyebrow: "Company",
   heading: "Over a decade moving critical freight. Now it has a name.",
   intro:
-    "Five Nines Logistics is the freight brand for operators who treat a delivery date the way an engineer treats uptime. The name is new; the desk behind it isn't. For over a decade we've run critical freight for the same shippers — and they're moving with us. We operate as an agent of Primary Freight LLC, with asset-based sister carriers on speed dial and a global partner network behind them.",
+    "Five Nines Logistics is the freight brand for operators who treat a delivery date the way an engineer treats uptime. The name is new; the desk behind it isn't. For over a decade we've run critical freight for the same shippers — and they're moving with us. We operate as an agent of Primary Freight LLC, with dedicated flatbed carrier partners on committed capacity and a vetted global network behind them.",
 }
 
 export const companyModel = {
   heading: "What 'agent of Primary Freight' means for your freight",
-  body: "It means asset-based capacity sits at the front of every dispatch decision, under established operating authority and insurance you can verify before you tender a load. You get the responsiveness of a dedicated specialist desk with the backing of carriers that own the trucks — not a broker reselling whatever the load board turns up.",
+  body: "It means your freight moves under Primary Freight's established broker authority and insurance — verifiable before you tender a load — handled by a specialist desk that treats your delivery date as the whole job. Dedicated flatbed carrier partners put committed equipment at the front of every capacity decision, backed by a vetted network for the modes and lanes we arrange beyond that.",
 }
 
 export type CompanyValue = {
@@ -435,7 +433,7 @@ export const companyStory: CompanyValue[] = [
   },
   {
     title: "How we're structured",
-    body: "We operate as an agent of Primary Freight LLC. That gives us two asset-based sister carriers, Just Drive Transportation and Primary Transportation, at the front of every dispatch decision, backed by a vetted partner network for the modes and lanes we don't run ourselves.",
+    body: "We operate as an agent of Primary Freight LLC, which holds the broker authority your freight moves under. Dedicated flatbed carrier partners put committed equipment at the front of every capacity decision, and a vetted carrier network covers the modes and lanes beyond flatbed.",
   },
   {
     title: "Why 'five nines'",
@@ -449,9 +447,9 @@ export type Credential = {
 }
 
 export const credentials: Credential[] = [
-  { label: "Operating authority", value: "Primary Freight LLC" },
+  { label: "Model", value: "Freight brokerage & agency" },
+  { label: "Broker authority", value: "Primary Freight LLC" },
   { label: "MC number", value: "MC# 841023" },
-  { label: "USDOT", value: "USDOT# pending" },
   { label: "Insurance", value: "$1M auto · $1M/$2M general · $4M umbrella · $150K contingent cargo" },
   { label: "Base of operations", value: "Houston, Texas" },
   { label: "Dispatch coverage", value: "24 hours, every day" },

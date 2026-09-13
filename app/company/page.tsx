@@ -10,7 +10,7 @@ import { companyPage, companyStory, companyModel, credentials, site } from "@/li
 export const metadata: Metadata = {
   title: "Company | Five Nines Logistics",
   description:
-    "Five Nines Logistics is the mission-critical freight brand operating as an agent of Primary Freight LLC, backed by asset-based sister carriers and a proven global partner network out of Houston, TX.",
+    "Five Nines Logistics is the mission-critical freight brand operating as an agent of Primary Freight LLC, backed by dedicated flatbed carrier partners and a proven global partner network out of Houston, TX.",
 }
 
 export default function CompanyPage() {
