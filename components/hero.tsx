@@ -50,9 +50,9 @@ export function Hero() {
             <dl className="mt-12 grid grid-cols-3 gap-6 border-t border-border pt-6">
               <div>
                 <dt className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                  On-time
+                  On-time target
                 </dt>
-                <dd className="mt-1 font-mono text-xl font-semibold text-foreground">99.999%</dd>
+                <dd className="mt-1 font-mono text-xl font-semibold text-foreground">Five nines</dd>
               </div>
               <div>
                 <dt className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
