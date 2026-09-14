@@ -2,7 +2,8 @@ import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
-import { PortalDashboardPreview } from "@/components/portal/portal-access"
+import { CustomerHome } from "@/components/portal/customer-home"
+import { CarrierHome } from "@/components/portal/carrier-home"
 import { SignOutButton } from "@/components/portal/sign-out-button"
 import { createClient } from "@/lib/supabase/server"
 
@@ -20,7 +21,10 @@ export default async function PortalHomePage() {
     redirect("/portal")
   }
 
-  const role = (user.user_metadata?.role as string) ?? "customer"
+  const role = (user.user_metadata?.role as string) === "carrier" ? "carrier" : "customer"
+  const company =
+    (user.user_metadata?.company as string)?.trim() ||
+    (role === "carrier" ? "Your authority" : "Your account")
 
   return (
     <main>
@@ -39,7 +43,9 @@ export default async function PortalHomePage() {
                 </span>
               </div>
               <h1 className="mt-5 text-balance text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-3xl">
-                Welcome back to the control tower.
+                {role === "carrier"
+                  ? "Your board, your settlements, one login."
+                  : "Welcome back to the control tower."}
               </h1>
               <p className="mt-3 truncate text-sm leading-relaxed text-muted-foreground">
                 {user.email}
@@ -49,7 +55,11 @@ export default async function PortalHomePage() {
           </div>
 
           <div className="mt-10">
-            <PortalDashboardPreview />
+            {role === "carrier" ? (
+              <CarrierHome company={company} />
+            ) : (
+              <CustomerHome company={company} />
+            )}
           </div>
         </div>
       </section>
