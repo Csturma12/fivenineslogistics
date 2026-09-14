@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type FormEvent } from "react"
 import Link from "next/link"
-import { ArrowRight, ShieldCheck } from "lucide-react"
+import { ArrowRight, ShieldCheck, MailCheck, Clock, CircleAlert } from "lucide-react"
 import { FiveNinesMark } from "@/components/five-nines-mark"
 import { cn } from "@/lib/utils"
 
 type Role = "customer" | "carrier"
+type SubmitState = "idle" | "submitting" | "pending" | "link_sent" | "error"
 
 const liveLoads = [
   { id: "LN-3402", lane: "PORT → HOU", status: "ARRIVING · 6 MIN", tone: "ok" as const },
@@ -16,6 +17,35 @@ const liveLoads = [
 
 export function PortalSignIn() {
   const [role, setRole] = useState<Role>("customer")
+  const [email, setEmail] = useState("")
+  const [fullName, setFullName] = useState("")
+  const [company, setCompany] = useState("")
+  const [state, setState] = useState<SubmitState>("idle")
+  const [error, setError] = useState("")
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (state === "submitting") return
+    setState("submitting")
+    setError("")
+    try {
+      const res = await fetch("/api/portal/access", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, role, fullName, company }),
+      })
+      const data = (await res.json()) as { outcome?: string; error?: string }
+      if (!res.ok) {
+        setState("error")
+        setError(data.error ?? "Something went wrong. Try again.")
+        return
+      }
+      setState(data.outcome === "link_sent" ? "link_sent" : "pending")
+    } catch {
+      setState("error")
+      setError("Network error. Check your connection and try again.")
+    }
+  }
 
   return (
     <div className="grid overflow-hidden rounded-xl border border-border lg:grid-cols-2">
@@ -93,69 +123,139 @@ export function PortalSignIn() {
           ))}
         </div>
 
-        <form className="mt-6 flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
-          <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-              Work email
-            </span>
-            <input
-              type="email"
-              autoComplete="email"
-              placeholder={role === "customer" ? "ops@yourcompany.com" : "dispatch@yourauthority.com"}
-              className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
-            />
-          </label>
-          <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-              Password
-            </span>
-            <input
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••••"
-              className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
-            />
-          </label>
-
-          <button
-            type="submit"
-            className="mt-1 flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 font-mono text-xs uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            Sign in <ArrowRight className="size-3.5" />
-          </button>
-
-          <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] uppercase tracking-wider">
+        {state === "link_sent" || state === "pending" ? (
+          <div className="mt-6 flex flex-col gap-4 rounded-lg border border-border bg-background p-5">
+            <div className="flex items-center gap-2.5">
+              {state === "link_sent" ? (
+                <MailCheck
+                  className="size-5 shrink-0 text-[color:var(--status-ok)]"
+                  aria-hidden="true"
+                />
+              ) : (
+                <Clock
+                  className="size-5 shrink-0 text-[color:var(--status-warn)]"
+                  aria-hidden="true"
+                />
+              )}
+              <h3 className="text-base font-semibold tracking-tight text-foreground">
+                {state === "link_sent" ? "Check your email" : "Request received"}
+              </h3>
+            </div>
+            <p className="text-[13px] leading-relaxed text-muted-foreground">
+              {state === "link_sent" ? (
+                <>
+                  We sent a password-free sign-in link to{" "}
+                  <span className="font-medium text-foreground">{email}</span>. It expires in about
+                  an hour and can only be used once.
+                </>
+              ) : (
+                <>
+                  Dispatch will approve <span className="font-medium text-foreground">{email}</span>{" "}
+                  and email your secure sign-in link — no password required. Enter your email again
+                  once you&apos;re approved.
+                </>
+              )}
+            </p>
             <button
               type="button"
-              className="min-h-11 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              onClick={() => {
+                setState("idle")
+                setEmail("")
+              }}
+              className="min-h-11 self-start font-mono text-[11px] uppercase tracking-wider text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
             >
-              Forgot password
+              Use a different email
             </button>
-            <a
-              href="tel:+12058423755"
-              className="text-[color:var(--status-ok)] underline-offset-4 hover:underline"
-            >
-              Dispatch answers in &lt; 1 hr
-            </a>
           </div>
-        </form>
+        ) : (
+          <>
+            <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
+              <label className="flex flex-col gap-1.5">
+                <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                  Work email
+                </span>
+                <input
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={role === "customer" ? "ops@yourcompany.com" : "dispatch@yourauthority.com"}
+                  className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
+                />
+              </label>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-1.5">
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                    Name <span className="text-muted-foreground/50">· optional</span>
+                  </span>
+                  <input
+                    type="text"
+                    autoComplete="name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Alex Rivera"
+                    className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                    Company <span className="text-muted-foreground/50">· optional</span>
+                  </span>
+                  <input
+                    type="text"
+                    autoComplete="organization"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    placeholder={role === "customer" ? "Gulfstream Fab" : "Hardline Transport"}
+                    className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
+                  />
+                </label>
+              </div>
 
-        <div className="mt-6 flex items-start gap-2 rounded-lg border border-border bg-background p-3">
-          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
-          <p className="text-[13px] leading-relaxed text-muted-foreground">
-            {role === "carrier" ? (
-              <>
-                Hauling for us? Request our certificate of insurance, or ask to be added as a
-                certificate holder — send it during onboarding and we&apos;ll return it same day.
-              </>
-            ) : (
-              <>
-                Need a certificate of insurance, or to be added as a certificate holder on a load?
-                Request it from your coordinator and we&apos;ll send it over.
-              </>
-            )}
-          </p>
-        </div>
+              {state === "error" && (
+                <p
+                  role="alert"
+                  className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-[color:var(--destructive)]"
+                >
+                  <CircleAlert className="size-3.5 shrink-0" aria-hidden="true" />
+                  {error}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={state === "submitting"}
+                className="mt-1 flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 font-mono text-xs uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+              >
+                {state === "submitting" ? "Sending" : "Get portal access"}
+                <ArrowRight className="size-3.5" />
+              </button>
+
+              <p className="font-mono text-[11px] leading-relaxed text-muted-foreground">
+                New here? Dispatch approves you, then emails a password-free link. Already approved?
+                Your link arrives the moment you enter your email.
+              </p>
+            </form>
+
+            <div className="mt-6 flex items-start gap-2 rounded-lg border border-border bg-background p-3">
+              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+              <p className="text-[13px] leading-relaxed text-muted-foreground">
+                {role === "carrier" ? (
+                  <>
+                    Hauling for us? Request our certificate of insurance, or ask to be added as a
+                    certificate holder — send it during onboarding and we&apos;ll return it same day.
+                  </>
+                ) : (
+                  <>
+                    Need a certificate of insurance, or to be added as a certificate holder on a
+                    load? Request it from your coordinator and we&apos;ll send it over.
+                  </>
+                )}
+              </p>
+            </div>
+          </>
+        )}
 
         <div className="mt-6 border-t border-border pt-5">
           <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
