@@ -339,6 +339,18 @@ export const sectors: Sector[] = [
     ],
   },
   {
+    code: "Pipe, fittings & valves (PFV)",
+    title: "The flow-control supply chain that feeds the plant",
+    description:
+      "PFV is a major part of our book, and it runs on the same clock as the turnaround it feeds. Distributors, fabricators, and mills move carbon and alloy pipe, forged and flanged fittings, and manual and actuated valves into the yard before the crew needs them — spooled, coated, and staged in the sequence the job calls for, not dumped at the gate.",
+    points: [
+      "Carbon & alloy pipe, spools & structural",
+      "Flanges, weld & forged fittings",
+      "Gate, ball, check & actuated valves",
+      "Coated, lined & mill-direct loads",
+    ],
+  },
+  {
     code: "Data centers",
     title: "Long-lead gear, delivered to the day",
     description:
@@ -385,7 +397,7 @@ export const whoWeServePage = {
     "Every shipper says their freight is important. The teams we work for can name the exact cost of a missed window, because it's already written into a commissioning schedule, a turnaround plan, or a launch date. That is the freight we're built for.",
   closing: {
     heading: "One tolerance for failure, whatever you move.",
-    body: "We don't run a different playbook by industry. Whether it's a transformer for a data hall or a valve for a refinery turnaround, the same method of procedure, the same asset-first sourcing, and the same reporting apply to every load.",
+    body: "Most of what we move ends up at the same place: a plant with a window that will not move. Refractory brick, a run of alloy pipe, a skid of valves, a transformer for a data hall — it's the same job to us. The same method of procedure, the same asset-first sourcing, and the same reporting apply to every load.",
   },
 }
 
