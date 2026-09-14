@@ -327,6 +327,18 @@ export type Sector = {
 
 export const sectors: Sector[] = [
   {
+    code: "Refractory & plant maintenance",
+    title: "The turnaround trade we came up in",
+    description:
+      "This is the freight we've run for over a decade, from a decade before that spent doing the work inside the plants. Brick, castable, and precast shapes land inside a shutdown window that will not move — for the installers, manufacturers, distributors, and the demolition, fireproofing, rubber-lining, and corrosion crews who keep furnaces, boilers, and vessels lined and running.",
+    points: [
+      "Firebrick, castable & ramming mix",
+      "Precast shapes & ceramic fiber",
+      "Demolition tear-out & haul-off",
+      "Fireproofing, rubber-lining & corrosion materials",
+    ],
+  },
+  {
     code: "Data centers",
     title: "Long-lead gear, delivered to the day",
     description:
