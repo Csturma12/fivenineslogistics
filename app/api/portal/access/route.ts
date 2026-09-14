@@ -5,10 +5,38 @@ import { site } from "@/lib/site"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-const FROM = `Five Nines Portal <portal@${process.env.RESEND_EMAIL_DOMAIN}>`
+// Preferred branded sender. Requires fivenineslogistics.com to be verified in Resend.
+const PREFERRED_FROM = `Five Nines Portal <portal@${process.env.RESEND_EMAIL_DOMAIN}>`
+// Always-verified Resend sandbox sender. Delivers only to the Resend account owner,
+// but keeps the flow working until the branded domain is verified.
+const SANDBOX_FROM = "Five Nines Portal <onboarding@resend.dev>"
 const ADMIN_TO = process.env.PORTAL_ADMIN_EMAIL || site.dispatchEmail
 
 type Role = "customer" | "carrier"
+
+type SendArgs = {
+  to: string[]
+  subject: string
+  html: string
+  replyTo?: string
+  idempotencyKey: string
+}
+
+// Send from the branded domain; if Resend rejects it as unverified, transparently
+// retry from the sandbox sender so a failed/pending domain never breaks the flow.
+async function sendPortalEmail({ to, subject, html, replyTo, idempotencyKey }: SendArgs) {
+  const base = { to, subject, html, ...(replyTo ? { replyTo } : {}) }
+
+  const first = await resend.emails.send({ from: PREFERRED_FROM, ...base }, { idempotencyKey })
+  if (!first.error) return first
+
+  if (/not verified|domain/i.test(first.error.message)) {
+    console.log("[v0] branded domain unverified, retrying from sandbox sender")
+    return resend.emails.send({ from: SANDBOX_FROM, ...base }, { idempotencyKey: `${idempotencyKey}/sbx` })
+  }
+
+  return first
+}
 
 function isEmail(v: unknown): v is string {
   return typeof v === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
@@ -80,15 +108,12 @@ export async function POST(req: NextRequest) {
       "/portal/home",
     )}`
 
-    const { error: mailErr } = await resend.emails.send(
-      {
-        from: FROM,
-        to: [email],
-        subject: "Your Five Nines portal sign-in link",
-        html: signInEmailHtml(confirmUrl),
-      },
-      { idempotencyKey: `portal-signin/${existing.id}/${Math.floor(Date.now() / 60000)}` },
-    )
+    const { error: mailErr } = await sendPortalEmail({
+      to: [email],
+      subject: "Your Five Nines portal sign-in link",
+      html: signInEmailHtml(confirmUrl),
+      idempotencyKey: `portal-signin/${existing.id}/${Math.floor(Date.now() / 60000)}`,
+    })
 
     if (mailErr) {
       console.error("[v0] signin mail error:", mailErr.message)
@@ -119,16 +144,13 @@ export async function POST(req: NextRequest) {
     requestId = inserted.id
   }
 
-  const { error: adminMailErr } = await resend.emails.send(
-    {
-      from: FROM,
-      to: [ADMIN_TO],
-      replyTo: email,
-      subject: `Portal access request — ${email} (${role})`,
-      html: adminEmailHtml({ email, role, fullName, company, requestId }),
-    },
-    { idempotencyKey: `portal-request/${requestId}` },
-  )
+  const { error: adminMailErr } = await sendPortalEmail({
+    to: [ADMIN_TO],
+    replyTo: email,
+    subject: `Portal access request — ${email} (${role})`,
+    html: adminEmailHtml({ email, role, fullName, company, requestId }),
+    idempotencyKey: `portal-request/${requestId}`,
+  })
 
   if (adminMailErr) {
     // The request is saved regardless; the user still sees "pending".
