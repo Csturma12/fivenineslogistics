@@ -313,9 +313,9 @@ export const footerLinks = [
 
 export const whoWeServe = {
   eyebrow: "Who we serve",
-  heading: "The operations we serve. One tolerance for failure.",
+  heading: "The plants that build America. One tolerance for failure.",
   intro:
-    "We don't chase every load. We work for the teams whose delivery date is written into a commissioning schedule, a shutdown window, or a go-live. These are a few of them — the standard is the same for every one.",
+    "More than half of what we move is refractory, plant maintenance, and PFV — freight headed for a furnace, a unit, or a shutdown window that will not move. Data halls and job sites run on the same clock, so they get the same standard. These are a few of them.",
 }
 
 export type Sector = {
