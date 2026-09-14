@@ -39,7 +39,7 @@ export function FiveNinesMark({
             rx={1}
             className={
               isSignal
-                ? `fill-status-ok-dark${animated ? " animate-pulse motion-reduce:animate-none" : ""}`
+                ? `fill-status-ok${animated ? " animate-pulse motion-reduce:animate-none" : ""}`
                 : "fill-current"
             }
           />

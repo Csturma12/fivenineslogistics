@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { site } from "@/lib/site"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -10,7 +9,7 @@ const PREFERRED_FROM = `Five Nines Portal <portal@${process.env.RESEND_EMAIL_DOM
 // Always-verified Resend sandbox sender. Delivers only to the Resend account owner,
 // but keeps the flow working until the branded domain is verified.
 const SANDBOX_FROM = "Five Nines Portal <onboarding@resend.dev>"
-const ADMIN_TO = process.env.PORTAL_ADMIN_EMAIL || site.dispatchEmail
+const ADMIN_TO = process.env.PORTAL_ADMIN_EMAIL || "sturma@blbxcritical.com"
 
 type Role = "customer" | "carrier"
 
