@@ -20,8 +20,8 @@ export function ReliabilityMonitor() {
           {site.name} LLC
         </span>
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
-          <span className="font-mono text-xs uppercase tracking-wider text-primary">Dispatch Live</span>
+          <span className="h-2 w-2 rounded-full bg-status-ok" aria-hidden="true" />
+          <span className="font-mono text-xs uppercase tracking-wider text-status-ok">Dispatch Live</span>
         </div>
       </div>
 
@@ -63,7 +63,7 @@ export function ReliabilityMonitor() {
           {dayStatuses.map((status, i) => (
             <div
               key={i}
-              className={`aspect-square rounded-[2px] ${status === "ok" ? "bg-primary/70" : "bg-muted-foreground/50"}`}
+              className={`aspect-square rounded-[2px] ${status === "ok" ? "bg-status-ok/70" : "bg-status-warn"}`}
               aria-hidden="true"
             />
           ))}

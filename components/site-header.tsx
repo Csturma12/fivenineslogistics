@@ -35,7 +35,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <a
             href={site.phoneHref}
             className="hidden items-center gap-1.5 font-mono text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground lg:flex"
@@ -43,6 +43,12 @@ export function SiteHeader() {
             <Phone className="size-3.5" />
             {site.phone}
           </a>
+          <Link
+            href="/portal"
+            className="flex min-h-11 items-center whitespace-nowrap font-mono text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Sign In
+          </Link>
           <Button
             render={<Link href="/request-capacity" />}
             nativeButton={false}
