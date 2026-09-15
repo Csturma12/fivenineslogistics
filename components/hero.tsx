@@ -21,9 +21,11 @@ export function Hero() {
             </h1>
 
             <p className="mt-5 max-w-lg text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Five nines is the uptime target a data center is engineered to. A refinery
-              turnaround runs on the same math. We built a Houston freight brokerage around it:
-              every load planned like it can&apos;t fail, because for our customers it can&apos;t.
+              We ran refractory and maintenance inside the plants for a decade before we ever
+              dispatched a load. So we plan every shipment backward from the window it has to
+              hit &mdash; the shutdown, the turnaround, the go-live. Data centers run on the
+              same discipline. When the delivery date is the whole job, that&apos;s the freight
+              we move.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">

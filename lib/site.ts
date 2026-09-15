@@ -297,16 +297,16 @@ export const navLinks = [
   { href: "/who-we-serve", label: "Who We Serve" },
   { href: "/modes", label: "Modes" },
   { href: "/carriers", label: "Carriers" },
-  { href: "/company", label: "Company" },
+  { href: "/company", label: "Who We Are" },
 ]
 
 export const footerLinks = [
   { href: "/who-we-serve", label: "Who We Serve" },
   { href: "/modes", label: "Modes" },
   { href: "/carriers", label: "Carriers" },
-  { href: "/company", label: "Company" },
-  { href: "/#method", label: "How We Run" },
-  { href: "/#reliability", label: "Reliability" },
+  { href: "/company", label: "Who We Are" },
+  { href: "/company#method", label: "How We Run" },
+  { href: "/company#reliability", label: "Reliability" },
   { href: "/portal", label: "Portal" },
   { href: "/request-capacity", label: "Request Capacity" },
 ]

@@ -4,6 +4,8 @@ import { Phone, Mail, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { DedicatedFleet } from "@/components/dedicated-fleet"
+import { Capacity } from "@/components/capacity"
 import {
   carriersPage,
   carrierBenefits,
@@ -130,6 +132,9 @@ export default function CarriersPage() {
             </div>
           </div>
         </section>
+
+        <DedicatedFleet />
+        <Capacity />
       </main>
       <SiteFooter />
     </>

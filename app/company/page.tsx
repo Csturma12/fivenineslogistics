@@ -4,13 +4,15 @@ import { ArrowRight, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { Method } from "@/components/method"
+import { Reliability } from "@/components/reliability"
 import { NetworkCta } from "@/components/network-cta"
 import { companyPage, companyStory, companyModel, credentials, site } from "@/lib/site"
 
 export const metadata: Metadata = {
-  title: "Company | Five Nines Logistics",
+  title: "Who We Are | Five Nines Logistics",
   description:
-    "Five Nines Logistics is the mission-critical freight brand operating as an agent of Primary Freight LLC, backed by dedicated flatbed carrier partners and a proven global partner network out of Houston, TX.",
+    "We ran refractory and plant maintenance inside the plants for a decade, then got into trucking in 2017. Five Nines Logistics is the mission-critical freight brand operating as an agent of Primary Freight LLC, out of Houston, TX.",
 }
 
 export default function CompanyPage() {
@@ -106,6 +108,8 @@ export default function CompanyPage() {
           </div>
         </section>
 
+        <Method />
+        <Reliability />
         <NetworkCta />
       </main>
       <SiteFooter />
