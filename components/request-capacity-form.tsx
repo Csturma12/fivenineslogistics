@@ -57,6 +57,7 @@ export function RequestCapacityForm() {
 
   return (
     <form action={formAction} className="rounded-xl border border-border bg-card/50 p-6 sm:p-8">
+      <input type="hidden" name="requestType" value="capacity" />
       <input type="hidden" name="mode" value={mode} />
       <input type="hidden" name="cadence" value={cadence} />
       <div className="flex flex-col gap-5">

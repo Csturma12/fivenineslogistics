@@ -99,17 +99,17 @@ export function CustomerHome({ company }: { company: string }) {
       </section>
 
       {/* Documents */}
-      <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6">
+      <section id="documents" className="flex scroll-mt-24 flex-col gap-4 rounded-xl border border-border bg-card p-6">
         <div className="flex items-baseline justify-between gap-4">
           <h2 className="font-mono text-xs uppercase tracking-wider text-foreground">Documents</h2>
           <span className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-            Synced from TMS
+            Request · review · approve
           </span>
         </div>
         <p className="text-[13px] leading-relaxed text-muted-foreground">
-          PODs, BOLs, invoices, COIs, and rate confirmations will pull straight from our TMS so
-          everything for your loads lives in one place. That connection is being wired up now — the
-          items below are a preview of the layout.
+          Shipment records and company compliance documents are handled separately. Load-specific
+          records will sync from the TMS. Authority, insurance, entity, and other compliance files
+          must be requested by a signed-in customer and approved before access is granted.
         </p>
         <div className="grid gap-2 sm:grid-cols-2">
           {documents.map((doc) => (
@@ -126,22 +126,23 @@ export function CustomerHome({ company }: { company: string }) {
                   {doc.note}
                 </div>
               </div>
-              <span
-                className="flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground"
-                aria-hidden="true"
+              <a
+                href={`mailto:${site.dispatchEmail}?subject=Document request: ${doc.kind} ${doc.id}`}
+                className="flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                aria-label={`Request ${doc.kind} ${doc.id}`}
               >
                 <Download className="size-3" aria-hidden="true" />
-                Soon
-              </span>
+                Request
+              </a>
             </div>
           ))}
         </div>
         <div className="mt-1 flex items-start gap-2 rounded-lg border border-border bg-background p-3">
           <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
           <p className="text-[13px] leading-relaxed text-muted-foreground">
-            Need a certificate of insurance today, or to be added as a certificate holder on a load?
-            Email your coordinator or call dispatch and we&apos;ll send it over — same day, while the
-            TMS document feed comes online.
+            For now, requests are reviewed and fulfilled by your coordinator. The next portal phase
+            will add customer-specific approvals, an audit record, private storage, and time-limited
+            download links. Sensitive legal documents will never be posted in the public site library.
           </p>
         </div>
       </section>

@@ -23,7 +23,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-5 lg:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}

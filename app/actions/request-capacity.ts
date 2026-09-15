@@ -29,6 +29,7 @@ export async function submitRequestCapacity(
 ): Promise<RequestState> {
   const field = (key: string) => (formData.get(key) as string | null)?.trim() ?? ""
 
+  const requestType = field("requestType") || "capacity"
   const name = field("name")
   const company = field("company")
   const email = field("email")
@@ -53,11 +54,12 @@ export async function submitRequestCapacity(
     return { status: "error", message: "Please enter a valid work email address." }
   }
 
-  const ticket = ticketId()
+  const ticket = requestType === "consulting" ? ticketId().replace("RC-", "SC-") : ticketId()
   const resend = new Resend(process.env.RESEND_API_KEY)
   const from = `Five Nines Dispatch <dispatch@${process.env.RESEND_EMAIL_DOMAIN}>`
 
   const rows: Array<[string, string]> = [
+    ["Request type", requestType === "consulting" ? "Supply chain consultation" : "Capacity"],
     ["Ticket", ticket],
     ["Contact", name],
     ["Company", company],
@@ -95,10 +97,10 @@ export async function submitRequestCapacity(
       from,
       to: [LEAD_INBOX],
       replyTo: email,
-      subject: `Capacity request ${ticket} · ${company}`,
+      subject: `${requestType === "consulting" ? "Consultation" : "Capacity"} request ${ticket} · ${company}`,
       html,
     },
-    { idempotencyKey: `capacity-request/${email}/${origin}-${destination}` },
+    { idempotencyKey: `${requestType}-request/${email}/${origin}-${destination}` },
   )
 
   if (error) {

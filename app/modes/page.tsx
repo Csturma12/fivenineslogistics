@@ -27,10 +27,10 @@ export default function ModesPage() {
               Nine modes. One tolerance for failure.
             </h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-              Our in-house capacity covers flatbed and step-deck, dry van, hotshot, expedited
-              sprinter and box-truck freight, plus one power unit dedicated to drayage. We extend
-              drayage through proven hub partners; heavy haul, ocean, and LTL move through our
-              partner network under the same dispatch, tracking, and reporting standard.
+              We arrange freight with current direct equipment, affiliated carrier capacity, and a
+              broader vetted network. Two hotshots, one sprinter, and one power unit support direct
+              operations today. Trailer and specialty access may be leased, borrowed, or supplied
+              by affiliated and partner carriers, depending on the load.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
