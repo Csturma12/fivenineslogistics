@@ -15,8 +15,9 @@ export function HomeServeStrip() {
               Freight for a window that will not move.
             </h2>
             <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-              More than half of what we move is refractory, plant maintenance, and PFV — headed for a
-              furnace, a unit, or a shutdown. Data halls and job sites run on the same clock.
+              We move freight into jobs that cannot wait: furnace work, plant shutdowns, new
+              manufacturing capacity, and mission-critical data-center builds. When the schedule
+              does not have time to wait on a truck, we plan backward from the delivery window.
             </p>
           </div>
           <Link

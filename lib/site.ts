@@ -28,9 +28,9 @@ export type Mode = {
 
 export const modesIntro = {
   eyebrow: "Modes",
-  heading: "Deep in six. Capable across all of it.",
+  heading: "Our equipment where it counts. Proven partners everywhere else.",
   intro:
-    "Our team spent years running flatbed, dry van, expedited, drayage, hotshot, and box truck freight before this company had a name. Everything else we handle through partners we've moved thousands of loads with.",
+    "Our in-house capacity covers flatbed and step-deck, dry van, hotshot, and expedited sprinter and box-truck freight. Drayage, heavy haul, ocean, and LTL move through proven partners under the same dispatch and reporting standard.",
 }
 
 export const modes: Mode[] = [
@@ -38,11 +38,11 @@ export const modes: Mode[] = [
     name: "Flatbed",
     slug: "flatbed",
     tier: "In-house",
-    description: "Step deck, RGN, conestoga. Tarped, chained, and permitted when it needs to be.",
+    description: "Flatbed, step-deck, and expedited over-the-road container transport. Secured, permitted, and planned before pickup.",
     detail:
-      "Open-deck freight is where we started. We spec the right trailer for the dimensions and weight, secure it to standard, and permit the load when it runs over legal. Tarping, chaining, and dunnage are planned before the truck shows up, not figured out at the dock.",
-    equipment: ["48' & 53' flatbed", "Step deck", "Double drop / RGN", "Conestoga", "Stretch & multi-axle"],
-    typicalLoads: ["Structural steel & pipe", "Machinery & equipment", "Building materials", "Coils & plate"],
+      "Open-deck freight is where we started. We spec the right trailer for the dimensions and weight, secure it to standard, and permit the load when it runs over legal. We also move loaded containers over the road on flatbed and step-deck equipment when the route or final destination calls for it. Tarping, chaining, dunnage, and container securement are planned before the truck shows up, not figured out at the dock.",
+    equipment: ["48' & 53' flatbed", "Step deck", "Double drop / RGN", "Conestoga", "Container securement"],
+    typicalLoads: ["Structural steel & pipe", "Machinery & equipment", "Expedited loaded containers", "Coils & plate"],
   },
   {
     name: "Dry van",
@@ -67,10 +67,10 @@ export const modes: Mode[] = [
   {
     name: "Drayage",
     slug: "drayage",
-    tier: "In-house",
-    description: "Port of Houston and Gulf terminals. Chassis, LFD tracking, and demurrage avoidance.",
+    tier: "Partner network",
+    description: "Port and inland coverage with chassis coordination, LFD tracking, and demurrage avoidance.",
     detail:
-      "We run containers in and out of the Port of Houston and Gulf terminals with our own dispatch discipline: chassis lined up, last-free-day tracked, and appointments booked so boxes move before demurrage and per-diem start stacking up.",
+      "At every listed hub, we work with partners that can unload loaded containers, mount them on chassis, and complete the final mile. We coordinate the equipment, appointments, and last-free-day tracking so boxes move before demurrage and per-diem start stacking up.",
     equipment: ["20' & 40' chassis", "Tri-axle chassis", "Transload capacity", "Bonded moves"],
     typicalLoads: ["Import / export containers", "Transload to over-the-road", "Port-to-warehouse", "FCL drayage"],
   },
@@ -131,7 +131,7 @@ export const warehousing = {
   eyebrow: "Warehousing & customs",
   heading: "Space to stage it, cleared to move it.",
   intro:
-    "Trucking is only half of a critical supply chain. We hold warehouse contracts with managed inventory in six key markets, backed by vetted partner space across the country — plus in-bond trucking and a customs broker on call so international freight never stalls at the border.",
+    "Trucking is only half of a critical supply chain. We have contracted and partner warehouse capacity in ten key markets, backed by vetted space across the country — plus in-bond trucking and a customs broker on call so international freight never stalls at the border.",
   locations: [
     { city: "Charleston, SC", note: "East Coast port distribution" },
     { city: "Houston, TX", note: "Gulf gateway & project staging" },
@@ -139,11 +139,15 @@ export const warehousing = {
     { city: "Los Angeles, CA", note: "West Coast port drayage & transload" },
     { city: "Indianapolis, IN", note: "Midwest inventory & distribution" },
     { city: "Harrisburg, PA", note: "Northeast corridor distribution" },
+    { city: "Chicago, IL", note: "Midwest warehousing & transload" },
+    { city: "Memphis, TN", note: "Mid-South warehousing & distribution" },
+    { city: "Norfolk, VA", note: "Port warehousing & final-mile staging" },
+    { city: "Brillion, WI", note: "Northeast Wisconsin warehousing" },
   ],
   capabilities: [
     {
       title: "Contract warehousing & inventory management",
-      body: "Dedicated and shared space in six markets with managed inventory — receiving, put-away, cycle counts, and outbound staging — plus a vetted partner network for overflow and coverage in every other region.",
+      body: "Contracted and partner space in ten markets for receiving, put-away, managed inventory, transload, and outbound staging — plus vetted overflow coverage in every other region.",
     },
     {
       title: "In-bond trucking",
@@ -384,6 +388,18 @@ export const sectors: Sector[] = [
       "Laydown-yard staging",
       "Oversize and permitted moves",
       "Crane-coordinated deliveries",
+    ],
+  },
+  {
+    code: "General freight",
+    title: "Straightforward freight, handled the right way",
+    description:
+      "Not every load is tied to a shutdown. We move regular truckload and expedited freight with the same clear communication, equipment checks, and follow-through we bring to critical work.",
+    points: [
+      "Dry-van and palletized freight",
+      "Flatbed and step-deck loads",
+      "Hotshot, sprinter, and box truck",
+      "Scheduled and expedited delivery",
     ],
   },
 ]
