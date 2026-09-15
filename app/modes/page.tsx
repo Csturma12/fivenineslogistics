@@ -27,9 +27,10 @@ export default function ModesPage() {
               Nine modes. One tolerance for failure.
             </h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-              We ran flatbed, dry van, expedited, drayage, hotshot, and box truck freight for years before this
-              company had a name — then built the rest of the network around the same standard. Every
-              mode below is planned, sourced, tracked, and reported the same way.
+              Our in-house capacity covers flatbed and step-deck, dry van, hotshot, expedited
+              sprinter and box-truck freight, plus one power unit dedicated to drayage. We extend
+              drayage through proven hub partners; heavy haul, ocean, and LTL move through our
+              partner network under the same dispatch, tracking, and reporting standard.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button

@@ -16,10 +16,10 @@ export function NetworkCta() {
             </h2>
             <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
               Regional gateways feed a network of 2,400+ monitored lanes across all 50 states, with
-              cross-border operations into Mexico and Canada — including the Santa Teresa and border
-              gateways that keep maquiladora and Canadian freight moving. Every hub reports into the
-              same control tower, so capacity requests get routed against real-time carrier
-              availability — not a spreadsheet.
+              cross-border operations into Mexico and Canada. At every listed hub, our partners can
+              unload loaded containers, mount them on chassis, and complete the final mile. Every
+              move reports into the same control tower, so capacity requests are routed against
+              current carrier and equipment availability — not a spreadsheet.
             </p>
 
             <div className="mt-8 grid grid-cols-4 gap-3 sm:grid-cols-4">
