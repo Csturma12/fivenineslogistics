@@ -313,9 +313,9 @@ export const footerLinks = [
 
 export const whoWeServe = {
   eyebrow: "Who we serve",
-  heading: "The operations we serve. One tolerance for failure.",
+  heading: "The plants that build America. One tolerance for failure.",
   intro:
-    "We don't chase every load. We work for the teams whose delivery date is written into a commissioning schedule, a shutdown window, or a go-live. These are a few of them — the standard is the same for every one.",
+    "More than half of what we move is refractory, plant maintenance, and PFV — freight headed for a furnace, a unit, or a shutdown window that will not move. Data halls and job sites run on the same clock, so they get the same standard. These are a few of them.",
 }
 
 export type Sector = {
@@ -326,6 +326,30 @@ export type Sector = {
 }
 
 export const sectors: Sector[] = [
+  {
+    code: "Refractory & plant maintenance",
+    title: "The turnaround trade we came up in",
+    description:
+      "This is the freight we've run for over a decade, from a decade before that spent doing the work inside the plants. Brick, castable, and precast shapes land inside a shutdown window that will not move — for the installers, manufacturers, distributors, and the demolition, fireproofing, rubber-lining, and corrosion crews who keep furnaces, boilers, and vessels lined and running.",
+    points: [
+      "Firebrick, castable & ramming mix",
+      "Precast shapes & ceramic fiber",
+      "Demolition tear-out & haul-off",
+      "Fireproofing, rubber-lining & corrosion materials",
+    ],
+  },
+  {
+    code: "Pipe, fittings & valves (PFV)",
+    title: "The flow-control supply chain that feeds the plant",
+    description:
+      "PFV is a major part of our book, and it runs on the same clock as the turnaround it feeds. Distributors, fabricators, and mills move carbon and alloy pipe, forged and flanged fittings, and manual and actuated valves into the yard before the crew needs them — spooled, coated, and staged in the sequence the job calls for, not dumped at the gate.",
+    points: [
+      "Carbon & alloy pipe, spools & structural",
+      "Flanges, weld & forged fittings",
+      "Gate, ball, check & actuated valves",
+      "Coated, lined & mill-direct loads",
+    ],
+  },
   {
     code: "Data centers",
     title: "Long-lead gear, delivered to the day",
@@ -373,7 +397,7 @@ export const whoWeServePage = {
     "Every shipper says their freight is important. The teams we work for can name the exact cost of a missed window, because it's already written into a commissioning schedule, a turnaround plan, or a launch date. That is the freight we're built for.",
   closing: {
     heading: "One tolerance for failure, whatever you move.",
-    body: "We don't run a different playbook by industry. Whether it's a transformer for a data hall or a valve for a refinery turnaround, the same method of procedure, the same asset-first sourcing, and the same reporting apply to every load.",
+    body: "Most of what we move ends up at the same place: a plant with a window that will not move. Refractory brick, a run of alloy pipe, a skid of valves, a transformer for a data hall — it's the same job to us. The same method of procedure, the same asset-first sourcing, and the same reporting apply to every load.",
   },
 }
 

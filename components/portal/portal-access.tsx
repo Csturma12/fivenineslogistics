@@ -15,8 +15,13 @@ const liveLoads = [
   { id: "LN-4519", lane: "HOU → NOLA", status: "MONITORING · WX", tone: "warn" as const },
 ]
 
-export function PortalSignIn() {
-  const [role, setRole] = useState<Role>("customer")
+const carrierBoard = [
+  { lane: "HOU → DFW", spec: "FLATBED · 44K", pay: "$1,180" },
+  { lane: "HOU → BTR", spec: "HOTSHOT · 8K", pay: "$740" },
+  { lane: "PORT → SAT", spec: "STEP DECK · 38K", pay: "$1,320" },
+]
+
+export function PortalSignIn({ role }: { role: Role }) {
   const [email, setEmail] = useState("")
   const [fullName, setFullName] = useState("")
   const [company, setCompany] = useState("")
@@ -56,36 +61,62 @@ export function PortalSignIn() {
           <span className="text-sm font-semibold tracking-tight">FIVE NINES</span>
         </div>
 
-        <div>
-          <h2 className="text-balance text-2xl font-semibold leading-[1.12] tracking-tight sm:text-3xl">
-            The control tower is always on.
-            <br />
-            <span className="text-[color:var(--status-ok-dark)]">So is your login.</span>
-          </h2>
+        {role === "carrier" ? (
+          <div>
+            <h2 className="text-balance text-2xl font-semibold leading-[1.12] tracking-tight sm:text-3xl">
+              The load board is always live.
+              <br />
+              <span className="text-[color:var(--status-ok-dark)]">So is your login.</span>
+            </h2>
 
-          <dl className="mt-6 flex flex-col gap-2 rounded-lg border border-navy-foreground/15 p-4">
-            {liveLoads.map((load) => (
-              <div
-                key={load.id}
-                className="flex items-center justify-between gap-3 font-mono text-[11px]"
-              >
-                <dt className="tracking-wider text-navy-foreground/70">
-                  {load.id} <span className="text-navy-foreground/40">·</span> {load.lane}
-                </dt>
-                <dd
-                  className={cn(
-                    "shrink-0 tracking-wider",
-                    load.tone === "ok" && "text-[color:var(--status-ok-dark)]",
-                    load.tone === "warn" && "text-[color:var(--status-warn-dark)]",
-                    load.tone === "muted" && "text-navy-foreground/60",
-                  )}
+            <dl className="mt-6 flex flex-col gap-2 rounded-lg border border-navy-foreground/15 p-4">
+              {carrierBoard.map((o) => (
+                <div
+                  key={o.lane}
+                  className="flex items-center justify-between gap-3 font-mono text-[11px]"
                 >
-                  {load.status}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+                  <dt className="tracking-wider text-navy-foreground/70">
+                    {o.lane} <span className="text-navy-foreground/40">·</span> {o.spec}
+                  </dt>
+                  <dd className="shrink-0 tracking-wider text-[color:var(--status-ok-dark)]">
+                    {o.pay}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        ) : (
+          <div>
+            <h2 className="text-balance text-2xl font-semibold leading-[1.12] tracking-tight sm:text-3xl">
+              The control tower is always on.
+              <br />
+              <span className="text-[color:var(--status-ok-dark)]">So is your login.</span>
+            </h2>
+
+            <dl className="mt-6 flex flex-col gap-2 rounded-lg border border-navy-foreground/15 p-4">
+              {liveLoads.map((load) => (
+                <div
+                  key={load.id}
+                  className="flex items-center justify-between gap-3 font-mono text-[11px]"
+                >
+                  <dt className="tracking-wider text-navy-foreground/70">
+                    {load.id} <span className="text-navy-foreground/40">·</span> {load.lane}
+                  </dt>
+                  <dd
+                    className={cn(
+                      "shrink-0 tracking-wider",
+                      load.tone === "ok" && "text-[color:var(--status-ok-dark)]",
+                      load.tone === "warn" && "text-[color:var(--status-warn-dark)]",
+                      load.tone === "muted" && "text-navy-foreground/60",
+                    )}
+                  >
+                    {load.status}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
 
         <p className="font-mono text-[10px] uppercase tracking-wider text-navy-foreground/45">
           99.999% on-time · dispatch 24/7/365 · MC# 841023
@@ -94,34 +125,14 @@ export function PortalSignIn() {
 
       {/* Sign-in panel */}
       <div className="bg-card p-6 sm:p-8">
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Sign in</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          {role === "carrier" ? "Carrier sign in" : "Customer sign in"}
+        </h2>
         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-          Your loads, documents, and settlements — one login.
+          {role === "carrier"
+            ? "The live load board, your loads, and settlements — one login."
+            : "Your loads, documents, and settlements — one login."}
         </p>
-
-        <div
-          role="tablist"
-          aria-label="Account type"
-          className="mt-6 grid grid-cols-2 gap-1 rounded-lg border border-border bg-background p-1"
-        >
-          {(["customer", "carrier"] as Role[]).map((r) => (
-            <button
-              key={r}
-              type="button"
-              role="tab"
-              aria-selected={role === r}
-              onClick={() => setRole(r)}
-              className={cn(
-                "min-h-11 rounded-md py-2 font-mono text-xs uppercase tracking-wider transition-colors",
-                role === r
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {r}
-            </button>
-          ))}
-        </div>
 
         {state === "link_sent" || state === "pending" ? (
           <div className="mt-6 flex flex-col gap-4 rounded-lg border border-border bg-background p-5">

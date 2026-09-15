@@ -10,7 +10,7 @@ import { sectors, whoWeServePage, whoWeServeInputs, site } from "@/lib/site"
 export const metadata: Metadata = {
   title: "Who We Serve | Five Nines Logistics",
   description:
-    "Data centers, oil & gas turnarounds, and mission-critical contractors — the operations that measure downtime in dollars per minute. One tolerance for failure, whatever you move.",
+    "Refractory and plant maintenance, data centers, oil & gas turnarounds, and mission-critical contractors — the operations that measure downtime in dollars per minute. One tolerance for failure, whatever you move.",
 }
 
 export default function WhoWeServePage() {
