@@ -352,14 +352,14 @@ export const sectors: Sector[] = [
   },
   {
     code: "Data centers",
-    title: "Long-lead gear, delivered to the day",
+    title: "Expedited 24/7 across Texas and the Midwest",
     description:
-      "Switchgear, generators, and transformers are ordered months out and installed in a window measured in hours. We stage, sequence, and deliver against your look-ahead, with a written method of procedure for every live-site drop.",
+      "Switchgear, generators, and transformers are ordered months out and installed in a window measured in hours. We run expedited hotshot and full-truckload freight to data center builds across Texas and the Midwest, day or night. When something has to be done right and delivered on time, we're the call you make.",
     points: [
-      "Switchgear and PDUs",
-      "Generators and UPS systems",
-      "Transformers and busway",
-      "Rack-and-stack inbound",
+      "24/7 hotshot, any hour",
+      "Expedited FTL, Texas and the Midwest",
+      "Switchgear, PDUs, and transformers",
+      "Generators, UPS, and rack-and-stack",
     ],
   },
   {
