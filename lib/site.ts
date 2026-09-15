@@ -19,7 +19,7 @@ export const site = {
 export type Mode = {
   name: string
   slug: string
-  tier: "In-house" | "Partner network"
+  tier: "In-house" | "In-house + partners" | "Partner network"
   description: string
   detail: string
   equipment: string[]
@@ -30,7 +30,7 @@ export const modesIntro = {
   eyebrow: "Modes",
   heading: "Our equipment where it counts. Proven partners everywhere else.",
   intro:
-    "Our in-house capacity covers flatbed and step-deck, dry van, hotshot, and expedited sprinter and box-truck freight. Drayage, heavy haul, ocean, and LTL move through proven partners under the same dispatch and reporting standard.",
+    "Our in-house capacity covers flatbed and step-deck, dry van, hotshot, expedited sprinter and box-truck freight, plus one power unit dedicated to drayage. We extend drayage coverage through proven hub partners; heavy haul, ocean, and LTL move through our partner network under the same dispatch and reporting standard.",
 }
 
 export const modes: Mode[] = [
@@ -67,10 +67,10 @@ export const modes: Mode[] = [
   {
     name: "Drayage",
     slug: "drayage",
-    tier: "Partner network",
-    description: "Port and inland coverage with chassis coordination, LFD tracking, and demurrage avoidance.",
+    tier: "In-house + partners",
+    description: "One dedicated power unit, backed by hub partners for chassis coordination and final-mile coverage.",
     detail:
-      "At every listed hub, we work with partners that can unload loaded containers, mount them on chassis, and complete the final mile. We coordinate the equipment, appointments, and last-free-day tracking so boxes move before demurrage and per-diem start stacking up.",
+      "We dedicate one power unit to drayage and extend that capacity through trusted partners at every listed hub. Those partners can unload loaded containers, mount them on chassis, and complete the final mile. We coordinate the equipment, appointments, and last-free-day tracking so boxes move before demurrage and per-diem start stacking up.",
     equipment: ["20' & 40' chassis", "Tri-axle chassis", "Transload capacity", "Bonded moves"],
     typicalLoads: ["Import / export containers", "Transload to over-the-road", "Port-to-warehouse", "FCL drayage"],
   },
