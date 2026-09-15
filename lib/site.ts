@@ -203,7 +203,7 @@ export const methodSteps: MethodStep[] = [
 export type CapacityBlock = {
   title: string
   description: string
-  partners: string[]
+  partners?: string[]
 }
 
 export const capacityIntro = {
@@ -222,7 +222,6 @@ export const capacityBlocks: CapacityBlock[] = [
     title: "Specialty & network capacity",
     description:
       "Vetted partners extend coverage into drayage, heavy haul, LTL, ocean, warehousing, and one-way lanes. We identify who is providing the equipment and keep one Five Nines coordinator accountable for the move.",
-    partners: ["Port & inland drayage", "Specialty equipment", "Global connections"],
   },
 ]
 
