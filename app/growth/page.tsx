@@ -43,14 +43,14 @@ const availableNow = [
 const roadmap = [
   {
     status: "Building next",
-    title: "Build the Five Nines customer base",
-    body: "Earn the first direct shipper relationships, turn service into repeat business, and build density around the lanes customers need most.",
-    items: ["Direct shipper acquisition", "Repeat-lane density", "Documented operating playbooks"],
+    title: "Grow the Five Nines book of business",
+    body: "Bring more of our existing shipper relationships under the Five Nines name, deepen repeat lanes, and add density where customers already trust us to run freight.",
+    items: ["Expand direct shipper base", "Deeper repeat-lane density", "Documented operating playbooks"],
   },
   {
     status: "Building next",
     title: "Strengthen the operating network",
-    body: "Formalize the carrier, warehouse, drayage, and specialist relationships that already make broader service possible.",
+    body: "Formalize the carrier, warehouse, drayage, and specialist relationships that already move our freight every week.",
     items: ["Carrier onboarding", "Partner scorecards", "Hub and facility documentation"],
   },
   {
@@ -80,8 +80,8 @@ const roadmap = [
 ]
 
 const measures = [
-  { label: "Customers served", value: "Starting point", note: "Earned one relationship at a time" },
-  { label: "Repeat lanes", value: "Building", note: "Density follows customer demand" },
+  { label: "Shipments", value: "Up to 500/wk", note: "Freight we already move every week" },
+  { label: "Repeat lanes", value: "Established", note: "Built on relationships that reorder" },
   { label: "Capacity relationships", value: "Established", note: "A decade of industry relationships" },
   { label: "Equipment", value: "Expanding", note: "Added when utilization supports it" },
   { label: "Facilities", value: "Planned", note: "Leased and partner locations" },
@@ -104,20 +104,20 @@ export default function GrowthPage() {
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
             <p className="font-mono text-xs uppercase tracking-wider text-primary">Watch Us Grow</p>
             <h1 className="mt-4 max-w-5xl text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
-              The experience is established. The company is just getting started.
+              An established freight practice, entering its next chapter.
             </h1>
             <div className="mt-7 grid gap-6 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
               <p className="max-w-3xl text-pretty text-lg leading-relaxed text-muted-foreground">
                 Five Nines is the next chapter of a ten-year freight career—not a first day in
-                logistics. Built by an operations and account manager overseeing up to 500 shipments
-                a week, we are moving toward a customer and carrier centered network that brings
-                solutions across every aspect of the supply chain. Our staff brings drivers with 10+
-                years on the road, foremen and superintendents from the field, and a decade of field
-                work in the refractory industry. This page tracks what we build from here.
+                logistics. Built by an operations and account manager already overseeing up to 500
+                shipments a week, we are moving toward a customer and carrier centered network that
+                brings solutions across every aspect of the supply chain. Our staff brings drivers
+                with 10+ years on the road, foremen and superintendents from the field, and a decade
+                of field work in the refractory industry. This page tracks where we take it next.
               </p>
               <p className="border-l border-primary pl-5 font-mono text-xs uppercase leading-relaxed tracking-wider text-foreground">
-                No invented launch dates. No pretending planned growth already happened. We will
-                show the work as it becomes real.
+                Real customers, real freight, and a decade of relationships already in place. This
+                roadmap is where we grow from here—reported as it becomes real.
               </p>
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function GrowthPage() {
                 </h2>
               </div>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                The Five Nines name is new. The work, relationships, and standards behind it are not.
+                The Five Nines name is new. The customers, work, relationships, and standards behind it are not.
               </p>
             </div>
             <div className="mt-9 grid gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-2">
@@ -238,7 +238,7 @@ export default function GrowthPage() {
                   Bring us the lane, capability, or relationship worth building around.
                 </h2>
                 <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">
-                  Shippers, carriers, warehouse operators, and strategic partners all have a place in this roadmap. The best growth starts with real operating demand.
+                  Shippers, carriers, warehouse operators, and strategic partners all have a place in this roadmap. We are already moving freight every week and growing from there.
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
