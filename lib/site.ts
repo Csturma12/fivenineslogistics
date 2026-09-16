@@ -486,7 +486,7 @@ export type CompanyValue = {
 export const companyStory: CompanyValue[] = [
   {
     title: "Where we come from",
-    body: "For over a decade we've dispatched flatbed, expedited, drayage, hotshot, and box-truck freight across Texas and the Gulf for a book of shippers who kept calling back. Five Nines is that relationship, organized under one name and one promise: the load arrives when we said it would. The customers who know our work are moving with us.",
+    body: "For over a decade, we've coordinated flatbed, expedited, drayage, hotshot, and box-truck freight across Texas and the Gulf. Five Nines brings that experience together under one name and one promise: the load arrives when we said it would. Our customers trust us because they know the service and transparency we provide.",
   },
   {
     title: "How we're structured",
