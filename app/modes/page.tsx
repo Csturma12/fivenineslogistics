@@ -43,13 +43,14 @@ export default function ModesPage() {
                 <ArrowRight className="size-4" data-icon="inline-end" />
               </Button>
               <Button
-                render={<Link href={`mailto:${site.dispatchEmail}`} />}
+                render={<Link href="/loads" />}
                 nativeButton={false}
                 size="lg"
                 variant="outline"
                 className="font-medium"
               >
-                Talk to Dispatch
+                View Load Board
+                <ArrowRight className="size-4" data-icon="inline-end" />
               </Button>
             </div>
           </div>

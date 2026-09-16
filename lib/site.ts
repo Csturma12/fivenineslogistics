@@ -316,6 +316,7 @@ export const heroSpec: { label: string; value: string }[] = [
 export const navLinks = [
   { href: "/who-we-serve", label: "Industries" },
   { href: "/modes", label: "Modes" },
+  { href: "/loads", label: "Load Board" },
   { href: "/consulting", label: "Consulting" },
   { href: "/growth", label: "Watch Us Grow" },
   { href: "/company", label: "Company" },
@@ -324,6 +325,7 @@ export const navLinks = [
 export const footerLinks = [
   { href: "/who-we-serve", label: "Who We Serve" },
   { href: "/modes", label: "Modes" },
+  { href: "/loads", label: "Load Board" },
   { href: "/carriers", label: "Carriers" },
   { href: "/company", label: "Who We Are" },
   { href: "/company#method", label: "How We Run" },
