@@ -6,9 +6,9 @@ import { SiteFooter } from "@/components/site-footer"
 import { PortalSignIn } from "@/components/portal/portal-access"
 
 export const metadata: Metadata = {
-  title: "Customer portal — Five Nines Logistics",
+  title: "Customer portal access — Five Nines Logistics",
   description:
-    "Sign in to track your freight, pull documents from our TMS, and settle — one login, the five-nines standard behind it.",
+    "Request verified, password-free customer portal access and connect with the team coordinating your freight.",
 }
 
 export default function CustomerPortalPage() {
@@ -20,17 +20,17 @@ export default function CustomerPortalPage() {
           <div className="max-w-2xl">
             <Link
               href="/portal"
-              className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <ArrowLeft className="size-3.5" aria-hidden="true" />
-              Both portals
+              All portal access
             </Link>
             <h1 className="mt-6 text-balance text-3xl font-semibold leading-[1.1] tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-              Sign in to track your freight.
+              Secure access for Five Nines customers.
             </h1>
             <p className="mt-5 text-pretty text-base leading-relaxed text-muted-foreground">
-              Live load status, documents pulled straight from our TMS, and settlements — one login,
-              the same five-nines standard running behind every move.
+              Submit your work email and company details. We verify every request before sending a
+              password-free sign-in link to approved users.
             </p>
           </div>
 

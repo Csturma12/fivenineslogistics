@@ -8,7 +8,7 @@ import { SignOutButton } from "@/components/portal/sign-out-button"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
-  title: "Your control tower — Five Nines Logistics",
+  title: "Approved portal access — Five Nines Logistics",
 }
 
 export default async function PortalHomePage() {
@@ -21,9 +21,9 @@ export default async function PortalHomePage() {
     redirect("/portal")
   }
 
-  const role = (user.user_metadata?.role as string) === "carrier" ? "carrier" : "customer"
+  const role = user.app_metadata?.role === "carrier" ? "carrier" : "customer"
   const company =
-    (user.user_metadata?.company as string)?.trim() ||
+    (typeof user.app_metadata?.company === "string" && user.app_metadata.company.trim()) ||
     (role === "carrier" ? "Your authority" : "Your account")
 
   return (
@@ -34,32 +34,23 @@ export default async function PortalHomePage() {
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1">
-                <span
-                  className="h-1.5 w-1.5 rounded-full bg-[color:var(--status-ok)]"
-                  aria-hidden="true"
-                />
+                <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--status-ok)]" aria-hidden="true" />
                 <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Signed in · {role}
+                  Approved · {role} access
                 </span>
               </div>
               <h1 className="mt-5 text-balance text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-3xl">
-                {role === "carrier"
-                  ? "Your board, your settlements, one login."
-                  : "Welcome back to the control tower."}
+                {role === "carrier" ? "Carrier connection" : "Customer connection"}
               </h1>
-              <p className="mt-3 truncate text-sm leading-relaxed text-muted-foreground">
-                {user.email}
+              <p className="mt-3 break-all text-sm leading-relaxed text-muted-foreground">
+                Signed in as {user.email}
               </p>
             </div>
             <SignOutButton />
           </div>
 
           <div className="mt-10">
-            {role === "carrier" ? (
-              <CarrierHome company={company} />
-            ) : (
-              <CustomerHome company={company} />
-            )}
+            {role === "carrier" ? <CarrierHome company={company} /> : <CustomerHome company={company} />}
           </div>
         </div>
       </section>

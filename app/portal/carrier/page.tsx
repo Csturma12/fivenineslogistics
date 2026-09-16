@@ -1,14 +1,14 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, ShieldCheck } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { PortalSignIn } from "@/components/portal/portal-access"
 
 export const metadata: Metadata = {
-  title: "Carrier portal — Five Nines Logistics",
+  title: "Carrier portal access — Five Nines Logistics",
   description:
-    "Sign in to our live load board. See freight offered to your authority, accept loads, upload PODs, and watch settlements — one login.",
+    "Request verified, password-free carrier portal access and connect with Five Nines carrier relations.",
 }
 
 export default function CarrierPortalPage() {
@@ -20,26 +20,23 @@ export default function CarrierPortalPage() {
           <div className="max-w-2xl">
             <Link
               href="/portal"
-              className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <ArrowLeft className="size-3.5" aria-hidden="true" />
-              Both portals
+              All portal access
             </Link>
             <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1">
-              <span
-                className="h-1.5 w-1.5 rounded-full bg-[color:var(--status-ok)]"
-                aria-hidden="true"
-              />
+              <ShieldCheck className="size-3.5 text-[color:var(--status-ok)]" aria-hidden="true" />
               <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                Carrier portal · live load board
+                Verified carrier access
               </span>
             </div>
             <h1 className="mt-5 text-balance text-3xl font-semibold leading-[1.1] tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-              Sign in to the load board.
+              A secure connection for trusted carriers.
             </h1>
             <p className="mt-5 text-pretty text-base leading-relaxed text-muted-foreground">
-              See freight offered to your authority, accept loads, upload PODs, and watch
-              settlements — one login built for drivers and dispatch.
+              Submit your dispatch email and company details. We verify every carrier relationship
+              before sending a password-free sign-in link to approved users.
             </p>
           </div>
 

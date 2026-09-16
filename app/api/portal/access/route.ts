@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   }
 
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : ""
-  const role: Role = body.role === "carrier" ? "carrier" : "customer"
+  const requestedRole = body.role
   const fullName = clean(body.fullName)
   const company = clean(body.company)
 
@@ -64,11 +64,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Enter a valid work email." }, { status: 400 })
   }
 
+  if (requestedRole !== "customer" && requestedRole !== "carrier") {
+    return NextResponse.json({ error: "Choose a valid portal." }, { status: 400 })
+  }
+
+  const role: Role = requestedRole
+
   const supabase = createAdminClient()
 
   const { data: existing, error: selErr } = await supabase
     .from("portal_access_requests")
-    .select("id,status,role")
+    .select("id,status,role,company")
     .eq("email", email)
     .maybeSingle()
 
@@ -79,14 +85,41 @@ export async function POST(req: NextRequest) {
 
   // Already approved by an admin -> issue a password-free sign-in link now.
   if (existing?.status === "authorized") {
-    // A magic link requires the auth user to exist first.
-    const { error: createErr } = await supabase.auth.admin.createUser({
+    const approvedRole: Role = existing.role === "carrier" ? "carrier" : "customer"
+    const approvedCompany = clean(existing.company) ?? (approvedRole === "carrier" ? "Your authority" : "Your account")
+    const authorization = { role: approvedRole, company: approvedCompany }
+
+    // Authorization belongs in protected app_metadata, never user-editable user_metadata.
+    const { data: createdUser, error: createErr } = await supabase.auth.admin.createUser({
       email,
       email_confirm: true,
-      user_metadata: { role: (existing.role as Role) ?? role },
+      app_metadata: authorization,
     })
-    if (createErr && !/already|registered|exists/i.test(createErr.message)) {
+
+    let authUserId = createdUser.user?.id
+    if (createErr && /already|registered|exists/i.test(createErr.message)) {
+      const { data: usersPage, error: usersErr } = await supabase.auth.admin.listUsers({
+        page: 1,
+        perPage: 1000,
+      })
+      if (usersErr) {
+        console.error("[v0] listUsers error:", usersErr.message)
+      }
+      authUserId = usersPage?.users.find((user) => user.email?.toLowerCase() === email)?.id
+    } else if (createErr) {
       console.error("[v0] createUser error:", createErr.message)
+    }
+
+    if (!authUserId) {
+      return NextResponse.json({ error: "Could not prepare portal access. Try again." }, { status: 500 })
+    }
+
+    const { error: metadataErr } = await supabase.auth.admin.updateUserById(authUserId, {
+      app_metadata: authorization,
+    })
+    if (metadataErr) {
+      console.error("[v0] updateUser metadata error:", metadataErr.message)
+      return NextResponse.json({ error: "Could not prepare portal access. Try again." }, { status: 500 })
     }
 
     const { data: linkData, error: linkErr } = await supabase.auth.admin.generateLink({
@@ -119,7 +152,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Could not send your link. Try again." }, { status: 500 })
     }
 
-    return NextResponse.json({ outcome: "link_sent" })
+    return NextResponse.json({ outcome: "received" })
   }
 
   // New or still-pending -> record the request and notify an admin to approve it.
@@ -156,7 +189,7 @@ export async function POST(req: NextRequest) {
     console.error("[v0] admin mail error:", adminMailErr.message)
   }
 
-  return NextResponse.json({ outcome: "pending" })
+  return NextResponse.json({ outcome: "received" })
 }
 
 function shell(inner: string): string {
