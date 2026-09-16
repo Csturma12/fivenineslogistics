@@ -59,6 +59,92 @@ export function SignalFiveMark(props: MarkProps) {
   return <NetworkFiveMark {...props} />
 }
 
+/* Nine cells, the ninth live green. "Nines" made literal — server-rack / rack-unit energy. */
+export function GridNineMark({ className, animated, monochrome }: MarkProps) {
+  const cells = [4, 26, 48].flatMap((y) => [4, 26, 48].map((x) => ({ x, y })))
+  return (
+    <svg viewBox="0 0 70 70" className={className} role="img" aria-label="Nine-cell rack, ninth cell live">
+      {cells.map((c, i) => {
+        const isLive = i === cells.length - 1
+        return (
+          <rect
+            key={`${c.x}-${c.y}`}
+            x={c.x}
+            y={c.y}
+            width={18}
+            height={18}
+            rx={4}
+            className={cn(isLive && !monochrome ? undefined : "fill-current", isLive && animated && !monochrome && "motion-safe:animate-pulse")}
+            style={isLive && !monochrome ? { fill: "var(--status-ok)" } : undefined}
+          />
+        )
+      })}
+    </svg>
+  )
+}
+
+/* Four corner brackets locked on a live green core — a viewfinder that never loses the load. */
+export function ViewfinderMark({ className, animated, monochrome }: MarkProps) {
+  return (
+    <svg viewBox="0 0 72 72" className={className} role="img" aria-label="Viewfinder locked on a live core">
+      <g fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="square">
+        <path d="M8 22V8h14M64 22V8H50M8 50v14h14M64 50v14H50" />
+      </g>
+      <rect
+        x="27"
+        y="27"
+        width="18"
+        height="18"
+        rx="4"
+        className={cn(monochrome ? "fill-current" : undefined, animated && !monochrome && "motion-safe:animate-pulse")}
+        style={monochrome ? undefined : { fill: "var(--status-ok)" }}
+      />
+    </svg>
+  )
+}
+
+/* Flatbed decks stacked in isometric — the live load rides on top in green. */
+export function IsoStackMark({ className, animated, monochrome }: MarkProps) {
+  const layers = [46, 37, 28]
+  const w = 26
+  const h = 13
+  const cx = 36
+  const diamond = (cy: number) => `${cx},${cy - h} ${cx + w},${cy} ${cx},${cy + h} ${cx - w},${cy}`
+  return (
+    <svg viewBox="0 0 72 66" className={className} role="img" aria-label="Stacked freight decks, top deck live">
+      {layers.map((cy, i) => {
+        const isTop = i === layers.length - 1
+        return (
+          <polygon
+            key={cy}
+            points={diamond(cy)}
+            className={cn(isTop && !monochrome ? undefined : "fill-current", isTop && animated && !monochrome && "motion-safe:animate-pulse")}
+            style={isTop && !monochrome ? { fill: "var(--status-ok)" } : undefined}
+            opacity={monochrome || isTop ? 1 : 0.35 + i * 0.22}
+          />
+        )
+      })}
+    </svg>
+  )
+}
+
+/* Ultra-condensed heavyweight 5N — no metaphor, just weight. The kind of mark you weld onto a gate. */
+export function CondensedWordmark({ className, animated, monochrome }: MarkProps) {
+  return (
+    <svg viewBox="0 0 72 72" className={className} role="img" aria-label="5N heavy wordmark">
+      <text x="2" y="56" className="font-mono text-[58px] font-black tracking-[-0.1em]">
+        <tspan className="fill-current">5</tspan>
+        <tspan
+          className={cn(monochrome ? "fill-current" : undefined, animated && !monochrome && "motion-safe:animate-pulse")}
+          style={monochrome ? undefined : { fill: "var(--status-ok)" }}
+        >
+          N
+        </tspan>
+      </text>
+    </svg>
+  )
+}
+
 export function MarkApplication({ children, label, dark = false }: { children: React.ReactNode; label: string; dark?: boolean }) {
   return <div className={cn("flex min-h-28 flex-col justify-between gap-4 rounded-lg border border-border p-4", dark ? "bg-[color:var(--navy)] text-[color:var(--navy-foreground)]" : "bg-card text-foreground")}><span className="font-mono text-[9px] uppercase tracking-wider opacity-60">{label}</span>{children}</div>
 }
