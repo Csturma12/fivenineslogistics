@@ -486,11 +486,11 @@ export type CompanyValue = {
 export const companyStory: CompanyValue[] = [
   {
     title: "Where we come from",
-    body: "For over a decade we've dispatched flatbed, expedited, drayage, hotshot, and box-truck freight across Texas and the Gulf for a book of shippers who kept calling back. Five Nines is that relationship, organized under one name and one promise: the load arrives when we said it would. The customers who know our work are moving with us.",
+    body: "For over a decade, we've coordinated flatbed, expedited, drayage, hotshot, and box-truck freight across Texas and the Gulf. Five Nines brings that experience together under one name and one promise: the load arrives when we said it would. Our customers trust us because they know the service and transparency we provide.",
   },
   {
     title: "How we're structured",
-    body: "We operate as an agent of Primary Freight LLC, which holds the broker authority used to arrange customer freight. Owned capacity, roughly 40 trucks and trailers available through affiliated relationships, and a broader vetted network support the lanes and services we offer.",
+    body: "We operate as an agent of Primary Freight LLC, which holds the broker authority used to arrange customer freight. Our Strategic Alliance gives us roughly 40 flatbeds and step decks from operators who have trusted us enough to dedicate capacity around our business for nearly 10 years, supported by a broader vetted network.",
   },
   {
     title: "Why 'five nines'",
