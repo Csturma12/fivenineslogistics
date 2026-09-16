@@ -10,7 +10,7 @@ import { modes, site, warehousing } from "@/lib/site"
 export const metadata: Metadata = {
   title: "Modes & Services | Five Nines Logistics",
   description:
-    "A Houston-based 3PL arranging flatbed, van, expedited, drayage, hotshot, heavy haul, ocean, LTL, and third-party warehousing through nationwide and global partners.",
+    "A Houston-based 3PL arranging flatbed, dry van, sprinter van, refrigerated trucking, expedited, drayage, hotshot, heavy haul, crane and rigging, ocean, LTL, and warehousing through nationwide and global partners.",
 }
 
 export default function ModesPage() {
@@ -24,7 +24,7 @@ export default function ModesPage() {
               Modes &amp; Services
             </span>
             <h1 className="mt-4 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl">
-              Nine modes. One tolerance for failure.
+              Twelve modes. One tolerance for failure.
             </h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
               Owned capacity, affiliated carriers, and a vetted nationwide and global network give

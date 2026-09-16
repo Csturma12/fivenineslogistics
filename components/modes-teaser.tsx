@@ -17,8 +17,8 @@ export function ModesTeaser() {
             </h2>
           </div>
           <p className="text-pretty leading-relaxed text-muted-foreground">
-            Eight modes, run to the same standard — from flatbed and hotshot to drayage, ocean, and
-            LTL. See the equipment and the freight we handle in each.
+            Twelve modes, run to the same standard — from sprinter van and refrigerated trucking to
+            heavy haul, crane and rigging, ocean, and LTL. See the equipment and freight we handle.
           </p>
         </div>
 
