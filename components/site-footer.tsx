@@ -4,7 +4,7 @@ import { site } from "@/lib/site"
 
 const groups = [
  {label:"Services",links:[{href:"/modes",label:"Modes & equipment"},{href:"/consulting",label:"Supply Chain Consulting"},{href:"/request-capacity",label:"Request Capacity"}]},
- {label:"Company",links:[{href:"/company",label:"Who We Are"},{href:"/who-we-serve",label:"Who We Serve"},{href:"/growth",label:"Watch Us Grow"},{href:"/carriers",label:"Haul for Us"}]},
+ {label:"Company",links:[{href:"/company",label:"Who We Are"},{href:"/who-we-serve",label:"Who We Serve"},{href:"/growth",label:"Watch Us Grow"},{href:"/work-with-us",label:"Work With Us"},{href:"/carriers",label:"Haul for Us"}]},
  {label:"Portal & resources",links:[{href:"/portal",label:"Customer Sign In"},{href:"/portal",label:"Carrier Sign In"},{href:"/portal/customer#documents",label:"Request Documents"}]},
 ]
 
