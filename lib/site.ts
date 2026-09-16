@@ -290,7 +290,7 @@ export const navLinks = [
   { href: "/who-we-serve", label: "Industries" },
   { href: "/modes", label: "Modes" },
   { href: "/consulting", label: "Consulting" },
-  { href: "/growth", label: "Growth" },
+  { href: "/growth", label: "Watch Us Grow" },
   { href: "/company", label: "Company" },
 ]
 
