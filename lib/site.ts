@@ -490,7 +490,7 @@ export const companyStory: CompanyValue[] = [
   },
   {
     title: "How we're structured",
-    body: "We operate as an agent of Primary Freight LLC, which holds the broker authority used to arrange customer freight. Our core capacity includes roughly 40 flatbeds and step decks from affiliated carriers that have trusted us enough to dedicate capacity around our business for nearly 10 years, supported by a broader vetted network.",
+    body: "We operate as an agent of Primary Freight LLC, which holds the broker authority used to arrange customer freight. Our Strategic Alliance gives us roughly 40 flatbeds and step decks from operators who have trusted us enough to dedicate capacity around our business for nearly 10 years, supported by a broader vetted network.",
   },
   {
     title: "Why 'five nines'",
