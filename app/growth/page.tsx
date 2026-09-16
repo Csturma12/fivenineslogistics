@@ -8,12 +8,12 @@ import { SiteFooter } from "@/components/site-footer"
 export const metadata: Metadata = { title: "Watch Us Grow | Five Nines Logistics", description: "A transparent operating journal covering Five Nines Logistics capacity, equipment, carrier relationships, and service growth." }
 
 const capacity = [
- {label:"Available today",value:"2 hotshots · 1 sprinter · 1 power unit",body:"Current equipment access through operating and carrier relationships. Trailer access may be leased, borrowed, or carrier-supplied depending on the job."},
- {label:"Established carrier capacity",value:"Approximately 40 trucks & trailers",body:"Independent carrier assets available through relationships built over roughly a decade. We coordinate them through the brokerage and do not call them a Five Nines-owned fleet."},
+ {label:"Owned capacity",value:"2 hotshots · 1 sprinter · 1 power unit",body:"Core equipment supporting urgent, dedicated, and regional work."},
+ {label:"Affiliated capacity",value:"Approximately 40 trucks & trailers",body:"Dependable capacity through carrier relationships built over roughly a decade."},
  {label:"Signing on",value:"4–5 additional hotshots planned",body:"Recruiting and onboarding are underway. These units are not counted as active capacity until agreements, insurance, and operating requirements are complete."},
 ]
 const updates = [
- {date:"September 2026",title:"Publishing the capacity model",body:"We separated current equipment access, established carrier capacity, and the extended partner network across the site. Customers should know who is providing the equipment before a load moves."},
+ {date:"September 2026",title:"Publishing the capacity model",body:"Owned equipment, affiliated capacity, and a vetted extended network now support the Five Nines service model."},
  {date:"September 2026",title:"Supply Chain Consulting opens",body:"Four practical first reviews are now available at no cost: freight cost audit, delay analysis, risk assessment, and route optimization."},
  {date:"Next report",title:"Equipment and hub additions",body:"New hotshots, trailers, power units, warehouse access, and drayage hubs will be posted here after they are active—not while they are still planned."},
 ]
