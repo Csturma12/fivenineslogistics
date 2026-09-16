@@ -20,8 +20,8 @@ export const metadata: Metadata = {
 const availableNow = [
   {
     icon: ShieldCheck,
-    title: "Ten years in freight",
-    body: "A decade of account management, execution, problem-solving, and enterprise relationships comes with us from day one.",
+    title: "Field-tested experience",
+    body: "Our staff includes drivers with 10+ years on the road, foremen and superintendents who have worked in the field, plus a decade of field work in the refractory industry—all behind us from day one.",
   },
   {
     icon: Building2,
@@ -109,9 +109,11 @@ export default function GrowthPage() {
             <div className="mt-7 grid gap-6 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
               <p className="max-w-3xl text-pretty text-lg leading-relaxed text-muted-foreground">
                 Five Nines is the next chapter of a ten-year freight career—not a first day in
-                logistics. I am moving from account manager to independent agent with the service
-                capabilities, relationships, and operating experience already in place. This page
-                tracks what we build from here.
+                logistics. We are moving from account manager to independent agent with the service
+                capabilities, relationships, and operating experience already in place. Our staff
+                brings drivers with 10+ years on the road, foremen and superintendents from the
+                field, and a decade of field work in the refractory industry. This page tracks what
+                we build from here.
               </p>
               <p className="border-l border-primary pl-5 font-mono text-xs uppercase leading-relaxed tracking-wider text-foreground">
                 No invented launch dates. No pretending planned growth already happened. We will
