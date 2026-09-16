@@ -109,11 +109,11 @@ export default function GrowthPage() {
             <div className="mt-7 grid gap-6 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
               <p className="max-w-3xl text-pretty text-lg leading-relaxed text-muted-foreground">
                 Five Nines is the next chapter of a ten-year freight career—not a first day in
-                logistics. We are moving from account manager to independent agent with the service
-                capabilities, relationships, and operating experience already in place. Our staff
-                brings drivers with 10+ years on the road, foremen and superintendents from the
-                field, and a decade of field work in the refractory industry. This page tracks what
-                we build from here.
+                logistics. Built by an operations and account manager overseeing up to 500 shipments
+                a week, we are moving toward a customer and carrier centered network that brings
+                solutions across every aspect of the supply chain. Our staff brings drivers with 10+
+                years on the road, foremen and superintendents from the field, and a decade of field
+                work in the refractory industry. This page tracks what we build from here.
               </p>
               <p className="border-l border-primary pl-5 font-mono text-xs uppercase leading-relaxed tracking-wider text-foreground">
                 No invented launch dates. No pretending planned growth already happened. We will
