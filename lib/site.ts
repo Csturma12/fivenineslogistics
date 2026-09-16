@@ -61,6 +61,24 @@ export const modes: Mode[] = [
     typicalLoads: ["Line-down parts", "AOG & critical spares", "Turnaround freight", "Time-definite deliveries"],
   },
   {
+    name: "Sprinter van",
+    slug: "sprinter-van",
+    description: "Dedicated, door-to-door capacity for urgent freight that needs to move now.",
+    detail:
+      "Sprinter vans give time-critical shipments a direct, right-sized option without waiting for scheduled LTL or paying for unused truck space. We coordinate exclusive-use service, rapid dispatch, proactive tracking, and delivery appointments from pickup through final handoff.",
+    equipment: ["High-roof sprinter van", "Cargo van", "Dock-high straight truck access", "Exclusive-use capacity"],
+    typicalLoads: ["AOG & line-down parts", "Critical components", "One to three pallets", "Trade show & event freight"],
+  },
+  {
+    name: "Refrigerated trucking",
+    slug: "refrigerated-trucking",
+    description: "Temperature-controlled capacity for food, ingredients, pharmaceuticals, and sensitive freight.",
+    detail:
+      "Cold-chain freight demands more than a reefer set point. We coordinate pre-cooled equipment, temperature requirements, washouts, appointment timing, tracking, and contingency planning to protect sensitive products from pickup through delivery.",
+    equipment: ["53' refrigerated trailer", "Multi-temperature reefer", "Refrigerated straight truck", "Temperature monitoring"],
+    typicalLoads: ["Food & beverage", "Fresh & frozen goods", "Pharmaceutical products", "Temperature-sensitive materials"],
+  },
+  {
     name: "Drayage",
     slug: "drayage",
     description: "Port and rail coverage with chassis coordination, transload, and final-mile support.",
@@ -95,6 +113,15 @@ export const modes: Mode[] = [
       "Over-dimensional and superload freight moves through top-tier specialized carriers with the equipment, authority, and field experience for the job. Five Nines coordinates the carrier, state permits, escorts, route surveys, site requirements, and customer updates so the move is managed as one project rather than a stack of vendors.",
     equipment: ["Multi-axle RGN", "Perimeter / stretch", "Dual-lane & Goldhofer", "Beam & jeep"],
     typicalLoads: ["Transformers & switchgear", "Pressure vessels", "Modules & skids", "Turbines & generators"],
+  },
+  {
+    name: "Crane & rigging",
+    slug: "crane-rigging",
+    description: "Lift planning, crane service, rigging crews, and machinery placement coordinated with transportation.",
+    detail:
+      "For freight that cannot simply be loaded or unloaded at a dock, we coordinate the crane, rigging crew, lift plan, site requirements, and transportation as one project. Every provider is matched to the load, location, schedule, and required certifications before mobilization.",
+    equipment: ["Mobile & all-terrain cranes", "Boom trucks", "Forklifts & telehandlers", "Rigging, gantries & skates"],
+    typicalLoads: ["Machinery installation", "Transformers & generators", "Industrial equipment", "Plant relocation projects"],
   },
   {
     name: "Ocean",
