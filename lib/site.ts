@@ -19,7 +19,6 @@ export const site = {
 export type Mode = {
   name: string
   slug: string
-  tier: "In-house" | "In-house + partners" | "Partner network"
   description: string
   detail: string
   equipment: string[]
@@ -28,100 +27,91 @@ export type Mode = {
 
 export const modesIntro = {
   eyebrow: "Modes",
-  heading: "Our equipment where it counts. Proven partners everywhere else.",
+  heading: "One 3PL relationship. Nationwide and global reach.",
   intro:
-    "Our in-house capacity covers flatbed and step-deck, dry van, hotshot, expedited sprinter and box-truck freight, plus one power unit dedicated to drayage. We extend drayage coverage through proven hub partners; heavy haul, ocean, and LTL move through our partner network under the same dispatch and reporting standard.",
+    "Owned capacity, affiliated carriers, and a vetted nationwide and global network give us the reach to solve the whole shipment. Our relationships run both ways: partners extend enterprise capabilities to Five Nines, and we support them with freight and services outside their own coverage.",
 }
 
 export const modes: Mode[] = [
   {
     name: "Flatbed",
     slug: "flatbed",
-    tier: "In-house",
     description: "Flatbed, step-deck, and expedited over-the-road container transport. Secured, permitted, and planned before pickup.",
     detail:
-      "Open-deck freight is where we started. We spec the right trailer for the dimensions and weight, secure it to standard, and permit the load when it runs over legal. We also move loaded containers over the road on flatbed and step-deck equipment when the route or final destination calls for it. Tarping, chaining, dunnage, and container securement are planned before the truck shows up, not figured out at the dock.",
+      "Open-deck freight is where we started. We match every load with the right flatbed, step-deck, Conestoga, or specialized trailer, then plan dimensions, securement, permits, dunnage, and site access before dispatch.",
     equipment: ["48' & 53' flatbed", "Step deck", "Double drop / RGN", "Conestoga", "Container securement"],
     typicalLoads: ["Structural steel & pipe", "Machinery & equipment", "Expedited loaded containers", "Coils & plate"],
   },
   {
     name: "Dry van",
     slug: "dry-van",
-    tier: "In-house",
     description: "53' and 48' vans for general freight, palletized goods, furniture, and home goods.",
     detail:
-      "Our workhorse mode. Enclosed, weather-protected capacity for general commodities, palletized freight, furniture, and home goods — floor-loaded or on pallets. We match the trailer and load securement to the product so it arrives the way it left, whether it's a full truckload of retail goods or protected equipment.",
+      "Enclosed, weather-protected capacity for general commodities, palletized freight, furniture, and home goods. Our nationwide carrier relationships cover regular and one-way lanes, while Five Nines handles the fit: trailer requirements, securement, appointments, tracking, and exception management through one coordinator.",
     equipment: ["53' dry van", "48' dry van", "Air-ride suspension", "Logistics posts & load bars", "Blanket-wrap option"],
     typicalLoads: ["General & retail freight", "Palletized goods", "Furniture & home goods", "Packaged equipment"],
   },
   {
     name: "Expedited",
     slug: "expedited",
-    tier: "In-house",
     description: "Team drivers, dedicated trucks, and an answer within the hour, day or night.",
     detail:
-      "When the clock is the constraint, we run team drivers and dedicated equipment straight through. You get a committed pickup, a hard ETA, and a coordinator who calls you before you have to call us.",
+      "When the clock is the constraint, we secure the fastest qualified option: sprinter, straight truck, hotshot, team service, or dedicated truck. Five Nines owns the communication, milestone tracking, and recovery plan from pickup through delivery.",
     equipment: ["Sprinter & cargo van", "Straight truck", "Team-driver dry van", "Dedicated power"],
     typicalLoads: ["Line-down parts", "AOG & critical spares", "Turnaround freight", "Time-definite deliveries"],
   },
   {
     name: "Drayage",
     slug: "drayage",
-    tier: "In-house + partners",
-    description: "One dedicated power unit, backed by hub partners for chassis coordination and final-mile coverage.",
+    description: "Port and rail coverage with chassis coordination, transload, and final-mile support.",
     detail:
-      "We dedicate one power unit to drayage and extend that capacity through trusted partners at every listed hub. Those partners can unload loaded containers, mount them on chassis, and complete the final mile. We coordinate the equipment, appointments, and last-free-day tracking so boxes move before demurrage and per-diem start stacking up.",
+      "We coordinate port, rail, chassis, transload, bonded, and final-mile service across our listed hubs and beyond. Appointments, last-free-day tracking, demurrage, and per-diem exposure stay under one Five Nines coordinator.",
     equipment: ["20' & 40' chassis", "Tri-axle chassis", "Transload capacity", "Bonded moves"],
     typicalLoads: ["Import / export containers", "Transload to over-the-road", "Port-to-warehouse", "FCL drayage"],
   },
   {
     name: "Hotshot",
     slug: "hotshot",
-    tier: "In-house",
     description: "Gooseneck and one-ton capacity across Texas and the Gulf for the part that can't wait.",
     detail:
-      "One-ton and gooseneck capacity staged across Texas and the Gulf for the load that can't wait for a full truck. Fast to dispatch, cheaper than a full flatbed, and ideal for the single skid or piece of equipment holding up a job.",
+      "Fast hotshot capacity supports Texas, Gulf Coast, and nationwide lanes. It is a practical option for the single skid, urgent part, or smaller piece of equipment that does not need a full-size truck.",
     equipment: ["One-ton dually", "Gooseneck trailer", "40' hotshot deck", "Tilt-deck"],
     typicalLoads: ["Oilfield parts", "Single skids & pallets", "Small equipment", "Field-service freight"],
   },
   {
     name: "Box truck",
     slug: "box-truck",
-    tier: "In-house",
     description: "Liftgate, inside delivery, and final-mile into live facilities.",
     detail:
-      "Final-mile and inside delivery into live facilities where a 53' can't dock. Liftgate, pallet jack, and drivers who know a delivery into an occupied building is different from a warehouse drop.",
+      "We cover the work a 53-foot trailer cannot, including liftgate, pallet jack, inside delivery, appointments, and white-glove requirements for live facilities and customer-facing deliveries.",
     equipment: ["26' box w/ liftgate", "Straight truck", "Pallet jack", "White-glove option"],
     typicalLoads: ["Inside deliveries", "Final-mile freight", "Live-site drops", "Retail & office"],
   },
   {
     name: "Oversize & heavy haul",
     slug: "oversize-heavy-haul",
-    tier: "Partner network",
     description: "Permits, escorts, and route surveys for transformers, vessels, and modules.",
     detail:
-      "Over-dimensional and superload freight, planned from the route backward. We handle state permits, pilot cars and police escorts, pole trucks, and route surveys for the moves where a bridge clearance or a turn radius decides the schedule.",
+      "Over-dimensional and superload freight moves through top-tier specialized carriers with the equipment, authority, and field experience for the job. Five Nines coordinates the carrier, state permits, escorts, route surveys, site requirements, and customer updates so the move is managed as one project rather than a stack of vendors.",
     equipment: ["Multi-axle RGN", "Perimeter / stretch", "Dual-lane & Goldhofer", "Beam & jeep"],
     typicalLoads: ["Transformers & switchgear", "Pressure vessels", "Modules & skids", "Turbines & generators"],
   },
   {
     name: "Ocean",
     slug: "ocean",
-    tier: "Partner network",
     description: "FCL and LCL through the largest global carriers, with drayage on both ends.",
     detail:
-      "FCL and LCL through the largest and most efficient global carriers, with drayage handled on both ends of the water. The same network that moves containers for global motorsport series and top e-commerce brands handles your freight.",
+      "Global forwarding and carrier relationships extend FCL, LCL, breakbulk, RoRo, customs, and drayage capabilities beyond our domestic footprint. These are reciprocal operating relationships: partners bring enterprise reach and overseas execution to our customers, and Five Nines brings them domestic freight, specialized transportation, and support where their own service ends.",
     equipment: ["FCL 20' / 40' / 40'HC", "LCL consolidation", "Breakbulk & RoRo", "Door-to-door drayage"],
     typicalLoads: ["Import / export ocean", "Project cargo", "Global container moves", "Port-to-door"],
   },
   {
     name: "LTL",
     slug: "ltl",
-    tier: "Partner network",
     description:
       "Volume and standard LTL, plus flatbed LTL, with the carriers that still hit appointment times.",
     detail:
-      "Standard, volume, and flatbed LTL routed through the carriers that still honor appointment windows. We class it right, book it right, and watch it through the terminal network so a partial doesn't get lost in transit.",
+      "Nationwide LTL relationships cover standard, volume, expedited, and open-deck partials. We select the carrier for lane strength and service requirements, then manage classification, booking, appointments, tracking, and claims through one Five Nines contact.",
     equipment: ["Standard LTL", "Volume / partial", "Flatbed LTL", "Guaranteed & expedited LTL"],
     typicalLoads: ["Palletized freight", "Partial truckloads", "Volume LTL", "Open-deck partials"],
   },
@@ -129,9 +119,9 @@ export const modes: Mode[] = [
 
 export const warehousing = {
   eyebrow: "Warehousing & customs",
-  heading: "Space to stage it, cleared to move it.",
+  heading: "Enterprise warehousing, managed as one 3PL service.",
   intro:
-    "Trucking is only half of a critical supply chain. We have contracted and partner warehouse capacity in ten key markets, backed by vetted space across the country — plus in-bond trucking and a customs broker on call so international freight never stalls at the border.",
+    "Our leased and partner facilities provide flexible space in key markets and across the country. Their enterprise systems, labor, and facility capabilities pair with our customer service, transportation coordination, and single point of accountability.",
   locations: [
     { city: "Charleston, SC", note: "East Coast port distribution" },
     { city: "Houston, TX", note: "Gulf gateway & project staging" },
@@ -147,7 +137,7 @@ export const warehousing = {
   capabilities: [
     {
       title: "Contract warehousing & inventory management",
-      body: "Contracted and partner space in ten markets for receiving, put-away, managed inventory, transload, and outbound staging — plus vetted overflow coverage in every other region.",
+      body: "Leased and third-party space for receiving, put-away, inventory management, transload, fulfillment, and outbound staging. Top-tier providers extend enterprise facility and systems capabilities to us; we bring coordinated transportation, responsive customer service, and business outside their core lanes or service mix.",
     },
     {
       title: "In-bond trucking",
@@ -184,7 +174,7 @@ export const methodSteps: MethodStep[] = [
     n: "STEP 2",
     title: "Source",
     description:
-      "First call goes to our sister asset carriers, Just Drive Transportation and Primary Transportation. Then to a vetted bench we've run for years. No load boards for critical freight.",
+      "We match the load with the right capacity based on lane, equipment, service history, availability, and customer requirements.",
   },
   {
     n: "STEP 3",
@@ -203,26 +193,25 @@ export const methodSteps: MethodStep[] = [
 export type CapacityBlock = {
   title: string
   description: string
-  partners: string[]
+  partners?: string[]
 }
 
 export const capacityIntro = {
   eyebrow: "Capacity",
-  heading: "Assets we control. Partners we've proven.",
+  heading: "Established capacity. Nationwide and global reach.",
 }
 
 export const capacityBlocks: CapacityBlock[] = [
   {
-    title: "Sister asset carriers",
+    title: "Owned & affiliated capacity",
     description:
-      "Five Nines operates as an agent of Primary Freight LLC. That puts two asset-based carriers at the front of our dispatch list: Just Drive Transportation and Primary Transportation. When a load can't go to the open market, it doesn't.",
-    partners: ["Just Drive Transportation", "Primary Transportation", "Primary Freight LLC"],
+      "Owned equipment and roughly 40 trucks and trailers available through long-standing affiliated relationships give us dependable core capacity across repeat lanes.",
+    partners: ["Long-standing carriers", "Repeat lanes", "Known operators"],
   },
   {
-    title: "Global ocean & drayage",
+    title: "Specialty & network capacity",
     description:
-      "Through partnerships with the largest and most efficient global shipping companies, our network moves containers for global motorsport series, athletic and retail brands, and the biggest names in e-commerce. The same lanes, terminals, and people handle your freight.",
-    partners: ["Port of Houston", "Gulf Coast terminals", "Global ocean carriers"],
+      "Vetted nationwide and global partners extend coverage into drayage, heavy haul, LTL, ocean, warehousing, and one-way lanes, all managed through one Five Nines coordinator.",
   },
 ]
 
@@ -298,10 +287,11 @@ export const heroSpec: { label: string; value: string }[] = [
 ]
 
 export const navLinks = [
-  { href: "/who-we-serve", label: "Who We Serve" },
+  { href: "/who-we-serve", label: "Industries" },
   { href: "/modes", label: "Modes" },
-  { href: "/carriers", label: "Carriers" },
-  { href: "/company", label: "Who We Are" },
+  { href: "/consulting", label: "Consulting" },
+  { href: "/growth", label: "Watch Us Grow" },
+  { href: "/company", label: "Company" },
 ]
 
 export const footerLinks = [
@@ -453,12 +443,12 @@ export const companyPage = {
   eyebrow: "Company",
   heading: "Over a decade moving critical freight. Now it has a name.",
   intro:
-    "Five Nines Logistics is the freight brand for operators who treat a delivery date the way an engineer treats uptime. The name is new; the desk behind it isn't. For over a decade we've run critical freight for the same shippers — and they're moving with us. We operate as an agent of Primary Freight LLC, with dedicated flatbed carrier partners on committed capacity and a vetted global network behind them.",
+    "Five Nines Logistics is a 3PL and freight brokerage brand for operators who need straight answers and accountable execution. We operate as an agent of Primary Freight LLC, combining owned capacity, affiliated carriers, and vetted nationwide and global partners for specialty modes, facilities, and additional lanes.",
 }
 
 export const companyModel = {
   heading: "What 'agent of Primary Freight' means for your freight",
-  body: "It means your freight moves under Primary Freight's established broker authority and insurance — verifiable before you tender a load — handled by a specialist desk that treats your delivery date as the whole job. Dedicated flatbed carrier partners put committed equipment at the front of every capacity decision, backed by a vetted network for the modes and lanes we arrange beyond that.",
+  body: "Your freight is arranged under Primary Freight's broker authority and insurance, with Five Nines handling the commercial relationship and daily coordination. Capacity may be owned, affiliated, or provided through our vetted carrier network, with the operating carrier identified on the shipment documents.",
 }
 
 export type CompanyValue = {
@@ -473,7 +463,7 @@ export const companyStory: CompanyValue[] = [
   },
   {
     title: "How we're structured",
-    body: "We operate as an agent of Primary Freight LLC, which holds the broker authority your freight moves under. Dedicated flatbed carrier partners put committed equipment at the front of every capacity decision, and a vetted carrier network covers the modes and lanes beyond flatbed.",
+    body: "We operate as an agent of Primary Freight LLC, which holds the broker authority used to arrange customer freight. Owned capacity, roughly 40 trucks and trailers available through affiliated relationships, and a broader vetted network support the lanes and services we offer.",
   },
   {
     title: "Why 'five nines'",

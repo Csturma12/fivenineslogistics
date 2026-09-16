@@ -10,7 +10,7 @@ import { modes, site, warehousing } from "@/lib/site"
 export const metadata: Metadata = {
   title: "Modes & Services | Five Nines Logistics",
   description:
-    "Flatbed, dry van, expedited, drayage, hotshot, box truck, oversize & heavy haul, ocean, and LTL — nine modes run to a five-nines reliability standard out of Houston, TX.",
+    "A Houston-based 3PL arranging flatbed, van, expedited, drayage, hotshot, heavy haul, ocean, LTL, and third-party warehousing through nationwide and global partners.",
 }
 
 export default function ModesPage() {
@@ -27,10 +27,10 @@ export default function ModesPage() {
               Nine modes. One tolerance for failure.
             </h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-              Our in-house capacity covers flatbed and step-deck, dry van, hotshot, expedited
-              sprinter and box-truck freight, plus one power unit dedicated to drayage. We extend
-              drayage through proven hub partners; heavy haul, ocean, and LTL move through our
-              partner network under the same dispatch, tracking, and reporting standard.
+              Owned capacity, affiliated carriers, and a vetted nationwide and global network give
+              us the reach to solve the whole shipment. Our relationships run both ways: partners
+              extend enterprise capabilities to Five Nines, and we support them with freight and
+              services outside their own coverage.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
@@ -62,14 +62,9 @@ export default function ModesPage() {
                 <div key={mode.slug} id={mode.slug} className="scroll-mt-24 bg-card">
                   <div className="grid gap-8 p-6 sm:p-10 lg:grid-cols-[1.4fr_1fr]">
                     <div>
-                      <div className="flex items-center gap-3">
-                        <span className="font-mono text-xs tabular-nums text-muted-foreground">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <span className="font-mono text-[11px] uppercase tracking-wider text-primary">
-                          {mode.tier}
-                        </span>
-                      </div>
+                      <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
                       <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                         {mode.name}
                       </h2>

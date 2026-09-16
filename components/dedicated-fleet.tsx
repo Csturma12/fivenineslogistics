@@ -1,79 +1,15 @@
-const points = [
-  {
-    title: "One lane, mastered",
-    body: "They don't chase whatever load pays today. The transcon is all they run — every scale, every fuel stop, every mountain pass and season on it is known.",
-  },
-  {
-    title: "Loaded out, loaded home",
-    body: "East Coast and Midwest out to California, then back. Round-trip lanes keep the trucks earning both directions and keep your capacity predictable.",
-  },
-  {
-    title: "Your freight, our people",
-    body: "Company drivers on company equipment — not a rotating cast of brokered carriers. The same names handle your load from pickup to delivery.",
-  },
-]
-
-const stats = [
-  { value: "40+", label: "Company drivers" },
-  { value: "2", label: "Coasts, every week" },
-  { value: "Transcon", label: "The only lane they run" },
-  { value: "Round trip", label: "Out loaded, back loaded" },
+const groups = [
+  { value: "Owned", label: "Core operating capacity", title: "Equipment ready to move", body: "Owned capacity supports urgent, dedicated, and regional work where direct control matters most." },
+  { value: "≈40", label: "Trucks & trailers", title: "Affiliated capacity", body: "Long-standing relationships built over roughly a decade give us dependable equipment and known operators across repeat lanes." },
+  { value: "Nationwide + global", label: "Vetted partner reach", title: "Extended 3PL network", body: "Top-tier partners extend specialty, warehousing, drayage, LTL, and international capabilities. We support them with freight and services outside their own coverage." },
 ]
 
 export function DedicatedFleet() {
-  return (
-    <section id="fleet" className="border-t border-border bg-secondary/80">
-      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
-          <div>
-            <span className="font-mono text-xs uppercase tracking-wider text-primary">
-              Dedicated fleet
-            </span>
-            <div className="mt-6 flex items-end gap-4">
-              <span className="text-7xl font-semibold leading-none tracking-tight text-foreground sm:text-8xl">
-                40
-              </span>
-              <span className="mb-2 text-5xl font-semibold leading-none tracking-tight text-primary sm:text-6xl">
-                +
-              </span>
-            </div>
-            <h2 className="mt-6 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Drivers who live on one lane.
-            </h2>
-            <p className="mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
-              Our own drivers run strictly transcontinental — East Coast and Midwest to
-              California and back. Same trucks, same people, every round trip. No lane
-              roulette, no rotating carriers on your freight.
-            </p>
-          </div>
-
-          <dl className="grid grid-cols-2 gap-px self-start overflow-hidden rounded-xl border border-border bg-border">
-            {stats.map((stat) => (
-              <div key={stat.label} className="flex flex-col gap-1 bg-card p-6">
-                <dt className="text-2xl font-semibold tracking-tight text-foreground">
-                  {stat.value}
-                </dt>
-                <dd className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                  {stat.label}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-
-        <div className="mt-14 grid gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-3">
-          {points.map((point) => (
-            <div key={point.title} className="flex flex-col bg-card p-6 sm:p-8">
-              <h3 className="text-lg font-semibold tracking-tight text-foreground">
-                {point.title}
-              </h3>
-              <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
-                {point.body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
+  return <section id="fleet" className="border-t border-border bg-secondary/80"><div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+    <p className="font-mono text-xs uppercase tracking-wider text-primary">How capacity is structured</p>
+    <div className="mt-5 grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14"><div><h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">The right capacity for the load.</h2><p className="mt-4 text-pretty leading-relaxed text-muted-foreground">Five Nines combines owned equipment, affiliated capacity, and a vetted nationwide and global network under one accountable 3PL relationship.</p></div>
+      <div className="grid gap-px overflow-hidden rounded-xl border border-border bg-border">{groups.map((group) => <article key={group.title} className="grid gap-4 bg-card p-6 sm:grid-cols-[10rem_1fr] sm:p-7"><div><div className="text-3xl font-semibold tracking-tight text-foreground">{group.value}</div><div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{group.label}</div></div><div><h3 className="text-lg font-semibold text-foreground">{group.title}</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{group.body}</p></div></article>)}</div>
+    </div>
+    <p className="mt-6 max-w-3xl text-xs leading-relaxed text-muted-foreground">Planned sign-ons and equipment additions are reported separately on Watch Us Grow and are not counted as active capacity until they are operating with us.</p>
+  </div></section>
 }

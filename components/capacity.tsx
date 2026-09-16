@@ -41,16 +41,18 @@ export function Capacity() {
               <p className="mt-3 flex-1 text-pretty leading-relaxed text-muted-foreground">
                 {block.description}
               </p>
-              <div className="mt-6 flex flex-wrap gap-2">
-                {block.partners.map((partner) => (
-                  <span
-                    key={partner}
-                    className="rounded border border-border bg-background px-2.5 py-1 font-mono text-[11px] text-foreground/90"
-                  >
-                    {partner}
-                  </span>
-                ))}
-              </div>
+              {block.partners && block.partners.length > 0 ? (
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {block.partners.map((partner) => (
+                    <span
+                      key={partner}
+                      className="rounded border border-border bg-background px-2.5 py-1 font-mono text-[11px] text-foreground/90"
+                    >
+                      {partner}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
