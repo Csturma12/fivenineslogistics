@@ -317,6 +317,7 @@ export const navLinks = [
   { href: "/who-we-serve", label: "Industries" },
   { href: "/modes", label: "Modes" },
   { href: "/loads", label: "Load Board" },
+  { href: "/carrier-vetting", label: "Vetting" },
   { href: "/consulting", label: "Consulting" },
   { href: "/growth", label: "Watch Us Grow" },
   { href: "/company", label: "Company" },
@@ -326,6 +327,7 @@ export const footerLinks = [
   { href: "/who-we-serve", label: "Who We Serve" },
   { href: "/modes", label: "Modes" },
   { href: "/loads", label: "Load Board" },
+  { href: "/carrier-vetting", label: "Vetting & Fraud Prevention" },
   { href: "/carriers", label: "Carriers" },
   { href: "/company", label: "Who We Are" },
   { href: "/company#method", label: "How We Run" },
@@ -558,4 +560,216 @@ export const carrierRequirements: string[] = [
 export const carrierPartners = {
   heading: "Partnerships are the point.",
   body: "Our best lanes run on carriers we've hauled with for years. Get on the bench once, prove you run clean, and you become a first call, not a last resort. That's how we've built every relationship that matters to this company.",
+}
+
+/* ---------- Carrier vetting & fraud prevention ---------- */
+
+export const vettingPage = {
+  eyebrow: "Vetting & fraud prevention",
+  heading: "We know who's picking up your freight.",
+  intro:
+    "Freight fraud, double-brokering, and cargo theft are at record highs, and a stolen or re-brokered critical load isn't a claim — it's a missed turnaround window with a crew standing idle. We vet every carrier with Highway and multiple layers on top of it, but the layer that actually protects your freight is the oldest one: we know the people driving it.",
+}
+
+export const vettingSignature = {
+  stat: "~75%",
+  label: "of the drivers at your gate on a critical load are already known to us",
+  heading: "We talk to the driver, the dispatcher, and the owner — before the load is assigned.",
+  body: "On a critical load we don't hand your freight to a name on a rate confirmation. We speak to the person behind the wheel, the dispatcher moving them, and the owner who stands behind the truck. Roughly three out of four drivers who show up at your gate on a critical load are operators we've run with before — not a stranger pulled off a load board an hour ago.",
+}
+
+export type VettingLayer = {
+  n: string
+  title: string
+  body: string
+}
+
+export const vettingLayers: VettingLayer[] = [
+  {
+    n: "01",
+    title: "Highway carrier identity",
+    body: "Every carrier is verified through Highway for real-time identity, authority, and fraud signals. It catches spoofed MC numbers, identity theft, and double-brokering fingerprints before a load is ever tendered — not after the freight is gone.",
+  },
+  {
+    n: "02",
+    title: "Authority & insurance, monitored continuously",
+    body: "MC/DOT authority, operating status, safety rating, and active insurance with a current COI are checked at setup and monitored continuously. A lapse flags before we tender, not at the fence line.",
+  },
+  {
+    n: "03",
+    title: "Human verification on critical loads",
+    body: "For freight headed into a shutdown window, a data hall, or a border crossing, we call the driver, the dispatcher, and the owner. We confirm the truck, the trailer, the ETA, and that the operator on the rate con is the operator picking up.",
+  },
+  {
+    n: "04",
+    title: "A known bench, not a spot-market gamble",
+    body: "Roughly 40 affiliated trucks and a decade of repeat operators mean most critical loads move on capacity we already trust. New carriers earn critical freight — they don't start with it.",
+  },
+  {
+    n: "05",
+    title: "Fraud controls at dispatch",
+    body: "No unverified reassignments, no last-minute swaps to an unknown carrier, no re-brokering. Documents and tender information are handled through controlled channels so your load can't be intercepted between booking and pickup.",
+  },
+]
+
+export const vettingThreats = {
+  heading: "What we're stopping before it reaches your dock.",
+  items: [
+    {
+      title: "Double-brokering",
+      body: "A broker or bad actor re-posts your load to an unvetted carrier and pockets the difference. You lose visibility and, often, the freight. Highway plus our known-bench model closes the door on it.",
+    },
+    {
+      title: "Identity theft & MC spoofing",
+      body: "Fraud rings hijack a legitimate carrier's authority to book and steal loads. Continuous identity verification flags the mismatch before we tender.",
+    },
+    {
+      title: "Strategic cargo theft",
+      body: "Thieves target high-value, time-critical freight — exactly what we haul. Knowing the driver and monitoring the move in real time removes the anonymity theft depends on.",
+    },
+  ],
+}
+
+/* ---------- Job site coordination (services) ---------- */
+
+export const jobSiteCoordination = {
+  eyebrow: "Hands-on job site coordination",
+  heading: "We don't stop at the gate. We manage the delivery on the ground.",
+  intro:
+    "Half of our staff and every driver we assign to critical work carries the credentials to get inside the fence — TWIC, HAZMAT, OSHA, and site-council orientations. That means we coordinate the delivery where it actually happens: at the laydown yard, the crane window, and the gate, not from a desk three states away.",
+  capabilities: [
+    {
+      title: "Gate, escort & credential coordination",
+      body: "We confirm gate hours, security and escort requirements, and driver credentials before dispatch, so the truck clears the fence instead of sitting at it. TWIC-carded drivers and staff move freely through MTSA ports and refinery gates.",
+    },
+    {
+      title: "Crane-window & laydown staging",
+      body: "Deliveries are timed to the crane pick and the laydown sequence the job actually needs — staged in order, not dumped at the gate. We coordinate the equipment waiting at the destination against the trailer we send.",
+    },
+    {
+      title: "On-site supervision & sign-off",
+      body: "For oversized, permitted, and critical moves, we put eyes on the delivery — check-in, spotting, unloading supervision, proof of delivery, and documented sign-off on every movement.",
+    },
+  ],
+}
+
+/* ---------- Certifications & compliance (services) ---------- */
+
+export const certificationsIntro = {
+  eyebrow: "Certifications & compliance",
+  heading: "Credentialed to get inside the fence — on both sides of the border.",
+  intro:
+    "Getting freight to the gate is the easy part. Getting it through the gate is where credentials matter. Half of our staff and every driver we assign to critical work is carded for restricted sites, and our cross-border program is built on the trusted-trader certifications that actually move trucks across the line.",
+}
+
+export type CertGroup = {
+  title: string
+  note: string
+  items: { name: string; abbr?: string; note: string }[]
+}
+
+export const certificationGroups: CertGroup[] = [
+  {
+    title: "Driver & site access",
+    note: "What gets our people through restricted gates.",
+    items: [
+      {
+        name: "TWIC card",
+        abbr: "TWIC",
+        note: "Half our staff and every driver we assign to critical work carries one — required for MTSA ports and refinery gates.",
+      },
+      {
+        name: "HAZMAT endorsement",
+        abbr: "H",
+        note: "TSA-vetted for placarded and hazardous materials loads.",
+      },
+      {
+        name: "OSHA 10 & OSHA 30",
+        note: "Construction-site and GC-orientation baseline; OSHA 30 for supervisory access on hyperscale builds.",
+      },
+      {
+        name: "PEC Basic Orientation Plus",
+        abbr: "PEC BOP",
+        note: "The de facto Gulf refinery gate card, reciprocal with most safety councils.",
+      },
+      {
+        name: "Safety-council orientations",
+        note: "Gulf Coast Safety Council, EHCMA, and ARSC site orientations for plant and petrochem access.",
+      },
+      {
+        name: "MSHA Part 46 / 48",
+        note: "New-miner training for surface aggregate and underground/metal mine sites.",
+      },
+    ],
+  },
+  {
+    title: "Cross-border — Mexico & Canada",
+    note: "Our specialty. The trusted-trader stack that moves trucks across the line.",
+    items: [
+      {
+        name: "Customs-Trade Partnership Against Terrorism",
+        abbr: "C-TPAT",
+        note: "U.S. supply-chain security certification — the northbound anchor for expedited, lower-inspection crossings.",
+      },
+      {
+        name: "Operador Económico Autorizado",
+        abbr: "OEA",
+        note: "Mexico's Authorized Economic Operator program, mutually recognized with C-TPAT. The long pole most brokers never clear — we did.",
+      },
+      {
+        name: "Free and Secure Trade",
+        abbr: "FAST",
+        note: "Expedited commercial-vehicle crossing for C-TPAT/OEA-approved freight at the U.S.–Mexico and U.S.–Canada borders.",
+      },
+      {
+        name: "Trusted-traveler enrollment",
+        abbr: "Global Entry",
+        note: "Vetted crossing credentials for our cross-border personnel to keep freight moving at the gate.",
+      },
+      {
+        name: "ACE / ACI e-Manifest",
+        note: "Electronic manifests filed on both borders so the driver clears with a trip number instead of a delay.",
+      },
+      {
+        name: "Licensed customs brokerage & in-bond",
+        note: "Partnered clearance on both borders with CBP-bonded in-bond moves, so drayage, warehousing, and paperwork run under one coordinator.",
+      },
+    ],
+  },
+  {
+    title: "Carrier network & platform compliance",
+    note: "How the whole network stays vetted and interchange-ready.",
+    items: [
+      {
+        name: "Highway carrier vetting",
+        note: "Real-time identity, authority, and fraud monitoring on every carrier in the network.",
+      },
+      {
+        name: "Uniform Intermodal Interchange Agreement",
+        abbr: "UIIA",
+        note: "Registered for intermodal equipment interchange, so drayage moves through rail and ocean terminals without friction.",
+      },
+      {
+        name: "ISNetworld / Avetta / Veriforce",
+        note: "Contractor-compliance platforms maintained at the carrier level for plant and industrial site access.",
+      },
+      {
+        name: "Broker authority & insurance",
+        note: "Freight arranged under Primary Freight LLC (MC# 841023) with $1M auto liability and full coverage; COI on request.",
+      },
+    ],
+  },
+]
+
+export const crossBorder = {
+  eyebrow: "Cross-border — Mexico & Canada",
+  heading: "We master cross-border trucking, and Mexico is one of our key markets.",
+  intro:
+    "Cross-border is a carrier problem, not a driver problem — the driver's FAST card is cheap and fast; the carrier's C-TPAT and Mexico OEA certification is the real bottleneck most brokers never get through. We're on the far side of it. That means C-TPAT and OEA mutual recognition, FAST-lane crossings, e-manifest on both borders, and drayage and transload staged on both sides of the line, coordinated through one point of contact.",
+  points: [
+    "C-TPAT + OEA mutual recognition for expedited, lower-inspection crossings",
+    "Southbound and northbound truckload, LTL, and project freight",
+    "Bonded in-bond moves and licensed customs clearance on both borders",
+    "Border-gateway drayage and transload — Laredo, El Paso, Santa Teresa",
+  ],
 }
