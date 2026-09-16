@@ -9,7 +9,7 @@ const _geistMono = Geist_Mono({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Five Nines Logistics | Critical Freight Brokerage',
   description:
-    'Critical freight brokerage, affiliated carrier capacity, direct equipment, supply chain consulting, drayage, expedited service, and warehousing coordination.',
+    'Critical freight brokerage, nationwide and global partner capacity, supply chain consulting, drayage, expedited service, and third-party warehousing coordination.',
   generator: 'v0.app',
   icons: {
     icon: [
