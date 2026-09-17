@@ -201,6 +201,99 @@ export function ReticleMark({ className, animated, monochrome }: MarkProps) {
   )
 }
 
+/* E variant — the brackets hold a live load bar instead of a point. Reads as the shipment riding the bed. */
+export function ViewfinderLoadMark({ className, animated, monochrome }: MarkProps) {
+  return (
+    <svg viewBox="0 0 72 72" className={className} role="img" aria-label="Viewfinder holding a live load">
+      <g fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="square">
+        <path d="M8 22V8h14M64 22V8H50M8 50v14h14M64 50v14H50" />
+      </g>
+      <rect
+        x="22"
+        y="31"
+        width="28"
+        height="10"
+        rx="5"
+        className={cn(monochrome ? "fill-current" : undefined, animated && !monochrome && "motion-safe:animate-pulse")}
+        style={monochrome ? undefined : { fill: "var(--status-ok)" }}
+      />
+    </svg>
+  )
+}
+
+/* E variant — brackets plus a converging crosshair on a tight core. More precision-instrument. */
+export function ViewfinderCrossMark({ className, animated, monochrome }: MarkProps) {
+  return (
+    <svg viewBox="0 0 72 72" className={className} role="img" aria-label="Viewfinder crosshair on a live core">
+      <g fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="square">
+        <path d="M8 22V8h14M64 22V8H50M8 50v14h14M64 50v14H50" />
+      </g>
+      <g fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+        <path d="M36 15v9M36 48v9M15 36h9M48 36h9" />
+      </g>
+      <rect
+        x="30"
+        y="30"
+        width="12"
+        height="12"
+        rx="3"
+        className={cn(monochrome ? "fill-current" : undefined, animated && !monochrome && "motion-safe:animate-pulse")}
+        style={monochrome ? undefined : { fill: "var(--status-ok)" }}
+      />
+    </svg>
+  )
+}
+
+/* B variant — five waypoints on one shipment route, the destination live. A path, not a generic mesh. */
+export function RouteFiveMark({ className, animated, monochrome }: MarkProps) {
+  return (
+    <svg viewBox="0 0 72 72" className={className} role="img" aria-label="Five-stop shipment route, destination live">
+      <path d="M10 52 26 38 37 54 52 28 62 14" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      <g className="fill-current"><circle cx="10" cy="52" r="6"/><circle cx="26" cy="38" r="6"/><circle cx="37" cy="54" r="6"/><circle cx="52" cy="28" r="6"/></g>
+      <LiveNode cx={62} cy={14} animated={animated} monochrome={monochrome} />
+    </svg>
+  )
+}
+
+/* B variant — the five nodes trace the numeral 5. The network literally becomes the name. */
+export function NodeFiveMark({ className, animated, monochrome }: MarkProps) {
+  return (
+    <svg viewBox="0 0 72 72" className={className} role="img" aria-label="Five nodes tracing the numeral five">
+      <path d="M46 12 H16 V33 L44 40 20 60" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      <g className="fill-current"><circle cx="46" cy="12" r="6"/><circle cx="16" cy="12" r="6"/><circle cx="16" cy="33" r="6"/><circle cx="44" cy="40" r="6"/></g>
+      <LiveNode cx={20} cy={60} animated={animated} monochrome={monochrome} />
+    </svg>
+  )
+}
+
+/* J variant — an open lock ring that reads as a status dial, core seated inside. More gauge than crosshair. */
+export function GaugeLockMark({ className, animated, monochrome }: MarkProps) {
+  return (
+    <svg viewBox="0 0 72 72" className={className} role="img" aria-label="Open lock gauge on a live core">
+      <path d="M45 12.4 A26 26 0 1 0 27 12.4" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
+      <circle
+        cx="36"
+        cy="36"
+        r="8"
+        className={cn(monochrome ? "fill-current" : undefined, animated && !monochrome && "motion-safe:animate-pulse")}
+        style={monochrome ? undefined : { fill: "var(--status-ok)" }}
+      />
+    </svg>
+  )
+}
+
+/* J variant — a bearing ring with a needle locked onto the live destination. Tracking a heading. */
+export function CompassLockMark({ className, animated, monochrome }: MarkProps) {
+  return (
+    <svg viewBox="0 0 72 72" className={className} role="img" aria-label="Bearing ring locked on a live node">
+      <circle cx="36" cy="36" r="26" fill="none" className="stroke-current" strokeWidth="5" />
+      <path d="M36 36 54 18" fill="none" className="stroke-current" strokeWidth="4" strokeLinecap="round" />
+      <circle cx="36" cy="36" r="4" className="fill-current" />
+      <LiveNode cx={54} cy={18} animated={animated} monochrome={monochrome} />
+    </svg>
+  )
+}
+
 export function MarkApplication({ children, label, dark = false }: { children: React.ReactNode; label: string; dark?: boolean }) {
   return <div className={cn("flex min-h-28 flex-col justify-between gap-4 rounded-lg border border-border p-4", dark ? "bg-[color:var(--navy)] text-[color:var(--navy-foreground)]" : "bg-card text-foreground")}><span className="font-mono text-[9px] uppercase tracking-wider opacity-60">{label}</span>{children}</div>
 }
