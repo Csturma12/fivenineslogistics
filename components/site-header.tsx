@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { FiveNinesPlate } from "@/components/five-nines-plate"
+import { FiveNinesForged } from "@/components/five-nines-forged"
 import { StatusTicker } from "@/components/status-ticker"
 import { navLinks, site } from "@/lib/site"
 
