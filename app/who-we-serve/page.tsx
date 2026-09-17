@@ -18,32 +18,30 @@ export default function WhoWeServePage() {
     <>
       <SiteHeader />
       <main>
-        <section className="border-b border-primary bg-primary text-primary-foreground">
-          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-            <span className="font-mono text-xs uppercase tracking-wider text-primary-foreground/70">
+        <section className="hero-grid border-b border-border">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+            <span className="font-mono text-xs uppercase tracking-wider text-primary">
               {whoWeServePage.eyebrow}
             </span>
-            <h1 className="mt-4 max-w-4xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
+            <h1 className="mt-4 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl">
               {whoWeServePage.heading}
             </h1>
-            <div className="mt-8 max-w-3xl border-t border-primary-foreground/20 pt-8">
-              <div className="flex flex-col gap-5">
-                {whoWeServePage.intro.map((paragraph) => (
-                  <p key={paragraph} className="text-pretty text-base leading-relaxed text-primary-foreground/85 sm:text-lg">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-              <p className="mt-6 font-mono text-xs font-semibold uppercase tracking-wider text-primary-foreground">
-                {whoWeServePage.proof}
-              </p>
+            <div className="mt-6 flex max-w-2xl flex-col gap-5">
+              {whoWeServePage.intro.map((paragraph) => (
+                <p key={paragraph} className="text-pretty text-lg leading-relaxed text-muted-foreground">
+                  {paragraph}
+                </p>
+              ))}
             </div>
+            <p className="mt-6 font-mono text-xs font-semibold uppercase tracking-wider text-primary">
+              {whoWeServePage.proof}
+            </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
                 render={<Link href="/request-capacity" />}
                 nativeButton={false}
                 size="lg"
-                className="bg-primary-foreground font-medium text-primary hover:bg-primary-foreground/90"
+                className="font-medium"
               >
                 Request Capacity
                 <ArrowRight className="size-4" data-icon="inline-end" />
@@ -53,7 +51,7 @@ export default function WhoWeServePage() {
                 nativeButton={false}
                 size="lg"
                 variant="outline"
-                className="border-primary-foreground/35 bg-transparent font-medium text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                className="font-medium"
               >
                 <Phone className="size-4" data-icon="inline-start" />
                 {site.phone}
@@ -103,24 +101,19 @@ export default function WhoWeServePage() {
               ))}
             </div>
 
-            <div className="mt-12 overflow-hidden rounded-xl border border-primary/25 bg-card">
-              <div className="h-2 bg-primary" />
-              <div className="grid gap-8 p-8 sm:p-12 lg:grid-cols-[0.8fr_1.5fr]">
-                <div>
-                  <span className="font-mono text-xs uppercase tracking-wider text-primary">
-                    {whoWeServePage.origin.eyebrow}
-                  </span>
-                  <h2 className="mt-3 max-w-md text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                    {whoWeServePage.origin.heading}
-                  </h2>
-                </div>
-                <div className="flex flex-col gap-5">
-                  {whoWeServePage.origin.body.map((paragraph) => (
-                    <p key={paragraph} className="text-pretty leading-relaxed text-muted-foreground">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
+            <div className="mt-12 rounded-xl border border-border bg-secondary/60 p-8 sm:p-12">
+              <span className="font-mono text-xs uppercase tracking-wider text-primary">
+                {whoWeServePage.origin.eyebrow}
+              </span>
+              <h2 className="mt-3 max-w-2xl text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                {whoWeServePage.origin.heading}
+              </h2>
+              <div className="mt-4 flex max-w-2xl flex-col gap-5">
+                {whoWeServePage.origin.body.map((paragraph) => (
+                  <p key={paragraph} className="text-pretty leading-relaxed text-muted-foreground">
+                    {paragraph}
+                  </p>
+                ))}
               </div>
             </div>
           </div>
