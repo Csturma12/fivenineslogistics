@@ -1,52 +1,58 @@
-import { Analytics } from '@vercel/analytics/next'
-import { SpeedInsights } from '@vercel/speed-insights/next'
-import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
-import './globals.css'
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import "./redesign.css";
 
-const _geistSans = Geist({ subsets: ['latin'] })
-const _geistMono = Geist_Mono({ subsets: ['latin'] })
+const _geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
+const _geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+});
 
 export const metadata: Metadata = {
-  title: 'Five Nines Logistics | Critical Freight Brokerage',
+  title: "Five Nines Logistics | Critical Freight Brokerage",
   description:
-    'Critical freight brokerage, nationwide and global partner capacity, supply chain consulting, drayage, expedited service, and third-party warehousing coordination.',
-  generator: 'v0.app',
+    "Critical freight brokerage, nationwide and global partner capacity, supply chain consulting, drayage, expedited service, and third-party warehousing coordination.",
+  generator: "v0.app",
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
+        url: "/icon-light-32x32.png",
+        media: "(prefers-color-scheme: light)",
       },
       {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
+        url: "/icon-dark-32x32.png",
+        media: "(prefers-color-scheme: dark)",
       },
       {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
+        url: "/icon.svg",
+        type: "image/svg+xml",
       },
     ],
-    apple: '/apple-icon.png',
+    apple: "/apple-icon.png",
   },
-}
+};
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#fafafa',
+  colorScheme: "light",
+  themeColor: "#12345a",
   userScalable: true,
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en" className="bg-background">
-      <body className="antialiased font-sans">
+      <body
+        className={`${_geistSans.variable} ${_geistMono.variable} antialiased font-sans`}
+      >
         {children}
-        {process.env.NODE_ENV === 'production' && (
+        {process.env.NODE_ENV === "production" && (
           <>
             <Analytics />
             <SpeedInsights />
@@ -54,5 +60,5 @@ export default function RootLayout({
         )}
       </body>
     </html>
-  )
+  );
 }

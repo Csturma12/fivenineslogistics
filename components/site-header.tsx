@@ -1,65 +1,98 @@
-import Link from "next/link"
-import { Phone } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { FiveNinesForged } from "@/components/five-nines-forged"
-import { StatusTicker } from "@/components/status-ticker"
-import { navLinks, site } from "@/lib/site"
-
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import { ArrowUpRight, Menu, X } from "lucide-react";
+import { FiveNinesForged } from "@/components/five-nines-forged";
+import { site } from "@/lib/site";
+const links = [
+  { href: "/who-we-serve", label: "Who we serve" },
+  { href: "/modes", label: "Capabilities" },
+  { href: "/company", label: "Our company" },
+  { href: "/carriers", label: "For carriers" },
+];
 export function SiteHeader() {
+  const [open, setOpen] = useState(false);
   return (
     <>
-      <StatusTicker />
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5" aria-label="Five Nines Logistics home">
-          <FiveNinesForged className="h-9 w-12 shrink-0 text-foreground" animated />
-          <span className="flex flex-col leading-tight">
-            <span className="text-[15px] font-semibold tracking-tight text-foreground">
-              FIVE NINES LOGISTICS
-            </span>
-            <span className="hidden font-mono text-[10px] uppercase tracking-wider text-muted-foreground sm:inline">
-              {site.agentOf} · {site.location}
-            </span>
+      <a className="skip-link" href="#page-content">
+        Skip to content
+      </a>
+      <div className="utility-bar">
+        <div className="design-container utility-inner">
+          <span>
+            <i className="brand-node" aria-hidden="true" />
+            Houston roots. Global reach.
           </span>
-        </Link>
-
-        <nav aria-label="Primary" className="hidden items-center gap-5 lg:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="font-mono text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-3 sm:gap-4">
-          <a
-            href={site.phoneHref}
-            className="hidden items-center gap-1.5 font-mono text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground lg:flex"
-          >
-            <Phone className="size-3.5" />
-            {site.phone}
+          <a href={site.phoneHref}>
+            24/7 dispatch <span className="utility-phone">· {site.phone}</span>
+            <ArrowUpRight size={13} aria-hidden="true" />
           </a>
+        </div>
+      </div>
+      <header className="design-header">
+        <div className="design-container header-inner">
           <Link
-            href="/portal"
-            className="flex min-h-11 items-center whitespace-nowrap font-mono text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+            href="/"
+            className="brand-lockup"
+            aria-label="Five Nines Logistics home"
           >
-            Sign In
+            <FiveNinesForged className="brand-mark" />
+            <span className="brand-name">
+              FIVE NINES<span>LOGISTICS</span>
+            </span>
           </Link>
-          <Button
-            render={<Link href="/request-capacity" />}
-            nativeButton={false}
-            size="sm"
-            className="font-medium"
+          <nav className="desktop-nav" aria-label="Primary">
+            {links.map((link) => (
+              <Link key={link.href} href={link.href}>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="header-actions">
+            <Link href="/portal" className="portal-link">
+              Client portal
+            </Link>
+            <Link href="/request-capacity" className="design-button header-cta">
+              Request capacity
+              <ArrowUpRight size={16} aria-hidden="true" />
+            </Link>
+            <button
+              className="menu-toggle"
+              aria-label={open ? "Close navigation" : "Open navigation"}
+              aria-expanded={open}
+              aria-controls="mobile-navigation"
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <X /> : <Menu />}
+            </button>
+          </div>
+        </div>
+        {open && (
+          <nav
+            id="mobile-navigation"
+            className="mobile-nav"
+            aria-label="Mobile navigation"
           >
-            Request Capacity
-          </Button>
-        </div>
-        </div>
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+              >
+                {link.label}
+                <ArrowUpRight size={18} aria-hidden="true" />
+              </Link>
+            ))}
+            <Link href="/portal" onClick={() => setOpen(false)}>
+              Client & carrier portal
+            </Link>
+            <Link href="/request-capacity" onClick={() => setOpen(false)}>
+              Request capacity
+            </Link>
+          </nav>
+        )}
       </header>
+      <span id="page-content" tabIndex={-1} className="content-anchor" />
     </>
-  )
+  );
 }
