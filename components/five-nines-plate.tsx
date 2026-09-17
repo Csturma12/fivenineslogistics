@@ -21,12 +21,12 @@ export function FiveNinesPlate({
       <rect x="2" y="2" width="116" height="68" rx="6" className="fill-[color:var(--navy)] stroke-current" strokeWidth="2" />
       <path d="M11 13h98M11 59h98" className="stroke-[color:var(--navy-foreground)]/35" />
       <text x="13" y="47" className="fill-[color:var(--navy-foreground)] font-mono text-[42px] font-black tracking-[-0.08em]">5N</text>
-      <text x="75" y="26" className="fill-[color:var(--navy-foreground)] font-mono text-[8px] font-bold tracking-[0.18em]">SERIES</text>
-      <text x="75" y="47" className="fill-[color:var(--navy-foreground)]/65 font-mono text-[7px] tracking-[0.12em]">LOGISTICS</text>
+      <text x="66" y="34" className="fill-[color:var(--navy-foreground)] font-mono text-[6px] font-bold tracking-[0.04em]">LOGISTICAL</text>
+      <text x="66" y="46" className="fill-[color:var(--navy-foreground)]/65 font-mono text-[6px] tracking-[0.05em]">SOLUTIONS</text>
       <circle
-        cx="105"
-        cy="21"
-        r="5"
+        cx="108"
+        cy="18"
+        r="4"
         className={animated ? "fill-[color:var(--status-ok)] motion-safe:animate-pulse" : "fill-[color:var(--status-ok)]"}
       />
     </svg>
