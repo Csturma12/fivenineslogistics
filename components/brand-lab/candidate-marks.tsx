@@ -145,6 +145,62 @@ export function CondensedWordmark({ className, animated, monochrome }: MarkProps
   )
 }
 
+/* E meets the wordmark — viewfinder brackets framing the 5N itself. The load kept in frame is the name. */
+export function BracketLockupMark({ className, animated, monochrome }: MarkProps) {
+  return (
+    <svg viewBox="0 0 120 72" className={className} role="img" aria-label="5N locked in a viewfinder frame">
+      <g fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="square">
+        <path d="M6 20V6h16M114 20V6H98M6 52v14h16M114 52v14H98" />
+      </g>
+      <text x="60" y="50" textAnchor="middle" className="font-mono text-[38px] font-black tracking-[-0.08em]">
+        <tspan className="fill-current">5</tspan>
+        <tspan
+          className={cn(monochrome ? "fill-current" : undefined, animated && !monochrome && "motion-safe:animate-pulse")}
+          style={monochrome ? undefined : { fill: "var(--status-ok)" }}
+        >
+          N
+        </tspan>
+      </text>
+    </svg>
+  )
+}
+
+/* Nameplate family, made physical — a pointed freight hang tag with a punch hole and a status lamp. */
+export function AssetTagMark({ className, animated, monochrome }: MarkProps) {
+  return (
+    <svg viewBox="0 0 120 72" className={className} role="img" aria-label="5N freight hang tag">
+      <path
+        d="M30 6h80a6 6 0 0 1 6 6v48a6 6 0 0 1-6 6H30L6 40 30 6Z"
+        className="fill-[color:var(--navy)] stroke-current"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <circle cx="23" cy="40" r="5" fill="none" className="stroke-[color:var(--navy-foreground)]/70" strokeWidth="3" />
+      <text x="42" y="52" className="fill-[color:var(--navy-foreground)] font-mono text-[34px] font-black tracking-[-0.08em]">5N</text>
+      <LiveNode cx={104} cy={20} animated={animated} monochrome={monochrome} />
+    </svg>
+  )
+}
+
+/* Round sibling of E — a targeting reticle locked on a live core. */
+export function ReticleMark({ className, animated, monochrome }: MarkProps) {
+  return (
+    <svg viewBox="0 0 72 72" className={className} role="img" aria-label="Reticle locked on a live core">
+      <circle cx="36" cy="36" r="26" fill="none" className="stroke-current" strokeWidth="5" />
+      <g className="stroke-current" strokeWidth="5" strokeLinecap="square">
+        <path d="M36 3v13M36 56v13M3 36h13M56 36h13" />
+      </g>
+      <circle
+        cx="36"
+        cy="36"
+        r="8"
+        className={cn(monochrome ? "fill-current" : undefined, animated && !monochrome && "motion-safe:animate-pulse")}
+        style={monochrome ? undefined : { fill: "var(--status-ok)" }}
+      />
+    </svg>
+  )
+}
+
 export function MarkApplication({ children, label, dark = false }: { children: React.ReactNode; label: string; dark?: boolean }) {
   return <div className={cn("flex min-h-28 flex-col justify-between gap-4 rounded-lg border border-border p-4", dark ? "bg-[color:var(--navy)] text-[color:var(--navy-foreground)]" : "bg-card text-foreground")}><span className="font-mono text-[9px] uppercase tracking-wider opacity-60">{label}</span>{children}</div>
 }
