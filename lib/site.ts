@@ -429,12 +429,19 @@ export const sectors: Sector[] = [
 
 export const whoWeServePage = {
   eyebrow: "Who we serve",
-  heading: "Freight for operations that measure downtime in dollars per minute.",
-  intro:
-    "Every shipper says their freight is important. The teams we work for can name the exact cost of a missed window, because it's already written into a commissioning schedule, a turnaround plan, or a launch date. That is the freight we're built for.",
-  closing: {
-    heading: "One tolerance for failure, whatever you move.",
-    body: "Most of what we move ends up at the same place: a plant with a window that will not move. Refractory brick, a run of alloy pipe, a skid of valves, a transformer for a data hall — it's the same job to us. The same method of procedure, the same asset-first sourcing, and the same reporting apply to every load.",
+  heading: "Freight held to the standard your facility runs on.",
+  intro: [
+    "Built on experience in plant maintenance, refractory work, and logistics, Five Nines understands what’s at stake when a crew is waiting, a shutdown window is closing, or a facility is counting down to go-live.",
+    "Our team plans every shipment backward from the window it has to hit—connecting the right equipment, carrier, and site requirements with clear communication from pickup through delivery. From plant turnarounds to mission-critical data center builds, when the delivery date is the whole job, that’s the freight we move.",
+  ],
+  proof: "Plant-floor experience. One accountable team. Five Nines.",
+  origin: {
+    eyebrow: "Where we come from",
+    heading: "The work inside the facility informs every move outside it.",
+    body: [
+      "Our roots are on the plant floor. Our founder spent ten years in plant maintenance, specializing in refractory work, followed by ten years coordinating logistics across the lower 48, Alaska, Hawaii, Canada, and Mexico.",
+      "Five Nines brings that broad experience to a business with strong roots in Texas and the Gulf. We understand both sides of the delivery: doing the work inside the facility and coordinating the freight that supports it. That perspective shapes how our team prepares each move and serves customers wherever the job takes them.",
+    ],
   },
 }
 
