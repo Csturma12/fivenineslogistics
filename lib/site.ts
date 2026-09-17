@@ -472,7 +472,7 @@ export const whoWeServeInputs = {
 
 export const companyPage = {
   eyebrow: "Company",
-  heading: "Over a decade moving critical freight. Now it has a name.",
+  heading: "Plant-floor roots. Logistics experience. A team built on trust.",
   intro:
     "Five Nines Logistics is a 3PL and freight brokerage brand for operators who need straight answers and accountable execution. We operate as an agent of Primary Freight LLC, combining owned capacity, affiliated carriers, and vetted nationwide and global partners for specialty modes, facilities, and additional lanes.",
 }
@@ -490,7 +490,7 @@ export type CompanyValue = {
 export const companyStory: CompanyValue[] = [
   {
     title: "Where we come from",
-    body: "For over a decade, we've coordinated flatbed, expedited, drayage, hotshot, and box-truck freight across Texas and the Gulf. Five Nines brings that experience together under one name and one promise: the load arrives when we said it would. Our customers trust us because they know the service and transparency we provide.",
+    body: "Our roots are on the plant floor. Our founder spent ten years in plant maintenance, specializing in refractory work, followed by ten years coordinating logistics across the lower 48, Alaska, Hawaii, Canada and Mexico.\n\nFive Nines brings that broad experience to a business with strong roots in Texas and the Gulf. We understand both sides of the delivery: doing the work inside the facility and coordinating the freight that supports it.\n\nNow we’re building that team further, with plans to bring aboard two to three experienced drivers our founder has worked with and counts among the most reliable he’s known. Their firsthand knowledge of equipment, routes and delivery-site realities will help shape how we plan and execute each move.",
   },
   {
     title: "How we're structured",

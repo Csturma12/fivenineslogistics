@@ -12,7 +12,7 @@ import { companyPage, companyStory, companyModel, credentials, site } from "@/li
 export const metadata: Metadata = {
   title: "Who We Are | Five Nines Logistics",
   description:
-    "We ran refractory and plant maintenance inside the plants for a decade, then got into trucking in 2017. Five Nines Logistics is the mission-critical freight brand operating as an agent of Primary Freight LLC, out of Houston, TX.",
+    "Built on ten years in plant maintenance and ten years coordinating logistics across all 50 states, Canada and Mexico. Five Nines is growing a team grounded in experience and trusted driver relationships.",
 }
 
 export default function CompanyPage() {
@@ -57,11 +57,15 @@ export default function CompanyPage() {
 
         <section className="border-b border-border">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-            <div className="grid gap-8 lg:grid-cols-3">
-              {companyStory.map((item, i) => (
+            <div className="mb-12 max-w-3xl">
+              <h2 className="text-3xl font-semibold tracking-tight text-foreground">{companyStory[0].title}</h2>
+              {companyStory[0].body.split("\n\n").map((paragraph) => <p key={paragraph} className="mt-5 text-lg leading-relaxed text-muted-foreground">{paragraph}</p>)}
+            </div>
+            <div className="grid gap-8 lg:grid-cols-2">
+              {companyStory.slice(1).map((item, i) => (
                 <div key={item.title} className="rounded-xl border border-border bg-card p-6 sm:p-8">
                   <span className="font-mono text-xs tabular-nums text-primary">
-                    {String(i + 1).padStart(2, "0")}
+                    {String(i + 2).padStart(2, "0")}
                   </span>
                   <h2 className="mt-3 text-xl font-semibold tracking-tight text-foreground">
                     {item.title}
