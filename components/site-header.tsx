@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { FiveNinesMark } from "@/components/five-nines-mark"
+import { StackedDecksMark } from "@/components/brand/icon-concepts"
 import { StatusTicker } from "@/components/status-ticker"
 import { navLinks, site } from "@/lib/site"
 
@@ -12,7 +12,7 @@ export function SiteHeader() {
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5" aria-label="Five Nines Logistics home">
-          <FiveNinesMark className="h-8 w-8 shrink-0" animated />
+          <StackedDecksMark className="h-8 w-8 shrink-0 text-foreground" animated />
           <span className="flex flex-col leading-tight">
             <span className="text-[15px] font-semibold tracking-tight text-foreground">
               FIVE NINES LOGISTICS
