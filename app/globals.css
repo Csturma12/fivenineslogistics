@@ -115,6 +115,11 @@
 }
 
 @layer utilities {
+  .font-condensed {
+    font-family: var(--font-condensed), 'Geist', ui-sans-serif, system-ui, sans-serif;
+    font-stretch: condensed;
+  }
+
   .bg-grid-technical {
     background-image:
       linear-gradient(to right, oklch(0.25 0.05 260 / 10%) 1px, transparent 1px),

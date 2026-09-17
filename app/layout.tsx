@@ -1,11 +1,16 @@
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Saira_Condensed } from 'next/font/google'
 import './globals.css'
 
 const _geistSans = Geist({ subsets: ['latin'] })
 const _geistMono = Geist_Mono({ subsets: ['latin'] })
+const sairaCondensed = Saira_Condensed({
+  subsets: ['latin'],
+  weight: ['700', '900'],
+  variable: '--font-condensed',
+})
 
 export const metadata: Metadata = {
   title: 'Five Nines Logistics | Critical Freight Brokerage',
@@ -43,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-background">
+    <html lang="en" className={`bg-background ${sairaCondensed.variable}`}>
       <body className="antialiased font-sans">
         {children}
         {process.env.NODE_ENV === 'production' && (
