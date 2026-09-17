@@ -6,19 +6,22 @@ function green(monochrome?: boolean) {
   return monochrome ? "currentColor" : "var(--status-ok)"
 }
 
-/* STACKED DECKS. Flatbed decks stacked in isometric — the live load on top runs
-   green. Same dimensional language as heavy-haul equipment, but ownable. */
+/* STACKED PLATES. Flat-top hexagonal plates stacked with dimensional depth —
+   the Blackbox layered-plate lineage, evolved. The live load on top runs green;
+   the plates below fall back to weight. Same geometry from favicon to gate. */
 export function StackedDecksMark({ className, monochrome, animated }: IconProps) {
   const cx = 24
-  const rx = 17
-  const ry = 8.5
-  const deck = (cy: number) => `M${cx} ${cy - ry} L${cx + rx} ${cy} L${cx} ${cy + ry} L${cx - rx} ${cy} Z`
+  const w = 17 // half-width to the flat side points
+  const h = 9.5 // half-height to the top/bottom points
+  // Flat-top hexagon centered at (cx, cy).
+  const plate = (cy: number) =>
+    `M${cx - w} ${cy} L${cx - w / 2} ${cy - h} L${cx + w / 2} ${cy - h} L${cx + w} ${cy} L${cx + w / 2} ${cy + h} L${cx - w / 2} ${cy + h} Z`
   return (
-    <svg viewBox="0 0 48 44" className={className} role="img" aria-label="Five Nines stacked decks">
-      <path d={deck(31)} fill="currentColor" opacity={0.25} />
-      <path d={deck(23)} fill="currentColor" opacity={0.5} />
+    <svg viewBox="0 0 48 46" className={className} role="img" aria-label="Five Nines stacked plates">
+      <path d={plate(32)} fill="currentColor" opacity={0.22} />
+      <path d={plate(22)} fill="currentColor" opacity={0.5} />
       <path
-        d={deck(14)}
+        d={plate(12)}
         fill={green(monochrome)}
         className={cn(animated && !monochrome && "motion-safe:animate-pulse")}
       />

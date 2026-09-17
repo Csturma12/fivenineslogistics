@@ -23,9 +23,9 @@ const labTheme = {
 const iconDirections = [
   {
     id: "6a",
-    name: "Stacked Decks",
-    tag: "Most on-brand",
-    note: "Flatbed decks stacked in isometric — the live load on top runs green. Same dimensional language as heavy-haul equipment, but ownable.",
+    name: "Stacked Plates",
+    tag: "Recommended · evolves the Blackbox mark",
+    note: "Flat-top hexagonal plates stacked with real depth — a direct descendant of the Blackbox Logistics layered-plate mark, so the lineage carries over. The live load on top runs green; the plates below fall back to weight.",
     Mark: StackedDecksMark,
   },
   {
