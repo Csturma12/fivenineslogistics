@@ -221,7 +221,7 @@ export default function Page() {
             </div>
             <div className="experience-copy">
               <p>Our founder spent ten years in plant maintenance, specializing in refractory work, followed by ten years coordinating logistics across the lower 48, Alaska, Hawaii, Canada and Mexico.</p>
-              <p>Today, we’re building on that experience with plans to bring aboard two to three seasoned drivers our founder has worked with and trusts. Their knowledge from behind the wheel will strengthen how we plan each move, from equipment selection to the final delivery.</p>
+              <p>Today, we’re building on that experience with plans to bring aboard seasoned drivers our founder has worked with and trusts. Their knowledge from behind the wheel will strengthen how we plan each move, from equipment selection to the final delivery.</p>
               <Link href="/company" className="text-link">
                 The story behind Five Nines
                 <ArrowUpRight size={18} aria-hidden="true" />

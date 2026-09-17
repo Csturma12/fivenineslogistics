@@ -490,7 +490,7 @@ export type CompanyValue = {
 export const companyStory: CompanyValue[] = [
   {
     title: "Where we come from",
-    body: "Our roots are on the plant floor. Our founder spent ten years in plant maintenance, specializing in refractory work, followed by ten years coordinating logistics across the lower 48, Alaska, Hawaii, Canada and Mexico.\n\nFive Nines brings that broad experience to a business with strong roots in Texas and the Gulf. We understand both sides of the delivery: doing the work inside the facility and coordinating the freight that supports it.\n\nNow we’re building that team further, with plans to bring aboard two to three experienced drivers our founder has worked with and counts among the most reliable he’s known. Their firsthand knowledge of equipment, routes and delivery-site realities will help shape how we plan and execute each move.",
+    body: "Our roots are on the plant floor. Our founder spent ten years in plant maintenance, specializing in refractory work, followed by ten years coordinating logistics across the lower 48, Alaska, Hawaii, Canada and Mexico.\n\nFive Nines brings that broad experience to a business with strong roots in Texas and the Gulf. We understand both sides of the delivery: doing the work inside the facility and coordinating the freight that supports it.\n\nNow we’re building that team further, with plans to bring aboard experienced drivers our founder has worked with and counts among the most reliable he’s known. Their firsthand knowledge of equipment, routes and delivery-site realities will help shape how we plan and execute each move.",
   },
   {
     title: "How we're structured",
