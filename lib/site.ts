@@ -474,7 +474,7 @@ export const companyPage = {
   eyebrow: "Company",
   heading: "Plant-floor roots. Logistics experience. A team built on trust.",
   intro:
-    "Five Nines Logistics is a 3PL and freight brokerage brand for operators who need straight answers and accountable execution. We operate as an agent of Primary Freight LLC, combining owned capacity, affiliated carriers, and vetted nationwide and global partners for specialty modes, facilities, and additional lanes.",
+    "Five Nines Logistics is a 3PL for businesses that need freight handled right—with straight answers, careful planning and accountable execution. Operating as an agent of Primary Freight LLC, we bring together owned capacity, affiliated carriers and trusted partners nationwide and globally to coordinate transportation, specialized services and warehousing around the job.",
 }
 
 export const companyModel = {
