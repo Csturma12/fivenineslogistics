@@ -1,10 +1,10 @@
-import type { Metadata } from "next"
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { SiteHeader } from "@/components/site-header"
-import { SiteFooter } from "@/components/site-footer"
-import { NetworkCta } from "@/components/network-cta"
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { NetworkCta } from "@/components/network-cta";
 import {
   modes,
   site,
@@ -13,13 +13,13 @@ import {
   certificationsIntro,
   certificationGroups,
   crossBorder,
-} from "@/lib/site"
+} from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Modes & Services | Five Nines Logistics",
   description:
     "A Houston-based 3PL arranging flatbed, dry van, sprinter van, refrigerated trucking, expedited, drayage, hotshot, heavy haul, crane and rigging, ocean, LTL, and warehousing through nationwide and global partners.",
-}
+};
 
 export default function ModesPage() {
   return (
@@ -35,9 +35,10 @@ export default function ModesPage() {
               Twelve modes. One tolerance for failure.
             </h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-              Owned capacity, affiliated carriers, and a vetted nationwide and global network give
-              us the reach to solve the whole shipment. Our relationships run both ways: partners
-              extend enterprise capabilities to Five Nines, and we support them with freight and
+              Owned capacity, affiliated carriers, and a vetted nationwide and
+              global network give us the reach to solve the whole shipment. Our
+              relationships run both ways: partners extend enterprise
+              capabilities to Five Nines, and we support them with freight and
               services outside their own coverage.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -68,7 +69,11 @@ export default function ModesPage() {
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
             <div className="grid gap-px overflow-hidden rounded-xl border border-border bg-border">
               {modes.map((mode, i) => (
-                <div key={mode.slug} id={mode.slug} className="scroll-mt-24 bg-card">
+                <div
+                  key={mode.slug}
+                  id={mode.slug}
+                  className="scroll-mt-24 bg-card"
+                >
                   <div className="grid gap-8 p-6 sm:p-10 lg:grid-cols-[1.4fr_1fr]">
                     <div>
                       <span className="font-mono text-xs tabular-nums text-muted-foreground">
@@ -89,7 +94,10 @@ export default function ModesPage() {
                         </h3>
                         <ul className="mt-3 flex flex-col gap-2">
                           {mode.equipment.map((item) => (
-                            <li key={item} className="flex items-center gap-2 text-sm text-foreground">
+                            <li
+                              key={item}
+                              className="flex items-center gap-2 text-sm text-foreground"
+                            >
                               <span className="size-1.5 shrink-0 rounded-full bg-primary" />
                               {item}
                             </li>
@@ -102,7 +110,10 @@ export default function ModesPage() {
                         </h3>
                         <ul className="mt-3 flex flex-col gap-2">
                           {mode.typicalLoads.map((item) => (
-                            <li key={item} className="flex items-center gap-2 text-sm text-foreground">
+                            <li
+                              key={item}
+                              className="flex items-center gap-2 text-sm text-foreground"
+                            >
                               <span className="size-1.5 shrink-0 rounded-full bg-border" />
                               {item}
                             </li>
@@ -117,7 +128,10 @@ export default function ModesPage() {
           </div>
         </section>
 
-        <section className="border-b border-border">
+        <section
+          id="warehousing"
+          className="scroll-mt-24 border-b border-border"
+        >
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
             <span className="font-mono text-xs uppercase tracking-wider text-primary">
               {warehousing.eyebrow}
@@ -136,8 +150,12 @@ export default function ModesPage() {
               <div className="mt-4 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-5">
                 {warehousing.locations.map((loc) => (
                   <div key={loc.city} className="bg-card p-5">
-                    <p className="text-sm font-semibold text-foreground">{loc.city}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{loc.note}</p>
+                    <p className="text-sm font-semibold text-foreground">
+                      {loc.city}
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      {loc.note}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -149,7 +167,9 @@ export default function ModesPage() {
             <div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-border bg-border lg:grid-cols-3">
               {warehousing.capabilities.map((cap) => (
                 <div key={cap.title} className="bg-card p-6 sm:p-8">
-                  <h3 className="text-lg font-semibold tracking-tight text-foreground">{cap.title}</h3>
+                  <h3 className="text-lg font-semibold tracking-tight text-foreground">
+                    {cap.title}
+                  </h3>
                   <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
                     {cap.body}
                   </p>
@@ -174,7 +194,9 @@ export default function ModesPage() {
             <div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-border bg-border lg:grid-cols-3">
               {jobSiteCoordination.capabilities.map((cap) => (
                 <div key={cap.title} className="bg-card p-6 sm:p-8">
-                  <h3 className="text-lg font-semibold tracking-tight text-foreground">{cap.title}</h3>
+                  <h3 className="text-lg font-semibold tracking-tight text-foreground">
+                    {cap.title}
+                  </h3>
                   <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
                     {cap.body}
                   </p>
@@ -185,7 +207,10 @@ export default function ModesPage() {
         </section>
 
         {/* Certifications & compliance */}
-        <section id="certifications" className="scroll-mt-24 border-b border-border">
+        <section
+          id="certifications"
+          className="scroll-mt-24 border-b border-border"
+        >
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
             <span className="font-mono text-xs uppercase tracking-wider text-primary">
               {certificationsIntro.eyebrow}
@@ -204,11 +229,16 @@ export default function ModesPage() {
                     <h3 className="text-xl font-semibold tracking-tight text-foreground">
                       {group.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground">{group.note}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {group.note}
+                    </p>
                   </div>
                   <div className="mt-4 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
                     {group.items.map((item) => (
-                      <div key={item.name} className="flex flex-col bg-card p-5">
+                      <div
+                        key={item.name}
+                        className="flex flex-col bg-card p-5"
+                      >
                         <div className="flex items-start justify-between gap-3">
                           <h4 className="text-sm font-semibold leading-snug text-foreground">
                             {item.name}
@@ -232,7 +262,10 @@ export default function ModesPage() {
         </section>
 
         {/* Cross-border emphasis */}
-        <section id="cross-border" className="scroll-mt-24 border-b border-border">
+        <section
+          id="cross-border"
+          className="scroll-mt-24 border-b border-border"
+        >
           <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.2fr_1fr] lg:items-center">
             <div>
               <span className="font-mono text-xs uppercase tracking-wider text-primary">
@@ -247,7 +280,10 @@ export default function ModesPage() {
             </div>
             <ul className="flex flex-col gap-px overflow-hidden rounded-xl border border-border bg-border">
               {crossBorder.points.map((point) => (
-                <li key={point} className="flex items-start gap-3 bg-card p-5 text-sm text-foreground">
+                <li
+                  key={point}
+                  className="flex items-start gap-3 bg-card p-5 text-sm text-foreground"
+                >
                   <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
                   <span className="leading-relaxed">{point}</span>
                 </li>
@@ -260,5 +296,5 @@ export default function ModesPage() {
       </main>
       <SiteFooter />
     </>
-  )
+  );
 }
