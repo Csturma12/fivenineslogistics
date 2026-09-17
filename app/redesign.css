@@ -4,7 +4,7 @@
   --foreground: #12345a;
   --card: #fff;
   --card-foreground: #12345a;
-  --primary: #164e83;
+  --primary: #1768b2;
   --primary-foreground: #fff;
   --secondary: #eef4f9;
   --secondary-foreground: #12345a;
@@ -12,16 +12,16 @@
   --muted-foreground: #54687e;
   --border: #dce5ee;
   --input: #cad7e4;
-  --ring: #28649a;
+  --ring: #1768b2;
   --navy: #12345a;
   --navy-foreground: #fff;
   --status-ok: #21b975;
   --status-ok-dark: #52d999;
   --signal: #21b975;
   --radius: 0.3rem;
-  --blue: #28649a;
+  --blue: #1768b2;
   --ink: #12345a;
-  --soft-blue: #f1f6fa;
+  --soft-blue: #eaf3fc;
   --line: #dce5ee;
 }
 html {
@@ -142,19 +142,19 @@ html {
   align-items: center;
   gap: 24px;
   padding: 14px 23px;
-  background: var(--ink);
+  background: var(--blue);
   color: #fff;
   font-size: 0.875rem;
   font-weight: 600;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--blue);
   border-radius: 3px;
   transition:
     background 0.2s,
     transform 0.2s;
 }
 .design-button:hover {
-  background: var(--blue);
-  border-color: var(--blue);
+  background: #12538f;
+  border-color: #12538f;
   transform: translateY(-2px);
 }
 .design-button svg,
@@ -333,7 +333,7 @@ button:focus-visible {
   box-shadow: 0 12px 42px rgb(18 52 90 / 10%);
   padding: 22px 25px;
   border: 1px solid var(--line);
-  border-top: 3px solid #28649a;
+  border-top: 3px solid #1768b2;
   border-radius: 2px;
 }
 .handoff-title {
@@ -385,8 +385,8 @@ button:focus-visible {
   color: #627489;
 }
 .operating-strip {
-  border-block: 1px solid var(--line);
-  background: #f7f9fc;
+  border-block: 1px solid #cadff1;
+  background: #eaf3fc;
 }
 .operating-grid {
   display: grid;
@@ -405,6 +405,7 @@ button:focus-visible {
   border: 0;
 }
 .operating-grid strong {
+  color: var(--blue);
   font-size: 1.9rem;
   font-weight: 650;
   letter-spacing: -0.04em;
@@ -460,7 +461,14 @@ button:focus-visible {
   border-right: 0;
 }
 .sector-card:hover {
-  background: #f1f6fa;
+  background: #eaf3fc;
+}
+.sector-top > svg {
+  padding: 9px;
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  background: #eaf3fc;
 }
 .sector-top {
   display: flex;
@@ -539,7 +547,7 @@ button:focus-visible {
 }
 .capability-options {
   padding: 28px 34px;
-  background: #f6f9fc;
+  background: #eaf3fc;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -569,7 +577,7 @@ button:focus-visible {
   flex-shrink: 0;
 }
 .capability-options button[aria-pressed="true"] {
-  color: var(--ink);
+  color: var(--blue);
   font-weight: 700;
 }
 .capability-options button[aria-pressed="true"] > span {
@@ -628,7 +636,7 @@ button:focus-visible {
 }
 .process-section {
   padding-block: 75px;
-  background: #12345a;
+  background: #174e83;
   color: white;
 }
 .process-section .eyebrow {
@@ -703,7 +711,8 @@ button:focus-visible {
   justify-content: center;
   width: 44px;
   height: 44px;
-  background: #f0f5fa;
+  background: #eaf3fc;
+  color: var(--blue);
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   flex-shrink: 0;
@@ -736,7 +745,7 @@ button:focus-visible {
   color: #138153;
 }
 .closing-section {
-  background: #edf4f9;
+  background: #e6f0fb;
   border-block: 1px solid var(--line);
   padding-block: 64px;
 }
