@@ -2,428 +2,256 @@
 
 import { useState, type FormEvent } from "react"
 import Link from "next/link"
-import { ArrowRight, ShieldCheck, MailCheck, Clock, CircleAlert } from "lucide-react"
+import {
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  CircleAlert,
+  Clock,
+  ShieldCheck,
+} from "lucide-react"
 import { FiveNinesMark } from "@/components/five-nines-mark"
-import { cn } from "@/lib/utils"
 
 type Role = "customer" | "carrier"
-type SubmitState = "idle" | "submitting" | "pending" | "link_sent" | "error"
+type SubmitState = "idle" | "submitting" | "pending" | "error"
 
-const liveLoads = [
-  { id: "LN-3402", lane: "PORT → HOU", status: "ARRIVING · 6 MIN", tone: "ok" as const },
-  { id: "LN-2291", lane: "HOU → DFW", status: "ETA 14:20 · ON PLAN", tone: "muted" as const },
-  { id: "LN-4519", lane: "HOU → NOLA", status: "MONITORING · WX", tone: "warn" as const },
-]
-
-const carrierBoard = [
-  { lane: "HOU → DFW", spec: "FLATBED · 44K", pay: "$1,180" },
-  { lane: "HOU → BTR", spec: "HOTSHOT · 8K", pay: "$740" },
-  { lane: "PORT → SAT", spec: "STEP DECK · 38K", pay: "$1,320" },
-]
+const roleCopy = {
+  customer: {
+    eyebrow: "Customer access",
+    title: "A direct line to your freight team.",
+    description:
+      "Approved customers receive secure, password-free access and a direct path to the team coordinating their freight.",
+    steps: [
+      "Enter your work email and company details.",
+      "We verify your relationship with Five Nines.",
+      "Approved users receive a secure sign-in link by email.",
+    ],
+    emailPlaceholder: "ops@yourcompany.com",
+    companyPlaceholder: "Your company",
+  },
+  carrier: {
+    eyebrow: "Carrier access",
+    title: "Built around trusted carrier relationships.",
+    description:
+      "Approved carriers receive secure, password-free access and a direct connection to carrier relations and dispatch.",
+    steps: [
+      "Enter your dispatch email and authority details.",
+      "We verify your carrier relationship and setup.",
+      "Approved users receive a secure sign-in link by email.",
+    ],
+    emailPlaceholder: "dispatch@yourauthority.com",
+    companyPlaceholder: "Legal carrier name",
+  },
+} as const
 
 export function PortalSignIn({ role }: { role: Role }) {
-  const [email, setEmail] = useState("")
-  const [fullName, setFullName] = useState("")
+  const copy = roleCopy[role]
+  const [email, setEmail] = useState("chriss@primarycompanies.com")
+  const [fullName, setFullName] = useState("Chris Sturma")
   const [company, setCompany] = useState("")
   const [state, setState] = useState<SubmitState>("idle")
   const [error, setError] = useState("")
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault()
     if (state === "submitting") return
+
     setState("submitting")
     setError("")
+
     try {
-      const res = await fetch("/api/portal/access", {
+      const response = await fetch("/api/portal/access", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ email, role, fullName, company }),
       })
-      const data = (await res.json()) as { outcome?: string; error?: string }
-      if (!res.ok) {
+      const data = (await response.json()) as { outcome?: string; error?: string }
+
+      if (!response.ok) {
         setState("error")
-        setError(data.error ?? "Something went wrong. Try again.")
+        setError(data.error ?? "We could not process your request. Please try again.")
         return
       }
-      setState(data.outcome === "link_sent" ? "link_sent" : "pending")
+
+      setState("pending")
     } catch {
       setState("error")
-      setError("Network error. Check your connection and try again.")
+      setError("We could not reach the portal. Check your connection and try again.")
     }
+  }
+
+  function resetForm() {
+    setState("idle")
+    setEmail("")
+    setError("")
   }
 
   return (
     <div className="grid overflow-hidden rounded-xl border border-border lg:grid-cols-2">
-      {/* Control-tower panel */}
-      <div className="flex flex-col justify-between gap-8 bg-navy p-6 text-navy-foreground sm:p-8">
+      <div className="flex flex-col justify-between gap-10 bg-navy p-6 text-navy-foreground sm:p-8">
         <div className="flex items-center gap-2.5">
           <FiveNinesMark className="h-7 w-7 shrink-0 text-navy-foreground" />
           <span className="text-sm font-semibold tracking-tight">FIVE NINES</span>
         </div>
 
-        {role === "carrier" ? (
-          <div>
-            <h2 className="text-balance text-2xl font-semibold leading-[1.12] tracking-tight sm:text-3xl">
-              The load board is always live.
-              <br />
-              <span className="text-[color:var(--status-ok-dark)]">So is your login.</span>
-            </h2>
+        <div>
+          <p className="font-mono text-[11px] uppercase tracking-wider text-[color:var(--status-ok-dark)]">
+            {copy.eyebrow}
+          </p>
+          <h2 className="mt-3 max-w-md text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
+            {copy.title}
+          </h2>
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-navy-foreground/65">
+            {copy.description}
+          </p>
 
-            <dl className="mt-6 flex flex-col gap-2 rounded-lg border border-navy-foreground/15 p-4">
-              {carrierBoard.map((o) => (
-                <div
-                  key={o.lane}
-                  className="flex items-center justify-between gap-3 font-mono text-[11px]"
-                >
-                  <dt className="tracking-wider text-navy-foreground/70">
-                    {o.lane} <span className="text-navy-foreground/40">·</span> {o.spec}
-                  </dt>
-                  <dd className="shrink-0 tracking-wider text-[color:var(--status-ok-dark)]">
-                    {o.pay}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        ) : (
-          <div>
-            <h2 className="text-balance text-2xl font-semibold leading-[1.12] tracking-tight sm:text-3xl">
-              The control tower is always on.
-              <br />
-              <span className="text-[color:var(--status-ok-dark)]">So is your login.</span>
-            </h2>
-
-            <dl className="mt-6 flex flex-col gap-2 rounded-lg border border-navy-foreground/15 p-4">
-              {liveLoads.map((load) => (
-                <div
-                  key={load.id}
-                  className="flex items-center justify-between gap-3 font-mono text-[11px]"
-                >
-                  <dt className="tracking-wider text-navy-foreground/70">
-                    {load.id} <span className="text-navy-foreground/40">·</span> {load.lane}
-                  </dt>
-                  <dd
-                    className={cn(
-                      "shrink-0 tracking-wider",
-                      load.tone === "ok" && "text-[color:var(--status-ok-dark)]",
-                      load.tone === "warn" && "text-[color:var(--status-warn-dark)]",
-                      load.tone === "muted" && "text-navy-foreground/60",
-                    )}
-                  >
-                    {load.status}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        )}
+          <ol className="mt-7 flex flex-col gap-3" aria-label="Portal access process">
+            {copy.steps.map((step, index) => (
+              <li key={step} className="flex items-start gap-3">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-navy-foreground/20 font-mono text-[10px] text-[color:var(--status-ok-dark)]">
+                  {index + 1}
+                </span>
+                <span className="pt-0.5 text-[13px] leading-relaxed text-navy-foreground/70">
+                  {step}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
 
         <p className="font-mono text-[10px] uppercase tracking-wider text-navy-foreground/45">
-          99.999% on-time · dispatch 24/7/365 · MC# 841023
+          Manually approved · password-free · secure email access
         </p>
       </div>
 
-      {/* Sign-in panel */}
       <div className="bg-card p-6 sm:p-8">
         <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-          {role === "carrier" ? "Carrier sign in" : "Customer sign in"}
+          {role === "carrier" ? "Carrier portal access" : "Customer portal access"}
         </h2>
-        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-          {role === "carrier"
-            ? "The live load board, your loads, and settlements — one login."
-            : "Your loads, documents, and settlements — one login."}
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Enter your details below. If you are already approved, we will email your sign-in link.
+          New requests are reviewed by our team first.
         </p>
 
-        {state === "link_sent" || state === "pending" ? (
-          <div className="mt-6 flex flex-col gap-4 rounded-lg border border-border bg-background p-5">
+        {state === "pending" ? (
+          <div className="mt-6 flex flex-col gap-4 rounded-lg border border-border bg-background p-5" aria-live="polite">
             <div className="flex items-center gap-2.5">
-              {state === "link_sent" ? (
-                <MailCheck
-                  className="size-5 shrink-0 text-[color:var(--status-ok)]"
-                  aria-hidden="true"
-                />
-              ) : (
-                <Clock
-                  className="size-5 shrink-0 text-[color:var(--status-warn)]"
-                  aria-hidden="true"
-                />
-              )}
+              <Clock className="size-5 shrink-0 text-[color:var(--status-warn)]" aria-hidden="true" />
               <h3 className="text-base font-semibold tracking-tight text-foreground">
-                {state === "link_sent" ? "Check your email" : "Request received"}
+                Request received
               </h3>
             </div>
             <p className="text-[13px] leading-relaxed text-muted-foreground">
-              {state === "link_sent" ? (
-                <>
-                  We sent a password-free sign-in link to{" "}
-                  <span className="font-medium text-foreground">{email}</span>. It expires in about
-                  an hour and can only be used once.
-                </>
-              ) : (
-                <>
-                  Dispatch will approve <span className="font-medium text-foreground">{email}</span>{" "}
-                  and email your secure sign-in link — no password required. Enter your email again
-                  once you&apos;re approved.
-                </>
-              )}
+              We received the access request for{" "}
+              <span className="font-medium text-foreground">{email}</span>. If the address is already
+              approved, a one-time sign-in link will arrive shortly. Otherwise, our team will verify
+              the relationship and follow up by email.
             </p>
             <button
               type="button"
-              onClick={() => {
-                setState("idle")
-                setEmail("")
-              }}
-              className="min-h-11 self-start font-mono text-[11px] uppercase tracking-wider text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              onClick={resetForm}
+              className="min-h-11 self-start font-mono text-[11px] uppercase tracking-wider text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Use a different email
             </button>
           </div>
         ) : (
-          <>
-            <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
+          <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
+            <label className="flex flex-col gap-1.5">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                Work email
+              </span>
+              <input
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder={copy.emailPlaceholder}
+                className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
+              />
+            </label>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <label className="flex flex-col gap-1.5">
                 <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Work email
+                  Name <span className="text-muted-foreground/50">· optional</span>
                 </span>
                 <input
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={role === "customer" ? "ops@yourcompany.com" : "dispatch@yourauthority.com"}
+                  type="text"
+                  autoComplete="name"
+                  value={fullName}
+                  onChange={(event) => setFullName(event.target.value)}
+                  placeholder="Full name"
                   className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
                 />
               </label>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-1.5">
-                  <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                    Name <span className="text-muted-foreground/50">· optional</span>
-                  </span>
-                  <input
-                    type="text"
-                    autoComplete="name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Alex Rivera"
-                    className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
-                  />
-                </label>
-                <label className="flex flex-col gap-1.5">
-                  <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                    Company <span className="text-muted-foreground/50">· optional</span>
-                  </span>
-                  <input
-                    type="text"
-                    autoComplete="organization"
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    placeholder={role === "customer" ? "Gulfstream Fab" : "Hardline Transport"}
-                    className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
-                  />
-                </label>
-              </div>
-
-              {state === "error" && (
-                <p
-                  role="alert"
-                  className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-[color:var(--destructive)]"
-                >
-                  <CircleAlert className="size-3.5 shrink-0" aria-hidden="true" />
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={state === "submitting"}
-                className="mt-1 flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 font-mono text-xs uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
-              >
-                {state === "submitting" ? "Sending" : "Get portal access"}
-                <ArrowRight className="size-3.5" />
-              </button>
-
-              <p className="font-mono text-[11px] leading-relaxed text-muted-foreground">
-                New here? Dispatch approves you, then emails a password-free link. Already approved?
-                Your link arrives the moment you enter your email.
-              </p>
-            </form>
-
-            <div className="mt-6 flex items-start gap-2 rounded-lg border border-border bg-background p-3">
-              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
-              <p className="text-[13px] leading-relaxed text-muted-foreground">
-                {role === "carrier" ? (
-                  <>
-                    Hauling for us? Request our certificate of insurance, or ask to be added as a
-                    certificate holder — send it during onboarding and we&apos;ll return it same day.
-                  </>
-                ) : (
-                  <>
-                    Need a certificate of insurance, or to be added as a certificate holder on a
-                    load? Request it from your coordinator and we&apos;ll send it over.
-                  </>
-                )}
-              </p>
+              <label className="flex flex-col gap-1.5">
+                <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                  Company <span className="text-muted-foreground/50">· optional</span>
+                </span>
+                <input
+                  type="text"
+                  autoComplete="organization"
+                  value={company}
+                  onChange={(event) => setCompany(event.target.value)}
+                  placeholder={copy.companyPlaceholder}
+                  className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
+                />
+              </label>
             </div>
-          </>
+
+            {state === "error" && (
+              <p role="alert" className="flex items-center gap-2 text-[13px] text-[color:var(--destructive)]">
+                <CircleAlert className="size-4 shrink-0" aria-hidden="true" />
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={state === "submitting"}
+              className="mt-1 flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary py-2.5 font-mono text-xs uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-60"
+            >
+              {state === "submitting" ? "Submitting" : "Continue securely"}
+              <ArrowRight className="size-3.5" aria-hidden="true" />
+            </button>
+
+            <p className="text-[13px] leading-relaxed text-muted-foreground">
+              We use these details only to verify portal access. Submitting this form does not create
+              an account or password.
+            </p>
+          </form>
         )}
+
+        <div className="mt-6 flex items-start gap-2 rounded-lg border border-border bg-background p-3">
+          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+          <p className="text-[13px] leading-relaxed text-muted-foreground">
+            Access is limited to verified Five Nines customers and carriers. Sign-in links are
+            single-use and expire automatically.
+          </p>
+        </div>
 
         <div className="mt-6 border-t border-border pt-5">
           <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-            New to Five Nines?
+            Not yet working with Five Nines?
           </p>
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Link
               href="/request-capacity"
-              className="flex min-h-11 items-center justify-center rounded-lg border border-border py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+              className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              Become a customer
+              <Building2 className="size-4" aria-hidden="true" />
+              Request capacity
             </Link>
             <Link
               href="/carriers"
-              className="flex min-h-11 items-center justify-center rounded-lg border border-border py-2.5 text-sm font-medium text-primary transition-colors hover:bg-secondary"
+              className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-medium text-primary transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
+              <CheckCircle2 className="size-4" aria-hidden="true" />
               Haul for us
             </Link>
           </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export function PortalDashboardPreview() {
-  return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      {/* Customer */}
-      <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-6">
-        <div className="flex items-baseline justify-between gap-4">
-          <h3 className="font-mono text-xs uppercase tracking-wider text-foreground">
-            Customer · Gulfstream Fab
-          </h3>
-          <span className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-[color:var(--status-ok)]">
-            On-time 100% · 90d
-          </span>
-        </div>
-
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { n: "4", l: "In transit" },
-            { n: "1", l: "Arriving today" },
-            { n: "0", l: "Exceptions" },
-          ].map((s) => (
-            <div key={s.l} className="rounded-lg border border-border p-3">
-              <div className="text-2xl font-semibold text-foreground">{s.n}</div>
-              <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                {s.l}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          {liveLoads.map((load) => (
-            <div
-              key={load.id}
-              className={cn(
-                "flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 font-mono text-[11px]",
-                load.tone === "warn"
-                  ? "border-[color:var(--status-warn)]/40 bg-[color:var(--status-warn)]/8"
-                  : "border-border",
-              )}
-            >
-              <span className="tracking-wider text-foreground">
-                {load.id} <span className="text-muted-foreground">· {load.lane}</span>
-              </span>
-              <span
-                className={cn(
-                  "shrink-0 tracking-wider",
-                  load.tone === "ok" && "text-[color:var(--status-ok)]",
-                  load.tone === "warn" && "text-[color:var(--status-warn)]",
-                  load.tone === "muted" && "text-muted-foreground",
-                )}
-              >
-                {load.status}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-1 grid grid-cols-2 gap-2">
-          <Link
-            href="/request-capacity"
-            className="flex min-h-11 items-center justify-center rounded-lg bg-primary py-2.5 font-mono text-[11px] uppercase tracking-wider text-primary-foreground"
-          >
-            Request capacity
-          </Link>
-          <button
-            type="button"
-            className="min-h-11 rounded-lg border border-border py-2.5 font-mono text-[11px] uppercase tracking-wider text-foreground"
-          >
-            Monthly scorecard
-          </button>
-        </div>
-      </div>
-
-      {/* Carrier */}
-      <div className="flex flex-col gap-5 rounded-xl border border-navy/40 bg-navy p-6 text-navy-foreground">
-        <div className="flex items-baseline justify-between gap-4">
-          <h3 className="font-mono text-xs uppercase tracking-wider">Carrier · Hardline Transport</h3>
-          <span className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-[color:var(--status-ok-dark)]">
-            Setup complete
-          </span>
-        </div>
-
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-wider text-navy-foreground/50">
-            Offered to you
-          </p>
-          <div className="mt-2 flex flex-col gap-2">
-            {[
-              { lane: "HOU → DFW · FLATBED · 44K", note: "Pickup 06:00 · switchgear, tarped", pay: "$1,180" },
-              { lane: "HOU → BTR · HOTSHOT · 8K", note: "Same day · valve skid, refinery TAR", pay: "$740" },
-            ].map((o) => (
-              <div
-                key={o.lane}
-                className="flex items-center justify-between gap-3 rounded-lg border border-navy-foreground/15 px-3 py-2.5"
-              >
-                <div className="min-w-0">
-                  <div className="font-mono text-[11px] tracking-wider">{o.lane}</div>
-                  <div className="mt-0.5 truncate text-[11px] text-navy-foreground/55">{o.note}</div>
-                </div>
-                <div className="shrink-0 font-mono text-sm font-semibold text-[color:var(--status-ok-dark)]">
-                  {o.pay}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-wider text-navy-foreground/50">
-            Settlements
-          </p>
-          <div className="mt-2 flex items-center justify-between gap-3 rounded-lg border border-navy-foreground/15 px-3 py-2.5 font-mono text-[11px]">
-            <span className="tracking-wider">LN-1187 · POD received</span>
-            <span className="shrink-0 tracking-wider text-[color:var(--status-ok-dark)]">
-              Pays Fri · $2,050
-            </span>
-          </div>
-        </div>
-
-        <div className="mt-1 grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            className="min-h-11 rounded-lg bg-[color:var(--status-ok-dark)] py-2.5 font-mono text-[11px] uppercase tracking-wider text-navy"
-          >
-            Accept load
-          </button>
-          <button
-            type="button"
-            className="min-h-11 rounded-lg border border-navy-foreground/25 py-2.5 font-mono text-[11px] uppercase tracking-wider text-navy-foreground"
-          >
-            Upload POD
-          </button>
         </div>
       </div>
     </div>

@@ -1,13 +1,13 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRight, PackageSearch, Truck } from "lucide-react"
+import { ArrowRight, PackageSearch, ShieldCheck, Truck } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 
 export const metadata: Metadata = {
-  title: "Portal — Five Nines Logistics",
+  title: "Secure customer and carrier portal — Five Nines Logistics",
   description:
-    "Two doors into the control tower. Customers track live loads and pull documents. Carriers work our live load board, accept freight, and watch settlements.",
+    "Request approved, password-free portal access for your Five Nines customer or carrier relationship.",
 }
 
 export default function PortalPage() {
@@ -18,82 +18,74 @@ export default function PortalPage() {
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1">
-              <span
-                className="h-1.5 w-1.5 rounded-full bg-[color:var(--status-ok)]"
-                aria-hidden="true"
-              />
+              <ShieldCheck className="size-3.5 text-[color:var(--status-ok)]" aria-hidden="true" />
               <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                Portal · two doors
+                Verified access · password-free
               </span>
             </div>
             <h1 className="mt-6 text-balance text-3xl font-semibold leading-[1.1] tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-              Pick your door into the control tower.
+              One secure entry point. Two dedicated relationships.
             </h1>
             <p className="mt-5 text-pretty text-base leading-relaxed text-muted-foreground">
-              Two logins, one standard behind them. Shippers track freight and pull documents.
-              Carriers work our live load board, accept loads, and watch settlements.
+              Choose the portal that matches how you work with Five Nines. Access is manually
+              approved, and verified users sign in through a secure link sent directly to their work
+              email—no password to remember.
             </p>
           </div>
 
           <div className="mt-10 grid gap-4 lg:grid-cols-2">
-            {/* Customer door */}
             <Link
               href="/portal/customer"
-              className="group flex flex-col justify-between gap-8 rounded-xl border border-border bg-card p-6 transition-colors hover:border-foreground/30 sm:p-8"
+              className="group flex flex-col justify-between gap-8 rounded-xl border border-border bg-card p-6 transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:p-8"
             >
               <div>
                 <div className="flex size-11 items-center justify-center rounded-lg border border-border bg-background">
                   <PackageSearch className="size-5 text-primary" aria-hidden="true" />
                 </div>
-                <h2 className="mt-5 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+                <p className="mt-5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                  For approved shippers
+                </p>
+                <h2 className="mt-2 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
                   Customer portal
                 </h2>
                 <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
-                  Track live loads in real time, pull PODs, BOLs, invoices, and COIs straight from
-                  our TMS, and settle — one login for your freight.
+                  Verify your customer relationship, receive secure access, and connect directly
+                  with the team coordinating your freight and documents.
                 </p>
               </div>
               <span className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-foreground">
-                Enter customer portal
-                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                Customer access
+                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </span>
             </Link>
 
-            {/* Carrier door */}
             <Link
               href="/portal/carrier"
-              className="group flex flex-col justify-between gap-8 rounded-xl border border-navy/40 bg-navy p-6 text-navy-foreground transition-colors hover:border-[color:var(--status-ok-dark)]/50 sm:p-8"
+              className="group flex flex-col justify-between gap-8 rounded-xl border border-navy/40 bg-navy p-6 text-navy-foreground transition-colors hover:border-[color:var(--status-ok-dark)]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--status-ok-dark)] sm:p-8"
             >
               <div>
                 <div className="flex size-11 items-center justify-center rounded-lg border border-navy-foreground/20 bg-navy-foreground/5">
                   <Truck className="size-5 text-[color:var(--status-ok-dark)]" aria-hidden="true" />
                 </div>
-                <div className="mt-5 flex items-center gap-2">
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-[color:var(--status-ok-dark)]">
-                    Live load board
-                  </span>
-                  <span
-                    className="h-1.5 w-1.5 rounded-full bg-[color:var(--status-ok-dark)]"
-                    aria-hidden="true"
-                  />
-                </div>
+                <p className="mt-5 font-mono text-[10px] uppercase tracking-wider text-[color:var(--status-ok-dark)]">
+                  For approved carriers
+                </p>
                 <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
                   Carrier portal
                 </h2>
                 <p className="mt-2 text-pretty text-sm leading-relaxed text-navy-foreground/65">
-                  See freight offered to your authority, accept loads off our board, upload PODs, and
-                  watch settlements — one login built for drivers and dispatch.
+                  Verify your carrier relationship, receive secure access, and stay connected with
+                  carrier relations and dispatch.
                 </p>
               </div>
               <span className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-[color:var(--status-ok-dark)]">
-                Enter carrier portal
-                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                Carrier access
+                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </span>
             </Link>
           </div>
         </div>
       </section>
-
       <SiteFooter />
     </main>
   )
