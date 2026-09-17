@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
-import { MarkApplication } from "@/components/brand-lab/candidate-marks"
+import { MarkApplication, SerialPlateMark } from "@/components/brand-lab/candidate-marks"
 import { PortalPreview, DashboardPreview } from "@/components/brand-lab/portal-preview"
 import { FiveNinesBadge } from "@/components/brand/five-nines-badge"
 import { FiveNinesWordmark } from "@/components/brand/five-nines-wordmark"
@@ -125,6 +125,45 @@ export default function BrandLabPage() {
               <FiveNinesBadge size={24} />
               <FiveNinesBadge size={16} />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SERIAL TAG */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <p className="font-mono text-xs uppercase tracking-wider text-primary">Applied artifact · Serial tag</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">Equipment serial tag</h2>
+          <p className="mt-4 max-w-md leading-relaxed text-muted-foreground">
+            The mark as a stamped asset plate — engraved frame, corner rivets, a real serial field, and the
+            green live-status stamp. The kind of tag that rivets to a trailer or a piece of gear.
+          </p>
+
+          <div className="mt-10 grid gap-3 lg:grid-cols-2">
+            <MarkApplication label="Anodized slate" dark>
+              <SerialPlateMark className="h-24 w-auto max-w-full text-[color:var(--navy-foreground)]" animated />
+            </MarkApplication>
+            <MarkApplication label="Etched steel">
+              <SerialPlateMark
+                className="h-24 w-auto max-w-full text-foreground"
+                variant="steel"
+                serial="5N-02291"
+                status="LIVE · IN TRANSIT"
+                animated
+              />
+            </MarkApplication>
+          </div>
+
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <MarkApplication label="One color">
+              <SerialPlateMark className="h-20 w-auto max-w-full text-foreground" variant="steel" monochrome />
+            </MarkApplication>
+            <MarkApplication label="Small scale" dark>
+              <div className="flex items-center gap-5">
+                <SerialPlateMark className="h-16 w-auto text-[color:var(--navy-foreground)]" />
+                <SerialPlateMark className="h-10 w-auto text-[color:var(--navy-foreground)]" />
+              </div>
+            </MarkApplication>
           </div>
         </div>
       </section>

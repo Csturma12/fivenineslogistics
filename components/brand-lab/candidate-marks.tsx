@@ -42,15 +42,71 @@ export function NetworkFiveMark({ className, animated, monochrome }: MarkProps) 
   )
 }
 
-export function SerialPlateMark({ className, animated, monochrome }: MarkProps) {
+type SerialTagProps = MarkProps & {
+  variant?: "slate" | "steel"
+  serial?: string
+  status?: string
+}
+
+export function SerialPlateMark({
+  className,
+  animated,
+  monochrome,
+  variant = "slate",
+  serial = "5N-04519",
+  status = "LIVE · ON PLAN",
+}: SerialTagProps) {
+  const steel = variant === "steel"
+  // Foreground ink + plate fill flip between anodized-navy and etched-steel.
+  const ink = steel ? "var(--foreground)" : "var(--navy-foreground)"
+  const plate = steel ? "var(--card)" : "var(--navy)"
+
   return (
-    <svg viewBox="0 0 120 72" className={className} role="img" aria-label="5N serial number equipment plate">
-      <rect x="2" y="2" width="116" height="68" rx="6" className="fill-[color:var(--navy)] stroke-current" strokeWidth="2" />
-      <path d="M11 13h98M11 59h98" className="stroke-[color:var(--navy-foreground)]/35" />
-      <text x="13" y="47" className="fill-[color:var(--navy-foreground)] font-mono text-[42px] font-black tracking-[-0.08em]">5N</text>
-      <text x="75" y="26" className="fill-[color:var(--navy-foreground)] font-mono text-[8px] font-bold tracking-[0.18em]">SERIES</text>
-      <text x="75" y="47" className="fill-[color:var(--navy-foreground)]/65 font-mono text-[7px] tracking-[0.12em]">LOGISTICS</text>
-      <LiveNode cx={105} cy={21} animated={animated} monochrome={monochrome} />
+    <svg viewBox="0 0 220 100" className={className} role="img" aria-label={`Five Nines equipment serial tag ${serial}`}>
+      {/* stamped plate + engraved inner frame */}
+      <rect x="3" y="3" width="214" height="94" rx="11" fill={plate} stroke="currentColor" strokeWidth="2" />
+      <rect x="12" y="12" width="196" height="76" rx="6" fill="none" stroke={ink} strokeOpacity="0.28" strokeWidth="1" />
+
+      {/* corner rivets */}
+      <g fill={ink} fillOpacity="0.4">
+        <circle cx="20" cy="20" r="2.4" /><circle cx="200" cy="20" r="2.4" />
+        <circle cx="20" cy="80" r="2.4" /><circle cx="200" cy="80" r="2.4" />
+      </g>
+
+      {/* header strip */}
+      <text x="28" y="28" fill={ink} fillOpacity="0.7" className="font-mono text-[6.5px] font-bold tracking-[0.12em]">
+        FIVE NINES LOGISTICS
+      </text>
+      <text x="192" y="28" textAnchor="end" fill={ink} fillOpacity="0.45" className="font-mono text-[6.5px] tracking-[0.08em]">
+        MC# 841023
+      </text>
+
+      {/* stamped 5N */}
+      <text x="28" y="76" fill={ink} className="font-condensed text-[46px] font-black tracking-[-0.06em]">
+        5N
+      </text>
+
+      {/* divider */}
+      <path d="M118 36V80" stroke={ink} strokeOpacity="0.22" strokeWidth="1" />
+
+      {/* serial + status block */}
+      <text x="130" y="46" fill={ink} fillOpacity="0.5" className="font-mono text-[6.5px] tracking-[0.2em]">
+        SERIAL
+      </text>
+      <text x="130" y="62" fill={ink} className="font-mono text-[13px] font-bold tracking-[0.04em]">
+        {serial}
+      </text>
+      <LiveNode cx={133} cy={74} animated={animated} monochrome={monochrome} />
+      <text
+        x="142"
+        y="77"
+        className={cn(
+          "font-mono text-[6.5px] font-bold tracking-[0.16em]",
+          monochrome ? "fill-current" : "fill-[color:var(--status-ok)]",
+        )}
+      >
+        {status}
+      </text>
     </svg>
   )
 }
