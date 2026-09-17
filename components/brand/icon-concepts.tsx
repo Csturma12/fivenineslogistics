@@ -6,25 +6,42 @@ function green(monochrome?: boolean) {
   return monochrome ? "currentColor" : "var(--status-ok)"
 }
 
-/* STACKED PLATES. Flat-top hexagonal plates stacked with dimensional depth —
-   the Blackbox layered-plate lineage, evolved. The live load on top runs green;
-   the plates below fall back to weight. Same geometry from favicon to gate. */
+/* STACKED PLATES. Flat-top hexagonal plates, each extruded to a real edge —
+   the Blackbox layered-plate lineage, sharpened into true dimensional depth.
+   The live load on top runs green; the plates below fall back to weight.
+   Same geometry from favicon to gate. */
 export function StackedDecksMark({ className, monochrome, animated }: IconProps) {
   const cx = 24
-  const w = 17 // half-width to the flat side points
-  const h = 9.5 // half-height to the top/bottom points
-  // Flat-top hexagon centered at (cx, cy).
-  const plate = (cy: number) =>
+  const w = 16 // half-width to the flat side points
+  const h = 7 // half-height to the top/bottom points (flat, plate-like)
+  const d = 3.6 // extruded thickness of each plate edge
+
+  // Flat-top hexagon top face, centered at (cx, cy).
+  const topFace = (cy: number) =>
     `M${cx - w} ${cy} L${cx - w / 2} ${cy - h} L${cx + w / 2} ${cy - h} L${cx + w} ${cy} L${cx + w / 2} ${cy + h} L${cx - w / 2} ${cy + h} Z`
-  return (
-    <svg viewBox="0 0 48 46" className={className} role="img" aria-label="Five Nines stacked plates">
-      <path d={plate(32)} fill="currentColor" opacity={0.22} />
-      <path d={plate(22)} fill="currentColor" opacity={0.5} />
+  // Front-facing thickness band below the lower edge of the hexagon.
+  const sideFace = (cy: number) =>
+    `M${cx - w} ${cy} L${cx - w / 2} ${cy + h} L${cx + w / 2} ${cy + h} L${cx + w} ${cy} L${cx + w} ${cy + d} L${cx + w / 2} ${cy + h + d} L${cx - w / 2} ${cy + h + d} L${cx - w} ${cy + d} Z`
+
+  const g = green(monochrome)
+  const plate = (cy: number, topOpacity: number, sideOpacity: number, fill: string, pulse = false) => (
+    <>
+      <path d={sideFace(cy)} fill={fill} opacity={sideOpacity} />
       <path
-        d={plate(12)}
-        fill={green(monochrome)}
-        className={cn(animated && !monochrome && "motion-safe:animate-pulse")}
+        d={topFace(cy)}
+        fill={fill}
+        opacity={topOpacity}
+        className={cn(pulse && animated && !monochrome && "motion-safe:animate-pulse")}
       />
+    </>
+  )
+
+  return (
+    <svg viewBox="0 0 48 44" className={className} role="img" aria-label="Five Nines stacked plates">
+      {/* back-to-front: bottom plate first, live green plate on top */}
+      {plate(30, 0.26, 0.16, "currentColor")}
+      {plate(22, 0.52, 0.34, "currentColor")}
+      {plate(14, 1, 0.6, g, true)}
     </svg>
   )
 }
