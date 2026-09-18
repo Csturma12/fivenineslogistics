@@ -46,8 +46,8 @@ const roleCopy = {
 
 export function PortalSignIn({ role }: { role: Role }) {
   const copy = roleCopy[role]
-  const [email, setEmail] = useState("chriss@primarycompanies.com")
-  const [fullName, setFullName] = useState("Chris Sturma")
+  const [email, setEmail] = useState("")
+  const [fullName, setFullName] = useState("")
   const [company, setCompany] = useState("")
   const [state, setState] = useState<SubmitState>("idle")
   const [error, setError] = useState("")
@@ -83,6 +83,8 @@ export function PortalSignIn({ role }: { role: Role }) {
   function resetForm() {
     setState("idle")
     setEmail("")
+    setFullName("")
+    setCompany("")
     setError("")
   }
 
