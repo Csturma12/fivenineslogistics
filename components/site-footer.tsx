@@ -66,7 +66,7 @@ export function SiteFooter() {
             ))}
           </nav>
           <div className="footer-authority">
-            <span className="footer-authority__label">Operating authority</span>
+            <span className="footer-authority__label">Mission critical agency of Primary Freight</span>
             <Image
               src="/primary-freight-logo.png"
               alt="Primary Freight, LLC"
@@ -78,7 +78,7 @@ export function SiteFooter() {
         </div>
         <div className="footer-legal">
           <p>
-            Five Nines Logistics is a 3PL and freight brokerage brand operating
+            Five Nines Logistics is a 3PL and freight brokerage operating
             as an agent of Primary Freight LLC, MC# 841023. Capacity may be
             owned, affiliated, or provided through vetted carrier and facility
             partners. The applicable operating provider is identified in
