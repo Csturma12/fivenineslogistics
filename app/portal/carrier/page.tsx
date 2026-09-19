@@ -46,8 +46,8 @@ export default async function CarrierPortalPage() {
               A secure connection for trusted carriers.
             </h1>
             <p className="mt-5 text-pretty text-base leading-relaxed text-muted-foreground">
-              Submit your dispatch email and company details. We verify every carrier relationship
-              before sending a password-free sign-in link to approved users.
+              Create an account with your dispatch email, confirm it once, and sign in anytime to
+              view and book open freight.
             </p>
           </div>
 

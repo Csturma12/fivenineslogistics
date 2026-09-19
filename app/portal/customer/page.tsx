@@ -40,8 +40,8 @@ export default async function CustomerPortalPage() {
               Secure access for Five Nines customers.
             </h1>
             <p className="mt-5 text-pretty text-base leading-relaxed text-muted-foreground">
-              Submit your work email and company details. We verify every request before sending a
-              password-free sign-in link to approved users.
+              Create an account with your work email, confirm it once, and sign in anytime to reach
+              the team coordinating your freight.
             </p>
           </div>
 
