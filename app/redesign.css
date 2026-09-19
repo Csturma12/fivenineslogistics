@@ -274,7 +274,6 @@ button:focus-visible {
 }
 .hero-visual {
   position: relative;
-  padding-bottom: 49px;
 }
 .photo-frame {
   position: relative;
@@ -325,10 +324,7 @@ button:focus-visible {
   padding: 7px 9px;
 }
 .handoff-card {
-  position: absolute;
-  bottom: 0;
-  left: 29px;
-  right: 29px;
+  margin-top: 18px;
   background: #fff;
   box-shadow: 0 12px 42px rgb(18 52 90 / 10%);
   padding: 22px 25px;
@@ -907,12 +903,10 @@ button:focus-visible {
     height: 460px;
   }
   .handoff-card {
-    left: 20px;
-    right: 20px;
-    padding: 20px;
+  padding: 20px;
   }
   .handoff-track {
-    gap: 7px;
+  gap: 7px;
   }
   .sector-card {
     padding: 25px 19px;
@@ -1043,13 +1037,8 @@ button:focus-visible {
   .photo-frame {
     height: 400px;
   }
-  .hero-visual {
-    padding-bottom: 45px;
-  }
   .handoff-card {
-    left: 20px;
-    right: 20px;
-    padding: 20px 22px;
+  padding: 20px 22px;
   }
   .handoff-track > span {
     flex-direction: row;
