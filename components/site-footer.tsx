@@ -53,30 +53,30 @@ export function SiteFooter() {
             <a href={`mailto:${site.dispatchEmail}`}>{site.dispatchEmail}</a>
             <a href={site.phoneHref}>{site.phone}</a>
           </div>
-          {groups.map((group) => (
-            <div className="footer-links" key={group.label}>
-              <h2>{group.label}</h2>
-              {group.links.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          ))}
+          <nav className="footer-nav" aria-label="Footer">
+            {groups.map((group) => (
+              <div className="footer-links" key={group.label}>
+                <h2>{group.label}</h2>
+                {group.links.map((link) => (
+                  <Link key={link.href} href={link.href}>
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </nav>
+          <div className="footer-authority">
+            <span className="footer-authority__label">Operating authority</span>
+            <Image
+              src="/primary-freight-logo.png"
+              alt="Primary Freight, LLC"
+              width={200}
+              height={124}
+              className="footer-authority__logo"
+            />
+          </div>
         </div>
         <div className="footer-legal">
-          <div className="footer-affiliation">
-            <span className="footer-affiliation__label">Operating authority</span>
-            <div className="footer-affiliation__plaque">
-              <Image
-                src="/primary-freight-logo.png"
-                alt="Primary Freight, LLC"
-                width={200}
-                height={122}
-                className="footer-affiliation__logo"
-              />
-            </div>
-          </div>
           <p>
             Five Nines Logistics is a 3PL and freight brokerage brand operating
             as an agent of Primary Freight LLC, MC# 841023. Capacity may be
