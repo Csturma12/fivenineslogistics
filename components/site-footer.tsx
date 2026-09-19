@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FiveNinesForged } from "@/components/five-nines-forged";
 import { site } from "@/lib/site";
 const groups = [
@@ -64,6 +65,18 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="footer-legal">
+          <div className="footer-affiliation">
+            <span className="footer-affiliation__label">Operating authority</span>
+            <div className="footer-affiliation__plaque">
+              <Image
+                src="/primary-freight-logo.png"
+                alt="Primary Freight, LLC"
+                width={200}
+                height={122}
+                className="footer-affiliation__logo"
+              />
+            </div>
+          </div>
           <p>
             Five Nines Logistics is a 3PL and freight brokerage brand operating
             as an agent of Primary Freight LLC, MC# 841023. Capacity may be

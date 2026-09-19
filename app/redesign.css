@@ -866,7 +866,31 @@ button:focus-visible {
 .footer-legal p {
   max-width: 950px;
 }
-.footer-legal > div {
+.footer-affiliation {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+.footer-affiliation__label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #63788b;
+}
+.footer-affiliation__plaque {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 14px 20px;
+}
+.footer-affiliation__logo {
+  height: auto;
+  width: 168px;
+}
+.footer-legal > div:not(.footer-affiliation) {
   display: flex;
   justify-content: space-between;
   gap: 30px;
