@@ -1,9 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import { ArrowLeft, ShieldCheck } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { PortalSignIn } from "@/components/portal/portal-access"
+import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
   title: "Carrier portal access — Five Nines Logistics",
@@ -11,7 +13,16 @@ export const metadata: Metadata = {
     "Request verified, password-free carrier portal access and connect with Five Nines carrier relations.",
 }
 
-export default function CarrierPortalPage() {
+export default async function CarrierPortalPage() {
+  // Already signed in? Skip the sign-in link step and go straight to the portal.
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (user) {
+    redirect("/portal/home")
+  }
+
   return (
     <main>
       <SiteHeader />
