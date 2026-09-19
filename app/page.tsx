@@ -12,6 +12,7 @@ import {
   PackageCheck,
   Clock3,
   ShieldCheck,
+  MoveUpRight,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -120,38 +121,26 @@ export default function Page() {
               </div>
               <span className="photo-index">5N / FIELD OPERATIONS</span>
             </div>
-            <div className="brand-flow">
-              <div className="brand-flow-head">
+            <div className="handoff-card">
+              <div className="handoff-title">
                 <span className="brand-node" aria-hidden="true" />
                 <span>ONE COORDINATED MOVE</span>
+                <MoveUpRight size={17} aria-hidden="true" />
               </div>
-              <div
-                className="brand-flow-diagram"
-                role="img"
-                aria-label="Five Nines connects the port to your site as one coordinated move"
-              >
-                <div className="flow-endpoint">
-                  <Ship size={18} aria-hidden="true" />
-                  <span>PORT</span>
-                </div>
-                <span className="flow-wire" aria-hidden="true">
-                  <i />
+              <div className="handoff-track">
+                <span>
+                  <Ship size={19} aria-hidden="true" />
+                  Port
                 </span>
-                <div className="flow-core">
-                  <div className="flow-diamond" aria-hidden="true">
-                    <span>5N</span>
-                  </div>
-                  <span className="flow-core-label">Five Nines</span>
-                </div>
-                <span className="flow-wire" aria-hidden="true">
-                  <i />
+                <i />
+                <span className="handoff-core">Five Nines</span>
+                <i />
+                <span>
+                  <PackageCheck size={19} aria-hidden="true" />
+                  Your site
                 </span>
-                <div className="flow-endpoint">
-                  <PackageCheck size={18} aria-hidden="true" />
-                  <span>SITE</span>
-                </div>
               </div>
-              <p>The solution between the port and your site.</p>
+              <p>The details stay connected. So does your team.</p>
             </div>
           </div>
         </section>

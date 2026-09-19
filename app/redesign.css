@@ -324,142 +324,78 @@ button:focus-visible {
   background: rgb(18 52 90 / 75%);
   padding: 7px 9px;
 }
-.brand-flow {
+.handoff-card {
   position: absolute;
   bottom: 0;
   left: 29px;
   right: 29px;
-  background: linear-gradient(155deg, #123a5f 0%, #0d2743 100%);
-  box-shadow: 0 18px 46px rgb(9 27 47 / 32%);
-  padding: 22px clamp(18px, 3vw, 30px) 20px;
-  border: 1px solid rgb(255 255 255 / 10%);
-  border-top: 3px solid var(--blue);
+  background: #fff;
+  box-shadow: 0 12px 42px rgb(18 52 90 / 10%);
+  padding: 22px 25px;
+  border: 1px solid var(--line);
+  border-top: 3px solid #1768b2;
   border-radius: 2px;
-  overflow: hidden;
 }
-/* faint routed lines behind the flow, echoing the reference panel */
-.brand-flow::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(
-      120% 90% at 8% -10%,
-      rgb(255 255 255 / 7%) 0%,
-      transparent 42%
-    ),
-    radial-gradient(
-      120% 90% at 100% 120%,
-      rgb(33 185 117 / 9%) 0%,
-      transparent 45%
-    );
-  pointer-events: none;
-}
-.brand-flow-head {
-  position: relative;
+.handoff-title {
   display: flex;
   align-items: center;
   gap: 8px;
   font-family: var(--font-mono);
   font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
-  color: rgb(233 242 250 / 78%);
+  letter-spacing: 0.1em;
 }
-.brand-flow-diagram {
+.handoff-title > svg {
+  margin-left: auto;
+}
+.handoff-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 16px;
+}
+.handoff-track > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.handoff-track > span > svg {
+  color: var(--blue);
+}
+.handoff-track > i {
+  height: 1px;
+  flex: 1;
+  background: #bdccd9;
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: clamp(8px, 2vw, 18px);
-  margin: 24px 0 16px;
 }
-.flow-endpoint {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-  width: clamp(74px, 22%, 104px);
-  padding: 16px 10px;
-  border: 1px solid rgb(255 255 255 / 32%);
+.handoff-track > i:after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -2px;
+  width: 5px;
+  height: 5px;
+  background: #21b975;
+}
+/* center node: Five Nines as the solution between port and site */
+.handoff-core {
+  padding: 8px 15px;
+  background: var(--blue);
+  color: #fff;
   border-radius: 3px;
-  color: #fff;
-}
-.flow-endpoint > svg {
-  color: rgb(210 227 240 / 85%);
-}
-.flow-endpoint > span {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-}
-.flow-wire {
-  position: relative;
-  flex: 1 1 auto;
-  height: 2px;
-}
-.flow-wire > i {
-  position: absolute;
-  inset: 0;
-  background: rgb(255 255 255 / 22%);
-}
-.flow-wire::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--signal);
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 4px rgb(33 185 117 / 18%);
-}
-.flow-core {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 9px;
-  flex: 0 0 auto;
-}
-.flow-diamond {
-  position: relative;
-  z-index: 0;
-  display: grid;
-  place-items: center;
-  width: clamp(58px, 15vw, 76px);
-  height: clamp(58px, 15vw, 76px);
-}
-.flow-diamond::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(150deg, #2a83cf 0%, var(--blue) 60%);
-  border-radius: 8px;
-  transform: rotate(45deg);
-  box-shadow: 0 12px 26px rgb(23 104 178 / 42%);
-}
-.flow-diamond > span {
-  font-family: var(--font-mono);
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #fff;
-}
-.flow-core-label {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgb(210 227 240 / 78%);
-}
-.brand-flow > p {
-  position: relative;
   font-size: 0.75rem;
-  color: rgb(210 227 240 / 70%);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 6px 16px rgb(23 104 178 / 30%);
+}
+.handoff-card > p {
+  font-size: 0.75rem;
+  color: #627489;
 }
 .operating-strip {
   border-block: 1px solid #cadff1;
