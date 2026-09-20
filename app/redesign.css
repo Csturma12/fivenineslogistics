@@ -70,6 +70,24 @@ html {
   align-items: center;
   gap: 9px;
 }
+.utility-right {
+  gap: 20px !important;
+}
+.utility-right > a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.utility-signin {
+  font-weight: 700;
+  color: var(--blue);
+  padding-left: 20px;
+  border-left: 1px solid var(--line);
+  transition: color 0.2s;
+}
+.utility-signin:hover {
+  color: var(--ink);
+}
 .design-header {
   position: sticky;
   top: 0;
