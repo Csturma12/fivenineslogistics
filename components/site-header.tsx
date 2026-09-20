@@ -23,10 +23,17 @@ export function SiteHeader() {
             <i className="brand-node" aria-hidden="true" />
             Houston roots. Global reach.
           </span>
-          <a href={site.phoneHref}>
-            24/7 dispatch <span className="utility-phone">· {site.phone}</span>
-            <ArrowUpRight size={13} aria-hidden="true" />
-          </a>
+          <span className="utility-right">
+            <a href={site.phoneHref}>
+              24/7 dispatch{" "}
+              <span className="utility-phone">· {site.phone}</span>
+              <ArrowUpRight size={13} aria-hidden="true" />
+            </a>
+            <Link href="/portal" className="utility-signin">
+              Sign in
+              <ArrowUpRight size={13} aria-hidden="true" />
+            </Link>
+          </span>
         </div>
       </div>
       <header className="design-header">
@@ -83,6 +90,9 @@ export function SiteHeader() {
                 <ArrowUpRight size={18} aria-hidden="true" />
               </Link>
             ))}
+            <Link href="/portal" onClick={() => setOpen(false)}>
+              Sign in
+            </Link>
             <Link href="/portal" onClick={() => setOpen(false)}>
               Client & carrier portal
             </Link>
