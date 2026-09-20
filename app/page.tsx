@@ -70,7 +70,7 @@ export default function Page() {
           <div className="hero-copy">
             <p className="eyebrow">
               <span className="brand-node" aria-hidden="true" />
-              Mission-critical freight / Houston, TX
+              99.999% Reliability / Mission-critical freight
             </p>
             <h1 id="hero-title">
               Critical freight.
@@ -83,6 +83,10 @@ export default function Page() {
               When a delivery holds up an entire operation, you need more than a
               truck. You need a partner who understands what’s on the line.
             </p>
+            <p className="hero-standard">
+              99.999% is the standard our customers hold their projects to. We
+              hold our operations to the same one.
+            </p>
             <div className="hero-actions">
               <Link href="/request-capacity" className="design-button">
                 Plan your shipment
@@ -93,6 +97,9 @@ export default function Page() {
                 <ArrowRight size={17} aria-hidden="true" />
               </a>
             </div>
+            <p className="hero-support">
+              Built for the freight that keeps critical work moving.
+            </p>
             <div className="hero-note">
               <ShieldCheck size={18} aria-hidden="true" />
               <span>Plant-floor experience. One accountable team. Five Nines.</span>

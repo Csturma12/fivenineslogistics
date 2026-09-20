@@ -259,13 +259,28 @@ button:focus-visible {
   max-width: 460px;
   margin-top: 26px;
 }
-.hero-actions {
+  .hero-actions {
   display: flex;
   align-items: center;
   gap: 27px;
   margin-top: 30px;
-}
-.text-link {
+  }
+  .hero-standard {
+  margin-top: 20px;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #24303f;
+  font-weight: 500;
+  max-width: 480px;
+  }
+.hero-support {
+  margin-top: 18px;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #53677d;
+  max-width: 420px;
+  }
+  .text-link {
   display: inline-flex;
   align-items: center;
   gap: 15px;
