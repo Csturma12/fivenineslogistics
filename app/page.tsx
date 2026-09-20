@@ -8,7 +8,6 @@ import {
   Factory,
   HardHat,
   Globe2,
-  Truck,
   Ship,
   PackageCheck,
   Clock3,
@@ -134,10 +133,7 @@ export default function Page() {
                   Port
                 </span>
                 <i />
-                <span>
-                  <Truck size={19} aria-hidden="true" />
-                  Transport
-                </span>
+                <span className="handoff-core">Five Nines</span>
                 <i />
                 <span>
                   <PackageCheck size={19} aria-hidden="true" />

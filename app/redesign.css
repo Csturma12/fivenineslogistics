@@ -274,7 +274,6 @@ button:focus-visible {
 }
 .hero-visual {
   position: relative;
-  padding-bottom: 49px;
 }
 .photo-frame {
   position: relative;
@@ -325,10 +324,7 @@ button:focus-visible {
   padding: 7px 9px;
 }
 .handoff-card {
-  position: absolute;
-  bottom: 0;
-  left: 29px;
-  right: 29px;
+  margin-top: 18px;
   background: #fff;
   box-shadow: 0 12px 42px rgb(18 52 90 / 10%);
   padding: 22px 25px;
@@ -379,6 +375,19 @@ button:focus-visible {
   width: 5px;
   height: 5px;
   background: #21b975;
+}
+/* center node: Five Nines as the solution between port and site */
+.handoff-core {
+  padding: 8px 15px;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 6px 16px rgb(23 104 178 / 30%);
 }
 .handoff-card > p {
   font-size: 0.75rem;
@@ -811,8 +820,13 @@ button:focus-visible {
 }
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  grid-template-columns: 1.3fr auto 1fr;
   gap: 45px;
+  align-items: start;
+}
+.footer-nav {
+  display: flex;
+  gap: 38px;
 }
 .footer-brand p {
   font-size: 0.875rem;
@@ -857,6 +871,24 @@ button:focus-visible {
 .footer-legal p {
   max-width: 950px;
 }
+.footer-authority {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-self: end;
+  align-items: flex-end;
+  text-align: right;
+}
+.footer-authority__label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #63788b;
+}
+.footer-authority__logo {
+  height: auto;
+  width: 190px;
+}
 .footer-legal > div {
   display: flex;
   justify-content: space-between;
@@ -894,12 +926,10 @@ button:focus-visible {
     height: 460px;
   }
   .handoff-card {
-    left: 20px;
-    right: 20px;
-    padding: 20px;
+  padding: 20px;
   }
   .handoff-track {
-    gap: 7px;
+  gap: 7px;
   }
   .sector-card {
     padding: 25px 19px;
@@ -965,8 +995,17 @@ button:focus-visible {
     gap: 25px;
   }
   .footer-grid {
-    grid-template-columns: 1.5fr 1fr;
+    grid-template-columns: 1fr;
     gap: 35px;
+  }
+  .footer-nav {
+    flex-wrap: wrap;
+    gap: 30px 45px;
+  }
+  .footer-authority {
+    justify-self: start;
+    align-items: flex-start;
+    text-align: left;
   }
 }
 @media (max-width: 760px) {
@@ -1030,13 +1069,8 @@ button:focus-visible {
   .photo-frame {
     height: 400px;
   }
-  .hero-visual {
-    padding-bottom: 45px;
-  }
   .handoff-card {
-    left: 20px;
-    right: 20px;
-    padding: 20px 22px;
+  padding: 20px 22px;
   }
   .handoff-track > span {
     flex-direction: row;
@@ -1183,11 +1217,11 @@ button:focus-visible {
     padding-top: 40px;
   }
   .footer-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 34px 25px;
+    grid-template-columns: 1fr;
+    gap: 34px;
   }
-  .footer-brand {
-    grid-column: 1/-1;
+  .footer-nav {
+    gap: 26px 40px;
   }
   .footer-legal > div {
     flex-direction: column;

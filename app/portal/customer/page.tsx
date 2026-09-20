@@ -1,9 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { PortalSignIn } from "@/components/portal/portal-access"
+import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
   title: "Customer portal access — Five Nines Logistics",
@@ -11,7 +13,16 @@ export const metadata: Metadata = {
     "Request verified, password-free customer portal access and connect with the team coordinating your freight.",
 }
 
-export default function CustomerPortalPage() {
+export default async function CustomerPortalPage() {
+  // Already signed in? Skip the sign-in link step and go straight to the portal.
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (user) {
+    redirect("/portal/home")
+  }
+
   return (
     <main>
       <SiteHeader />
@@ -29,8 +40,8 @@ export default function CustomerPortalPage() {
               Secure access for Five Nines customers.
             </h1>
             <p className="mt-5 text-pretty text-base leading-relaxed text-muted-foreground">
-              Submit your work email and company details. We verify every request before sending a
-              password-free sign-in link to approved users.
+              Create an account with your work email, confirm it once, and sign in anytime to reach
+              the team coordinating your freight.
             </p>
           </div>
 

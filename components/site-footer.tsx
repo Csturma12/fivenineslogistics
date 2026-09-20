@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FiveNinesForged } from "@/components/five-nines-forged";
 import { site } from "@/lib/site";
 const groups = [
@@ -52,20 +53,32 @@ export function SiteFooter() {
             <a href={`mailto:${site.dispatchEmail}`}>{site.dispatchEmail}</a>
             <a href={site.phoneHref}>{site.phone}</a>
           </div>
-          {groups.map((group) => (
-            <div className="footer-links" key={group.label}>
-              <h2>{group.label}</h2>
-              {group.links.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          ))}
+          <nav className="footer-nav" aria-label="Footer">
+            {groups.map((group) => (
+              <div className="footer-links" key={group.label}>
+                <h2>{group.label}</h2>
+                {group.links.map((link) => (
+                  <Link key={link.href} href={link.href}>
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </nav>
+          <div className="footer-authority">
+            <span className="footer-authority__label">Mission critical agency of Primary Freight</span>
+            <Image
+              src="/primary-freight-logo.png"
+              alt="Primary Freight, LLC"
+              width={200}
+              height={124}
+              className="footer-authority__logo"
+            />
+          </div>
         </div>
         <div className="footer-legal">
           <p>
-            Five Nines Logistics is a 3PL and freight brokerage brand operating
+            Five Nines Logistics is a 3PL and freight brokerage operating
             as an agent of Primary Freight LLC, MC# 841023. Capacity may be
             owned, affiliated, or provided through vetted carrier and facility
             partners. The applicable operating provider is identified in

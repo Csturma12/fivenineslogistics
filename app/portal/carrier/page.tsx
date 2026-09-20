@@ -1,9 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import { ArrowLeft, ShieldCheck } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { PortalSignIn } from "@/components/portal/portal-access"
+import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
   title: "Carrier portal access — Five Nines Logistics",
@@ -11,7 +13,16 @@ export const metadata: Metadata = {
     "Request verified, password-free carrier portal access and connect with Five Nines carrier relations.",
 }
 
-export default function CarrierPortalPage() {
+export default async function CarrierPortalPage() {
+  // Already signed in? Skip the sign-in link step and go straight to the portal.
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (user) {
+    redirect("/portal/home")
+  }
+
   return (
     <main>
       <SiteHeader />
@@ -35,8 +46,8 @@ export default function CarrierPortalPage() {
               A secure connection for trusted carriers.
             </h1>
             <p className="mt-5 text-pretty text-base leading-relaxed text-muted-foreground">
-              Submit your dispatch email and company details. We verify every carrier relationship
-              before sending a password-free sign-in link to approved users.
+              Create an account with your dispatch email, confirm it once, and sign in anytime to
+              view and book open freight.
             </p>
           </div>
 
