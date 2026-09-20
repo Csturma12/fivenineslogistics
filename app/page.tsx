@@ -82,8 +82,6 @@ export default function Page() {
             <p className="hero-description">
               When a delivery holds up an entire operation, you need more than a
               truck. You need a partner who understands what’s on the line.
-            </p>
-            <p className="hero-standard">
               99.999% is the standard our customers hold their projects to. We
               hold our operations to the same one.
             </p>
