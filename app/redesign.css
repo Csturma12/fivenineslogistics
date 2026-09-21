@@ -1039,6 +1039,14 @@ button:focus-visible {
   }
   .utility-inner {
     font-size: 0.65rem;
+    gap: 12px;
+  }
+  .utility-right {
+    gap: 12px !important;
+    flex-shrink: 0;
+  }
+  .utility-signin {
+    padding-left: 12px;
   }
   .utility-phone {
     display: none;

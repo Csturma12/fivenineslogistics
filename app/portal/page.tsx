@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/site-footer"
 export const metadata: Metadata = {
   title: "Secure customer and carrier portal — Five Nines Logistics",
   description:
-    "Request approved, password-free portal access for your Five Nines customer or carrier relationship.",
+    "Sign in or create an account for your Five Nines customer or carrier relationship.",
 }
 
 export default function PortalPage() {
@@ -20,16 +20,17 @@ export default function PortalPage() {
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1">
               <ShieldCheck className="size-3.5 text-[color:var(--status-ok)]" aria-hidden="true" />
               <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                Verified access · password-free
+                Customer & carrier access
               </span>
             </div>
             <h1 className="mt-6 text-balance text-3xl font-semibold leading-[1.1] tracking-tight text-foreground sm:text-4xl lg:text-5xl">
               One secure entry point. Two dedicated relationships.
             </h1>
             <p className="mt-5 text-pretty text-base leading-relaxed text-muted-foreground">
-              Choose the portal that matches how you work with Five Nines. Access is manually
-              approved, and verified users sign in through a secure link sent directly to their work
-              email—no password to remember.
+              Choose the portal that matches how you work with Five Nines. Already registered?
+              Sign in with your email and password. New here? Create an account and confirm
+              your email to get started. Shipment and carrier services are subject to onboarding
+              and approval.
             </p>
           </div>
 

@@ -1,0 +1,155 @@
+.section {
+  padding-block: 84px 64px;
+  background: #f7f9fc;
+  border-bottom: 1px solid var(--line);
+}
+.intro {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+.story h2 {
+  margin-block: 17px 24px;
+}
+.story > p:not(:first-child) {
+  max-width: 590px;
+  color: #53677d;
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-top: 16px;
+}
+.math {
+  padding: 32px;
+  background: var(--ink);
+  color: #fff;
+  border-top: 3px solid var(--signal);
+  border-radius: 3px;
+}
+.mathLabel,
+.availability,
+.equation > span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.7;
+  color: #c5d8e8;
+}
+.mathLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.number {
+  display: block;
+  margin-top: 22px;
+  font-size: clamp(3.2rem, 5vw, 4.9rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+}
+.number > span {
+  font-size: 0.55em;
+  color: #69dda6;
+}
+.availability {
+  margin-top: 7px;
+  font-size: 0.875rem;
+}
+.equation {
+  margin-block: 24px 18px;
+  padding-top: 20px;
+  border-top: 1px solid #476582;
+}
+.equation > strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+.math > p {
+  color: #c5d8e8;
+  font-size: 0.75rem;
+  line-height: 1.7;
+}
+.math > a {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.math > a:focus-visible {
+  outline-color: #69dda6;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  margin-top: 48px;
+}
+.safeguard {
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+}
+.safeguard > svg {
+  color: var(--blue);
+  margin-bottom: 17px;
+}
+.safeguard > h3 {
+  font-size: 1.0625rem;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -0.025em;
+  margin-bottom: 10px;
+}
+.safeguard > p {
+  font-size: 0.875rem;
+  line-height: 1.8;
+  color: #53677d;
+}
+.closing {
+  border-left: 3px solid var(--signal);
+  padding-left: 18px;
+  margin-top: 38px;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.7;
+}
+@media (max-width: 1000px) {
+  .intro {
+    gap: 32px;
+    grid-template-columns: 1.1fr 1fr;
+  }
+  .math {
+    padding: 26px;
+  }
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .section {
+    padding-block: 54px 48px;
+  }
+  .intro {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .story > p:not(:first-child) {
+    font-size: 0.9375rem;
+  }
+  .number {
+    font-size: clamp(3.2rem, 12vw, 4.9rem);
+  }
+  .grid {
+    margin-top: 32px;
+    gap: 26px;
+  }
+}
+@media (max-width: 540px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
