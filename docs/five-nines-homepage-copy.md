@@ -2,17 +2,17 @@
 
 ## Reliability is designed in. Not left to chance.
 
-In cloud computing, “five nines” means 99.999% availability. That level of reliability is built through monitoring, maintenance, disciplined procedures and redundancy.
+“Five nines” is a benchmark for systems designed to keep working with minimal interruption. That level of reliability is built through monitoring, maintenance, disciplined procedures and redundancy.
 
-Freight moves through a different world, but the principle holds: prepare thoroughly, stay connected and have a plan when conditions change. We bring that mindset to the people, equipment and decisions behind your shipment.
+For freight, the principle is straightforward: prepare thoroughly, stay connected and have a plan when conditions change. We bring that mindset to the people, equipment and decisions behind your shipment.
 
-### The math behind the name
+### The benchmark
 
 99.999% availability means 0.001% downtime: approximately 5 minutes, 15 seconds over a 365-day year.
 
-The number inspires our operating discipline. It is not a measured shipment-performance rate or a delivery guarantee.
+Availability measures the time a system is ready to work. Five nines leaves just 0.001% of the year for interruptions. In freight, that mindset means planning ahead, staying connected and responding quickly.
 
-[About availability in cloud computing — AWS](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/availability.html)
+The number inspires our operating discipline. It is not a measured shipment-performance rate or a delivery guarantee.
 
 ### People on call. Around the clock.
 

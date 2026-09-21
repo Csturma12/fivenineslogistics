@@ -72,16 +72,8 @@
   font-size: 0.75rem;
   line-height: 1.7;
 }
-.math > a {
-  display: inline-block;
+.math > p + p {
   margin-top: 16px;
-  font-size: 0.75rem;
-  line-height: 1.6;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-.math > a:focus-visible {
-  outline-color: #69dda6;
 }
 .grid {
   display: grid;

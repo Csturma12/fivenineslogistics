@@ -67,19 +67,20 @@ export function FiveNinesStandard() {
               Not left to chance.
             </h2>
             <p>
-              In cloud computing, “five nines” means 99.999% availability. That
-              level of reliability is built through monitoring, maintenance,
+              “Five nines” is a benchmark for systems designed to keep working
+              with minimal interruption. That level of reliability is built
+              through monitoring, maintenance,
               disciplined procedures and redundancy.
             </p>
             <p>
-              Freight moves through a different world, but the principle holds:
-              prepare thoroughly, stay connected and have a plan when conditions
+              For freight, the principle is straightforward: prepare thoroughly,
+              stay connected and have a plan when conditions
               change. We bring that mindset to the people, equipment and decisions
               behind your shipment.
             </p>
           </div>
           <aside className={styles.math} aria-label="The math behind the name">
-            <span className={styles.mathLabel}>The cloud-computing benchmark</span>
+            <span className={styles.mathLabel}>The benchmark</span>
             <strong className={styles.number}>99.999<span>%</span></strong>
             <span className={styles.availability}>availability</span>
             <div className={styles.equation}>
@@ -87,12 +88,14 @@ export function FiveNinesStandard() {
               <strong>≈ 5 minutes, 15 seconds</strong>
             </div>
             <p>
+              Availability measures the time a system is ready to work. Five nines
+              leaves just 0.001% of the year for interruptions. In freight, that
+              mindset means planning ahead, staying connected and responding quickly.
+            </p>
+            <p>
               The number inspires our operating discipline. It is not a measured
               shipment-performance rate or a delivery guarantee.
             </p>
-            <a href="https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/availability.html">
-              About availability in cloud computing ↗
-            </a>
           </aside>
         </div>
         <div className={styles.grid}>
