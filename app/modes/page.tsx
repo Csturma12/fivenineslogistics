@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { NetworkCta } from "@/components/network-cta";
+import { DedicatedFleet } from "@/components/dedicated-fleet";
 import {
   modes,
   site,
@@ -64,6 +65,8 @@ export default function ModesPage() {
             </div>
           </div>
         </section>
+
+        <DedicatedFleet />
 
         <section className="border-b border-border">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">

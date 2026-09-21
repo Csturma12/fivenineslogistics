@@ -57,7 +57,7 @@ export function SiteHeader() {
           </nav>
           <div className="header-actions">
             <Link href="/portal" className="portal-link">
-              Client portal
+              Customer & carrier login
             </Link>
             <Link href="/request-capacity" className="design-button header-cta">
               Request capacity
@@ -91,10 +91,7 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link href="/portal" onClick={() => setOpen(false)}>
-              Sign in
-            </Link>
-            <Link href="/portal" onClick={() => setOpen(false)}>
-              Client & carrier portal
+              Customer & carrier login
             </Link>
             <Link href="/request-capacity" onClick={() => setOpen(false)}>
               Request capacity
