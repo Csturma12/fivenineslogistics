@@ -78,6 +78,12 @@ export function FiveNinesStandard() {
               change. We bring that mindset to the people, equipment and decisions
               behind your shipment.
             </p>
+            <p>
+              The number inspires our operating discipline. Rather than a measure
+              of our current performance, it guides our standard operating
+              procedures and challenges us to pursue 99.999% efficiency in
+              logistics planning and transportation.
+            </p>
           </div>
           <aside className={styles.math} aria-label="The math behind the name">
             <span className={styles.mathLabel}>The benchmark</span>
@@ -91,10 +97,6 @@ export function FiveNinesStandard() {
               Availability measures the time a system is ready to work. Five nines
               leaves just 0.001% of the year for interruptions. In freight, that
               mindset means planning ahead, staying connected and responding quickly.
-            </p>
-            <p>
-              The number inspires our operating discipline. It is not a measured
-              shipment-performance rate or a delivery guarantee.
             </p>
           </aside>
         </div>

@@ -6,13 +6,13 @@
 
 For freight, the principle is straightforward: prepare thoroughly, stay connected and have a plan when conditions change. We bring that mindset to the people, equipment and decisions behind your shipment.
 
+The number inspires our operating discipline. Rather than a measure of our current performance, it guides our standard operating procedures and challenges us to pursue 99.999% efficiency in logistics planning and transportation.
+
 ### The benchmark
 
 99.999% availability means 0.001% downtime: approximately 5 minutes, 15 seconds over a 365-day year.
 
 Availability measures the time a system is ready to work. Five nines leaves just 0.001% of the year for interruptions. In freight, that mindset means planning ahead, staying connected and responding quickly.
-
-The number inspires our operating discipline. It is not a measured shipment-performance rate or a delivery guarantee.
 
 ### People on call. Around the clock.
 
