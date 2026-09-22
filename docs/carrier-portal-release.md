@@ -34,6 +34,7 @@ This is the current release checklist. Earlier handoff and migration-status note
 - Website typecheck and 18 isolated portal/Postgres tests pass.
 - Operations typecheck and 14 targeted Agent Desk/bridge tests pass.
 - Local sample-data carrier board and setup screens render. Sample actions never persist or send email. Preview routes return 404 in production.
+- Website draft PR #30 built successfully on Vercel. Its deployed `/portal` sign-in and customer-portal link were verified. Fly companion review is PR #71; its initial CI exposed a date-sensitive legacy test, corrected separately within that review.
 - No authenticated production bid, document operation, real email, TAI write, or automatic assignment was tested or performed.
 - Operations full legacy suite was not run because some tests manipulate actual credential-setting names; safety instructions prohibit that. New tests inject synthetic transports and do not load storage or secrets.
 
