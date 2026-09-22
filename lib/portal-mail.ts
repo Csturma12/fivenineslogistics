@@ -1,6 +1,5 @@
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 // Preferred branded sender. Requires fivenineslogistics.com to be verified in Resend.
 const PREFERRED_FROM = `Five Nines Portal <portal@${process.env.RESEND_EMAIL_DOMAIN}>`
@@ -19,6 +18,7 @@ type SendArgs = {
 // Send from the branded domain; if Resend rejects it as unverified, transparently
 // retry from the sandbox sender so a failed/pending domain never breaks the flow.
 export async function sendPortalEmail({ to, subject, html, replyTo, idempotencyKey }: SendArgs) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const base = { to, subject, html, ...(replyTo ? { replyTo } : {}) }
 
   const first = await resend.emails.send({ from: PREFERRED_FROM, ...base }, { idempotencyKey })
