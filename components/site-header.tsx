@@ -23,10 +23,17 @@ export function SiteHeader() {
             <i className="brand-node" aria-hidden="true" />
             Houston roots. Global reach.
           </span>
-          <a href={site.phoneHref}>
-            24/7 dispatch <span className="utility-phone">· {site.phone}</span>
-            <ArrowUpRight size={13} aria-hidden="true" />
-          </a>
+          <span className="utility-right">
+            <a href={site.phoneHref}>
+              24/7 dispatch{" "}
+              <span className="utility-phone">· {site.phone}</span>
+              <ArrowUpRight size={13} aria-hidden="true" />
+            </a>
+            <Link href="/portal" className="utility-signin">
+              Sign in
+              <ArrowUpRight size={13} aria-hidden="true" />
+            </Link>
+          </span>
         </div>
       </div>
       <header className="design-header">
@@ -50,7 +57,7 @@ export function SiteHeader() {
           </nav>
           <div className="header-actions">
             <Link href="/portal" className="portal-link">
-              Client portal
+              Customer & carrier login
             </Link>
             <Link href="/request-capacity" className="design-button header-cta">
               Request capacity
@@ -84,7 +91,7 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link href="/portal" onClick={() => setOpen(false)}>
-              Client & carrier portal
+              Customer & carrier login
             </Link>
             <Link href="/request-capacity" onClick={() => setOpen(false)}>
               Request capacity

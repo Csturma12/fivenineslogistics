@@ -70,6 +70,24 @@ html {
   align-items: center;
   gap: 9px;
 }
+.utility-right {
+  gap: 20px !important;
+}
+.utility-right > a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.utility-signin {
+  font-weight: 700;
+  color: var(--blue);
+  padding-left: 20px;
+  border-left: 1px solid var(--line);
+  transition: color 0.2s;
+}
+.utility-signin:hover {
+  color: var(--ink);
+}
 .design-header {
   position: sticky;
   top: 0;
@@ -241,13 +259,20 @@ button:focus-visible {
   max-width: 460px;
   margin-top: 26px;
 }
-.hero-actions {
+  .hero-actions {
   display: flex;
   align-items: center;
   gap: 27px;
   margin-top: 30px;
-}
-.text-link {
+  }
+.hero-support {
+  margin-top: 18px;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #53677d;
+  max-width: 420px;
+  }
+  .text-link {
   display: inline-flex;
   align-items: center;
   gap: 15px;
@@ -1014,6 +1039,14 @@ button:focus-visible {
   }
   .utility-inner {
     font-size: 0.65rem;
+    gap: 12px;
+  }
+  .utility-right {
+    gap: 12px !important;
+    flex-shrink: 0;
+  }
+  .utility-signin {
+    padding-left: 12px;
   }
   .utility-phone {
     display: none;

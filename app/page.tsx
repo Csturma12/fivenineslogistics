@@ -17,6 +17,7 @@ import {
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CapabilityExplorer } from "@/components/capability-explorer";
+import { FiveNinesStandard } from "@/components/five-nines-standard";
 import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title:
@@ -70,7 +71,7 @@ export default function Page() {
           <div className="hero-copy">
             <p className="eyebrow">
               <span className="brand-node" aria-hidden="true" />
-              Mission-critical freight / Houston, TX
+              Inspired by 99.999% reliability
             </p>
             <h1 id="hero-title">
               Critical freight.
@@ -82,6 +83,9 @@ export default function Page() {
             <p className="hero-description">
               When a delivery holds up an entire operation, you need more than a
               truck. You need a partner who understands what’s on the line.
+              Inspired by the discipline behind always-on systems, we build
+              every move around preparation, visibility and a team that stays
+              accountable.
             </p>
             <div className="hero-actions">
               <Link href="/request-capacity" className="design-button">
@@ -93,6 +97,9 @@ export default function Page() {
                 <ArrowRight size={17} aria-hidden="true" />
               </a>
             </div>
+            <p className="hero-support">
+              Built for the freight that keeps critical work moving.
+            </p>
             <div className="hero-note">
               <ShieldCheck size={18} aria-hidden="true" />
               <span>Plant-floor experience. One accountable team. Five Nines.</span>
@@ -164,6 +171,7 @@ export default function Page() {
             </div>
           </div>
         </section>
+        <FiveNinesStandard />
         <section
           className="design-section design-container"
           aria-labelledby="industries-title"
