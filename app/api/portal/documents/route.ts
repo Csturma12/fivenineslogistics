@@ -30,7 +30,11 @@ export async function GET(request: Request) {
         .from(BUCKET)
         .createSignedUrl(doc.path, 60, { download: doc.name || doc.title }),
     );
-    return Response.redirect(signed!.signedUrl, 303);
+    return new Response(null, { status: 303, headers: {
+      Location: signed!.signedUrl,
+      "Cache-Control": "private, no-store",
+      "Referrer-Policy": "no-referrer",
+    } });
   } catch (error) {
     return failure(error);
   }

@@ -183,7 +183,7 @@ export async function GET(request: Request) {
               .order("pickup_date", { ascending: true })
               .limit(200),
           ) || [];
-        loads = rows.map(carrierLoad);
+        loads = rows.map((row) => carrierLoad(row, process.env.PORTAL_AUTO_BOOK_ENABLED === "true"));
       }
       return Response.json(
         { ...base, documents, requests, bids, bookings, loads, historyLoads },
@@ -230,6 +230,8 @@ export async function POST(request: Request) {
     if (!body || typeof body !== "object" || Array.isArray(body))
       throw new PortalProblem("Invalid request.");
     const action = body.action;
+    if (action === "auto_book" && process.env.PORTAL_AUTO_BOOK_ENABLED !== "true")
+      throw new PortalProblem("Auto-book is not enabled. Please submit a bid for dispatch review.", 409);
     if (action === "initialize") {
       if (!["carrier", "customer"].includes(body.role))
         throw new PortalProblem("Choose a portal.");

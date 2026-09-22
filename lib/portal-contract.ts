@@ -202,7 +202,7 @@ export function centralToday(now = new Date()) {
   }).format(now);
 }
 // Keep this projection explicit even when a future query adds private columns.
-export function carrierLoad(row: Record<string, unknown>): PortalLoad {
+export function carrierLoad(row: Record<string, unknown>, allowAutoBook = true): PortalLoad {
   return {
     id: String(row.id),
     origin_city: String(row.origin_city),
@@ -215,9 +215,9 @@ export function carrierLoad(row: Record<string, unknown>): PortalLoad {
     weight_lbs: row.weight_lbs == null ? null : Number(row.weight_lbs),
     dimensions: row.dimensions as string | null,
     status: String(row.status),
-    auto_book: row.auto_book === true,
+    auto_book: allowAutoBook && row.auto_book === true,
     carrier_offer_usd:
-      row.auto_book === true && row.carrier_offer_usd != null
+      allowAutoBook && row.auto_book === true && row.carrier_offer_usd != null
         ? Number(row.carrier_offer_usd)
         : null,
   };

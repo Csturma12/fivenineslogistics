@@ -37,8 +37,8 @@ export function previewWorkspace(view: string): Workspace {
     weight_lbs: 42000,
     dimensions: "40 × 8 × 8 ft",
     status: carrier ? "available" : "in_transit",
-    auto_book: carrier,
-    carrier_offer_usd: carrier ? 1750 : null,
+    auto_book: false,
+    carrier_offer_usd: null,
     tracking_location: "Huntsville, TX",
     tracking_at: "2026-09-23T15:30:00Z",
   };

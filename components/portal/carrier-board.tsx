@@ -44,9 +44,9 @@ export function CarrierBoard({
     <div className="space-y-6">
       <Panel eyebrow="Carrier opportunities" title="Available loads">
         <p className="mb-6 text-sm leading-6 text-slate-600">
-          Lane details only. Send your bid to dispatch, or reserve at the listed
-          carrier offer where enabled. Dispatch confirms final assignment and
-          sends the rate confirmation.
+          Find a lane and send your bid to dispatch. Your bids and counteroffers
+          stay here for review. Dispatch confirms final assignment and sends the
+          rate confirmation before a truck is dispatched.
         </p>
         {!ready ? (
           <Empty>

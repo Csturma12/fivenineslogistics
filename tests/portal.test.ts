@@ -14,6 +14,23 @@ import {
 } from "../lib/portal-contract";
 import { ingestRows } from "../lib/portal-ingest";
 import { notificationHtml } from "../lib/portal-notification";
+import { requireBridgeToken } from "../lib/portal-bridge-auth";
+
+test("bridge requires a configured strong token and an exact bearer credential", () => {
+  const token = "fictional-bridge-test-token-not-a-real-secret";
+  const request = (value?: string) => new Request("https://example.test/api/tms/loads", { headers: value ? { authorization: value } : {} });
+  assert.throws(() => requireBridgeToken(request(), undefined), /not configured/);
+  assert.throws(() => requireBridgeToken(request(), "short"), /not configured/);
+  assert.throws(() => requireBridgeToken(request(`Bearer ${"x".repeat(token.length)}`), token), /Unauthorized/);
+  assert.throws(() => requireBridgeToken(request(token), token), /Unauthorized/);
+  assert.doesNotThrow(() => requireBridgeToken(request(`Bearer ${token}`), token));
+});
+
+test("release switch hides auto-book and offer amounts even when feed provides them", () => {
+  const row = carrierLoad({ id: "example", auto_book: true, carrier_offer_usd: 1500 }, false);
+  assert.equal(row.auto_book, false);
+  assert.equal(row.carrier_offer_usd, null);
+});
 
 const db = new PGlite();
 before(async () => {
@@ -27,6 +44,8 @@ before(async () => {
       "utf8",
     ),
   );
+  // Existing installations receive just the replacement procedure, not a schema reset.
+  await db.exec(await readFile(new URL("../scripts/portal-email-upgrade.sql", import.meta.url), "utf8"));
 });
 after(async () => {
   await db.close();

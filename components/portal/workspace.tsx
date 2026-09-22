@@ -20,9 +20,11 @@ import {
 export function PortalWorkspace({
   desk = false,
   previewData,
+  initialRole,
 }: {
   desk?: boolean;
   previewData?: Workspace;
+  initialRole?: "carrier" | "customer";
 }) {
   const [data, setData] = useState<Workspace | null>(previewData || null);
   const [error, setError] = useState("");
@@ -138,7 +140,7 @@ export function PortalWorkspace({
             </p>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
               {desk
-                ? "Agent desk"
+                ? "Portal review desk"
                 : p?.role === "carrier"
                   ? "Carrier portal"
                   : p?.role === "customer"
@@ -156,7 +158,7 @@ export function PortalWorkspace({
                   className={secondary}
                   href={desk ? "/portal/home" : "/agent-desk"}
                 >
-                  {desk ? "My portal" : "Open agent desk"}
+                  {desk ? "My portal" : "Review portal submissions"}
                 </Link>
               ) : null}
               {!previewData ? <SignOutButton /> : null}
@@ -196,11 +198,11 @@ export function PortalWorkspace({
         {data && !p && !desk ? (
           <Panel title="Choose your portal">
             <p className="mb-5 text-sm text-slate-600">
-              Select the account you are setting up. This does not grant
+              Start your {initialRole || "portal"} profile. This does not grant
               approved access or connect you to another company’s shipments.
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
-              {(["customer", "carrier"] as const).map((role) => (
+              {(initialRole ? [initialRole] : (["customer", "carrier"] as const)).map((role) => (
                 <button
                   key={role}
                   disabled={busy}

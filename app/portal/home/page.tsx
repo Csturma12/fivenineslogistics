@@ -1,16 +1,9 @@
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
-import { PortalWorkspace } from "@/components/portal/workspace";
-export const metadata = {
-  title: "Your portal — Five Nines Logistics",
-  robots: { index: false, follow: false },
-};
-export default function PortalHomePage() {
-  return (
-    <main>
-      <SiteHeader />
-      <PortalWorkspace />
-      <SiteFooter />
-    </main>
-  );
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { profileFor } from "@/lib/portal-service";
+export const dynamic = "force-dynamic";
+export default async function LegacyPortalHome() {
+  const { data: { user } } = await (await createClient()).auth.getUser();
+  const profile = user ? await profileFor(user.id) : null;
+  redirect((profile?.role || user?.app_metadata?.role) === "customer" ? "/portal/customer" : "/portal");
 }

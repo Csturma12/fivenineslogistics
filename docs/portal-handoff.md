@@ -1,5 +1,7 @@
 # Five Nines portal handoff — September 20, 2026
 
+> Historical implementation notes. See `carrier-portal-release.md` for the current branch, environment boundaries, verification and activation checklist.
+
 ## Current state
 
 **Migration update:** the owner selected replacement website project `pzupanvsfrgudoghpjpq`.
