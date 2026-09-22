@@ -36,11 +36,11 @@ const roleCopy = {
     eyebrow: "Carrier access",
     title: "Built around trusted carrier relationships.",
     description:
-      "Create an account to connect with carrier relations and dispatch, and to view and book open freight. Confirm your email once, then sign in anytime.",
+      "Create your account, submit your carrier packet, and complete Highway verification. Dispatch approval opens access to lanes, bids and carrier offers.",
     steps: [
       "Create an account with your dispatch email and a password.",
       "Confirm your email to activate access.",
-      "Sign in anytime to view and book open freight.",
+      "Complete setup for approval, then view loads and submit bids.",
     ],
     emailPlaceholder: "dispatch@yourauthority.com",
     companyPlaceholder: "Legal carrier name",

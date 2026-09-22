@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server"
 export const metadata: Metadata = {
   title: "Carrier portal access — Five Nines Logistics",
   description:
-    "Request verified, password-free carrier portal access and connect with Five Nines carrier relations.",
+    "Set up your carrier account, submit documents, and access load bids after verification.",
 }
 
 export default async function CarrierPortalPage() {
@@ -47,7 +47,7 @@ export default async function CarrierPortalPage() {
             </h1>
             <p className="mt-5 text-pretty text-base leading-relaxed text-muted-foreground">
               Create an account with your dispatch email, confirm it once, and sign in anytime to
-              view and book open freight.
+              finish your carrier setup. Approved carriers can view lanes, bid, and reserve loads at posted carrier offers.
             </p>
           </div>
 

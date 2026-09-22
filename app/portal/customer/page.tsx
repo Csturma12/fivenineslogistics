@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server"
 export const metadata: Metadata = {
   title: "Customer portal access — Five Nines Logistics",
   description:
-    "Request verified, password-free customer portal access and connect with the team coordinating your freight.",
+    "Sign in to request freight service, access company documents, and view your verified shipments.",
 }
 
 export default async function CustomerPortalPage() {

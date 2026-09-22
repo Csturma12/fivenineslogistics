@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/site-footer"
 export const metadata: Metadata = {
   title: "Secure customer and carrier portal — Five Nines Logistics",
   description:
-    "Request approved, password-free portal access for your Five Nines customer or carrier relationship.",
+    "Create your Five Nines customer or carrier account and complete your secure setup.",
 }
 
 export default function PortalPage() {
@@ -20,16 +20,16 @@ export default function PortalPage() {
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1">
               <ShieldCheck className="size-3.5 text-[color:var(--status-ok)]" aria-hidden="true" />
               <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                Verified access · password-free
+                Secure accounts · verified relationships
               </span>
             </div>
             <h1 className="mt-6 text-balance text-3xl font-semibold leading-[1.1] tracking-tight text-foreground sm:text-4xl lg:text-5xl">
               One secure entry point. Two dedicated relationships.
             </h1>
             <p className="mt-5 text-pretty text-base leading-relaxed text-muted-foreground">
-              Choose the portal that matches how you work with Five Nines. Access is manually
-              approved, and verified users sign in through a secure link sent directly to their work
-              email—no password to remember.
+              Choose the portal that matches how you work with Five Nines. Create an account,
+              confirm your email, then sign in with your password. Our team verifies your setup
+              before opening shipment visibility or carrier load-board access.
             </p>
           </div>
 
@@ -43,14 +43,14 @@ export default function PortalPage() {
                   <PackageSearch className="size-5 text-primary" aria-hidden="true" />
                 </div>
                 <p className="mt-5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                  For approved shippers
+                  For customers
                 </p>
                 <h2 className="mt-2 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
                   Customer portal
                 </h2>
                 <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
-                  Verify your customer relationship, receive secure access, and connect directly
-                  with the team coordinating your freight and documents.
+                  Access company documents, enter a load request, and track your shipments
+                  once your company account is verified.
                 </p>
               </div>
               <span className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-foreground">
@@ -68,14 +68,14 @@ export default function PortalPage() {
                   <Truck className="size-5 text-[color:var(--status-ok-dark)]" aria-hidden="true" />
                 </div>
                 <p className="mt-5 font-mono text-[10px] uppercase tracking-wider text-[color:var(--status-ok-dark)]">
-                  For approved carriers
+                  For carriers
                 </p>
                 <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
                   Carrier portal
                 </h2>
                 <p className="mt-2 text-pretty text-sm leading-relaxed text-navy-foreground/65">
-                  Verify your carrier relationship, receive secure access, and stay connected with
-                  carrier relations and dispatch.
+                  Submit your carrier packet, complete Highway verification, and bid on
+                  available loads after dispatch approves your setup.
                 </p>
               </div>
               <span className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-[color:var(--status-ok-dark)]">
