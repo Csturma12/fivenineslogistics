@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Workspace } from "@/lib/portal-contract";
+import { PortalResponseError, readWorkspaceResponse, sendPortalChange } from "@/lib/portal-client";
 import { SignOutButton } from "./sign-out-button";
 import { ProfileForm, LoadRequestForm } from "./workspace-forms";
 import { CarrierBoard } from "./carrier-board";
@@ -37,12 +38,8 @@ export function PortalWorkspace({
     const res = await fetch(`/api/portal/workspace${desk ? "?desk=1" : ""}`, {
       cache: "no-store",
     });
-    const body = await res.json();
-    if (!res.ok) {
-      if (res.status === 401) window.location.assign("/portal");
-      throw new Error(body.error || "Unable to load your portal.");
-    }
-    setData(body);
+    if (res.status === 401) window.location.assign("/portal");
+    setData(await readWorkspaceResponse(res));
   }, [desk, previewData]);
   useEffect(() => {
     let active = true;
@@ -65,17 +62,7 @@ export function PortalWorkspace({
     setNotice("");
     try {
       const file = body instanceof FormData;
-      const res = await fetch(
-        `/api/portal/${file ? "documents" : "workspace"}`,
-        {
-          method: "POST",
-          ...(file ? {} : { headers: { "Content-Type": "application/json" } }),
-          body: file ? body : JSON.stringify(body),
-        },
-      );
-      const result = await res.json();
-      if (!res.ok)
-        throw new Error(result.error || "Unable to save. Please retry.");
+      await sendPortalChange(body);
       setNotice(
         file
           ? "Document uploaded securely."
@@ -90,6 +77,8 @@ export function PortalWorkspace({
       }
       return true;
     } catch (e) {
+      if (e instanceof PortalResponseError && e.status === 401)
+        window.location.assign("/portal");
       setError(
         e instanceof Error
           ? e.message

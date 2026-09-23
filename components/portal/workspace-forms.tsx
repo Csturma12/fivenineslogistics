@@ -2,6 +2,8 @@
 import { useState } from "react";
 import type { Profile, Workspace } from "@/lib/portal-contract";
 import { centralToday, setupMissing } from "@/lib/portal-contract";
+import { carrierSetupMailto } from "@/lib/portal-setup-email";
+import { site } from "@/lib/site";
 import {
   Panel,
   Field,
@@ -31,7 +33,15 @@ export function ProfileForm({
 }) {
   const carrier = profile.role === "carrier";
   const d = profile.details;
-  const missing = setupMissing(profile, documents, centralToday());
+  const missing = setupMissing(
+    profile,
+    documents,
+    centralToday(),
+    carrier ? "submission" : "approval",
+  );
+  const packetAwaitingReview = documents.some(
+    (doc) => ["packet", "combined"].includes(doc.kind || "") && !doc.reviewed_at,
+  );
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
       <Panel
@@ -222,7 +232,10 @@ export function ProfileForm({
             <Panel eyebrow="Setup checklist" title="Your next steps">
               <ol className="space-y-4 text-sm leading-6 text-slate-600">
                 <li>1. Save your business and operating details.</li>
-                <li>2. Upload the packet, COI, W9 and NOA if you factor.</li>
+                <li>
+                  2. Upload one master PDF containing your carrier packet, COI,
+                  W-9 and NOA if you factor. Separate files are also welcome.
+                </li>
                 <li>3. Complete Highway setup and submit for review.</li>
                 <li>
                   4. Dispatch verifies your setup and opens load-board access.
@@ -238,6 +251,13 @@ export function ProfileForm({
                   review.
                 </p>
               )}
+              {packetAwaitingReview ? (
+                <p className="mt-4 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+                  Packet received — awaiting staff review. You do not need to
+                  split it into separate files. Our team will confirm the
+                  documents inside and contact you if anything is missing.
+                </p>
+              ) : null}
             </Panel>
             <Panel title="Highway verification">
               <Badge value={profile.highway_status} />
@@ -270,10 +290,28 @@ export function ProfileForm({
             </Panel>
             <Panel title="Carrier documents">
               <p className="mb-4 text-sm text-slate-600">
-                Private files · PDF, JPG or PNG · up to 3 MB each. Save your
-                draft before uploading.
+                One master PDF is fine — no separate uploads required. Our team
+                reviews the contents before approving access. Private files ·
+                up to 3 MB each. Save your draft before uploading.
               </p>
               <UploadForm upload={upload} busy={busy} />
+              <div className="mt-5 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+                <p className="font-medium text-[#14365b]">File too large or having trouble?</p>
+                <p className="mt-2">
+                  Email your setup documents to our carrier team. One combined
+                  PDF is fine. We’ll help you complete the remaining portal steps.
+                </p>
+                <a className="mt-3 inline-block font-medium text-blue-700 underline" href={carrierSetupMailto(site.carriersEmail)}>
+                  Email setup documents →
+                </a>
+                <p className="mt-2 text-xs">
+                  Opens your email app with a checklist. Attach your packet, COI,
+                  W-9 and NOA (if applicable), together or separately, yourself.
+                  Emailing does not automatically complete portal setup or
+                  Highway approval.
+                </p>
+                <p className="mt-2 text-xs">No email app? Send the same documents to {site.carriersEmail}.</p>
+              </div>
               <DocumentList docs={documents} />
             </Panel>
           </>
@@ -299,13 +337,17 @@ export function UploadForm({
   busy: boolean;
   company?: boolean;
 }) {
+  const [kind, setKind] = useState("combined");
   return (
     <form
       className="space-y-3"
       onSubmit={async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-        if (await upload(new FormData(form))) form.reset();
+        if (await upload(new FormData(form))) {
+          form.reset();
+          setKind("combined");
+        }
       }}
     >
       <fieldset disabled={busy} className="space-y-3">
@@ -322,21 +364,35 @@ export function UploadForm({
         ) : (
           <label className="block text-sm">
             Document type
-            <select name="kind" className={input}>
+            <select
+              name="kind"
+              className={input}
+              value={kind}
+              onChange={(e) => setKind(e.target.value)}
+            >
+              <option value="combined">
+                Combined/master carrier packet (one PDF)
+              </option>
               <option value="packet">Carrier packet</option>
               <option value="coi">Certificate of insurance (COI)</option>
-              <option value="w9">W9</option>
+              <option value="w9">W-9</option>
               <option value="noa">Notice of assignment (NOA)</option>
             </select>
           </label>
         )}
         <label className="block text-sm">
-          Choose file
+          {!company && kind === "combined"
+            ? "Choose master PDF"
+            : "Choose file (PDF, JPG or PNG)"}
           <input
             className="mt-2 block w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-blue-50 file:p-2 file:text-blue-800"
             type="file"
             name="file"
-            accept="application/pdf,image/jpeg,image/png"
+            accept={
+              !company && kind === "combined"
+                ? "application/pdf"
+                : "application/pdf,image/jpeg,image/png"
+            }
             required
           />
         </label>

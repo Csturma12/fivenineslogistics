@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     if (company && !staff)
       throw new PortalProblem("Agent desk access required.", 403);
     if (!company) await requireProfile(user.id, "carrier");
-    if (!["company", "packet", "coi", "w9", "noa"].includes(kind))
+    if (!["company", "combined", "packet", "coi", "w9", "noa"].includes(kind))
       throw new PortalProblem("Choose a document type.");
     const file = form.get("file");
     if (!(file instanceof File) || file.size === 0 || file.size > 3_145_728)
@@ -71,6 +71,8 @@ export async function POST(request: Request) {
             : null;
     if (!mime || mime !== file.type)
       throw new PortalProblem("Upload a valid PDF, JPG or PNG.");
+    if (kind === "combined" && mime !== "application/pdf")
+      throw new PortalProblem("Upload your combined carrier packet as one PDF.");
     const name =
       text(file.name, 200).replace(/[^a-zA-Z0-9._ -]/g, "_") || "document";
     const title = company ? text(form.get("title"), 150) : "";

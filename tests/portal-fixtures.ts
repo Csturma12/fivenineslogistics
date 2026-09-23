@@ -1,14 +1,15 @@
 import type { Workspace, Profile } from "../lib/portal-contract";
 
 export function previewWorkspace(view: string): Workspace {
-  const carrier = view === "carrier" || view === "setup";
+  const carrier = view === "carrier" || view === "setup" || view === "desk";
+  const masterPacket = view === "setup" || view === "desk";
   const id = "11111111-1111-4111-8111-111111111111";
   const profile: Profile = {
     user_id: id,
     email: "preview@example.test",
     role: carrier ? "carrier" : "customer",
     company: carrier ? "Sample Carrier" : "Sample Customer",
-    status: view === "setup" ? "draft" : "approved",
+    status: masterPacket ? "submitted" : "approved",
     highway_status: "verified",
     customer_account_id: carrier ? null : "sample-account",
     review_note: "",
@@ -48,14 +49,25 @@ export function previewWorkspace(view: string): Workspace {
     profile,
     hint: profile.role,
     company: profile.company,
-    documents: carrier
-      ? ["packet", "coi", "w9"].map((kind) => ({
-          id: kind,
-          kind,
-          name: `sample-${kind}.pdf`,
-          user_id: id,
-        }))
-      : [],
+    documents: masterPacket
+      ? [
+          {
+            id: "44444444-4444-4444-8444-444444444444",
+            kind: "combined",
+            name: "sample-master-carrier-packet.pdf",
+            user_id: id,
+            included_kinds: [],
+            reviewed_at: null,
+          },
+        ]
+      : carrier
+        ? ["packet", "coi", "w9"].map((kind) => ({
+            id: kind,
+            kind,
+            name: `sample-${kind}.pdf`,
+            user_id: id,
+          }))
+        : [],
     companyDocuments: [],
     loads: [
       load,
