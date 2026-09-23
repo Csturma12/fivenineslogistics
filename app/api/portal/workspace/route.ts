@@ -195,7 +195,7 @@ export async function GET(request: Request) {
         ? result(
             await db
               .from("fn_loads")
-              .select(`${LOAD_FIELDS},tracking_location,tracking_at`)
+              .select(`${LOAD_FIELDS},external_id,tracking_location,tracking_at`)
               .eq("customer_account_id", profile.customer_account_id)
               .order("pickup_date", { ascending: false })
               .limit(200),
@@ -203,6 +203,7 @@ export async function GET(request: Request) {
         : [];
     const loads = rows.map((row) => ({
       ...carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
+      external_id: (row.external_id as string) || undefined,
       tracking_location: row.tracking_location,
       tracking_at: row.tracking_at,
     }));

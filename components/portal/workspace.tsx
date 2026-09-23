@@ -340,8 +340,15 @@ export function PortalWorkspace({
                           key={load.id}
                           className="rounded-lg border p-5"
                         >
-                          <div className="flex flex-wrap justify-between gap-3">
-                            <h3 className="font-semibold">{lane(load)}</h3>
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                              {load.external_id ? (
+                                <p className="font-mono text-[11px] uppercase tracking-[.2em] text-blue-600">
+                                  Ref {load.external_id}
+                                </p>
+                              ) : null}
+                              <h3 className="font-semibold">{lane(load)}</h3>
+                            </div>
                             <Badge value={load.status} />
                           </div>
                           <LoadFacts load={load} />
