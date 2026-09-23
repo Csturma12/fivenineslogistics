@@ -1,10 +1,12 @@
 import { Resend } from "resend"
 
 
-// Preferred branded sender. Requires fivenineslogistics.com to be verified in Resend.
-const PREFERRED_FROM = `Five Nines Portal <portal@${process.env.RESEND_EMAIL_DOMAIN}>`
-// Always-verified Resend sandbox sender. Delivers only to the Resend account owner,
-// but keeps the flow working until the branded domain is verified.
+// Branded sender. Used whenever RESEND_EMAIL_DOMAIN is configured.
+const EMAIL_DOMAIN = process.env.RESEND_EMAIL_DOMAIN
+const PREFERRED_FROM = EMAIL_DOMAIN ? `Five Nines Portal <portal@${EMAIL_DOMAIN}>` : null
+// Resend sandbox sender. IMPORTANT: it only delivers to the Resend account owner's
+// own address — every other recipient is silently dropped. Use only when no branded
+// domain is configured (e.g. local dev).
 const SANDBOX_FROM = "Five Nines Portal <onboarding@resend.dev>"
 
 type SendArgs = {
@@ -15,21 +17,34 @@ type SendArgs = {
   idempotencyKey: string
 }
 
-// Send from the branded domain; if Resend rejects it as unverified, transparently
-// retry from the sandbox sender so a failed/pending domain never breaks the flow.
+// When a branded domain is configured we send ONLY from it. We deliberately do not
+// fall back to the sandbox sender on error: that sender reaches only the Resend
+// account owner, so a silent fallback blackholes mail to real carriers/customers
+// (exactly the failure mode that hid a broken carrier-setup email). Instead we log
+// the failure loudly and return the error to the caller.
 export async function sendPortalEmail({ to, subject, html, replyTo, idempotencyKey }: SendArgs) {
   const resend = new Resend(process.env.RESEND_API_KEY)
   const base = { to, subject, html, ...(replyTo ? { replyTo } : {}) }
 
-  const first = await resend.emails.send({ from: PREFERRED_FROM, ...base }, { idempotencyKey })
-  if (!first.error) return first
-
-  if (/not verified|domain/i.test(first.error.message)) {
-    console.log("[v0] branded domain unverified, retrying from sandbox sender")
-    return resend.emails.send({ from: SANDBOX_FROM, ...base }, { idempotencyKey: `${idempotencyKey}/sbx` })
+  if (PREFERRED_FROM) {
+    const res = await resend.emails.send({ from: PREFERRED_FROM, ...base }, { idempotencyKey })
+    if (res.error) {
+      console.error(
+        `[v0] portal email FAILED from ${PREFERRED_FROM} to ${to.join(", ")}: ${res.error.message}. ` +
+          `Not falling back to the sandbox sender (it only reaches the Resend account owner). ` +
+          `Verify that ${EMAIL_DOMAIN} is still verified in Resend.`,
+      )
+    }
+    return res
   }
 
-  return first
+  // No branded domain configured — local/dev only. This reaches only the Resend
+  // account owner, so it must never be relied on in production.
+  console.warn(
+    "[v0] RESEND_EMAIL_DOMAIN is not set; sending from the Resend sandbox sender, " +
+      "which only delivers to the Resend account owner.",
+  )
+  return resend.emails.send({ from: SANDBOX_FROM, ...base }, { idempotencyKey: `${idempotencyKey}/sbx` })
 }
 
 function shell(inner: string): string {
