@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Workspace } from "@/lib/portal-contract";
+import { PortalResponseError, readWorkspaceResponse, sendPortalChange } from "@/lib/portal-client";
 import { SignOutButton } from "./sign-out-button";
 import { ProfileForm, LoadRequestForm } from "./workspace-forms";
 import { CarrierBoard } from "./carrier-board";
@@ -16,24 +17,6 @@ import {
   LoadFacts,
   Panel,
 } from "./workspace-ui";
-
-const MAX_UPLOAD_BYTES = 3_145_728;
-
-async function readBody(res: Response): Promise<{ error?: string; [k: string]: unknown }> {
-  const raw = await res.text();
-  if (!raw) return {};
-  try {
-    return JSON.parse(raw);
-  } catch {
-    // Non-JSON response (e.g. platform 413 "Request Entity Too Large" or a proxy error page).
-    return {
-      error:
-        res.status === 413
-          ? "That file is too large to upload. Each file must be 3 MB or smaller."
-          : `Something went wrong (${res.status || "network error"}). Please try again.`,
-    };
-  }
-}
 
 export function PortalWorkspace({
   desk = false,
@@ -55,12 +38,8 @@ export function PortalWorkspace({
     const res = await fetch(`/api/portal/workspace${desk ? "?desk=1" : ""}`, {
       cache: "no-store",
     });
-    const body = await readBody(res);
-    if (!res.ok) {
-      if (res.status === 401) window.location.assign("/portal");
-      throw new Error(body.error || "Unable to load your portal.");
-    }
-    setData(body as unknown as Workspace);
+    if (res.status === 401) window.location.assign("/portal");
+    setData(await readWorkspaceResponse(res));
   }, [desk, previewData]);
   useEffect(() => {
     let active = true;
@@ -83,24 +62,7 @@ export function PortalWorkspace({
     setNotice("");
     try {
       const file = body instanceof FormData;
-      if (file) {
-        const chosen = body.get("file");
-        if (chosen instanceof File && chosen.size > MAX_UPLOAD_BYTES)
-          throw new Error(
-            "That file is too large. Each file must be 3 MB or smaller.",
-          );
-      }
-      const res = await fetch(
-        `/api/portal/${file ? "documents" : "workspace"}`,
-        {
-          method: "POST",
-          ...(file ? {} : { headers: { "Content-Type": "application/json" } }),
-          body: file ? body : JSON.stringify(body),
-        },
-      );
-      const result = await readBody(res);
-      if (!res.ok)
-        throw new Error(result.error || "Unable to save. Please retry.");
+      await sendPortalChange(body);
       setNotice(
         file
           ? "Document uploaded securely."
@@ -115,6 +77,8 @@ export function PortalWorkspace({
       }
       return true;
     } catch (e) {
+      if (e instanceof PortalResponseError && e.status === 401)
+        window.location.assign("/portal");
       setError(
         e instanceof Error
           ? e.message

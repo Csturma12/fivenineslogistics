@@ -2,6 +2,8 @@
 import { useState } from "react";
 import type { Profile, Workspace } from "@/lib/portal-contract";
 import { centralToday, setupMissing } from "@/lib/portal-contract";
+import { carrierSetupMailto } from "@/lib/portal-setup-email";
+import { site } from "@/lib/site";
 import {
   Panel,
   Field,
@@ -274,6 +276,22 @@ export function ProfileForm({
                 draft before uploading.
               </p>
               <UploadForm upload={upload} busy={busy} />
+              <div className="mt-5 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+                <p className="font-medium text-[#14365b]">File too large or having trouble?</p>
+                <p className="mt-2">
+                  Email your setup documents to our carrier team. We’ll help you
+                  complete the remaining portal steps.
+                </p>
+                <a className="mt-3 inline-block font-medium text-blue-700 underline" href={carrierSetupMailto(site.carriersEmail)}>
+                  Email setup documents →
+                </a>
+                <p className="mt-2 text-xs">
+                  Opens your email app with a checklist. Attach your packet, COI,
+                  W-9 and NOA (if applicable) yourself. Emailing does not automatically
+                  complete portal setup or Highway approval.
+                </p>
+                <p className="mt-2 text-xs">No email app? Send the same documents to {site.carriersEmail}.</p>
+              </div>
               <DocumentList docs={documents} />
             </Panel>
           </>
