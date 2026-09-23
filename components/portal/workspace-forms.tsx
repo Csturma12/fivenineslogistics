@@ -294,10 +294,12 @@ export function UploadForm({
   upload,
   busy,
   company = false,
+  customer = false,
 }: {
   upload: Upload;
   busy: boolean;
   company?: boolean;
+  customer?: boolean;
 }) {
   return (
     <form
@@ -319,6 +321,16 @@ export function UploadForm({
               maxLength={150}
             />
           </>
+        ) : customer ? (
+          <label className="block text-sm">
+            Document type
+            <select name="kind" className={input}>
+              <option value="bol">Bill of lading (BOL)</option>
+              <option value="po">Purchase order (PO)</option>
+              <option value="packing_list">Packing list</option>
+              <option value="other">Other document</option>
+            </select>
+          </label>
         ) : (
           <label className="block text-sm">
             Document type

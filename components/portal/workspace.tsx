@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Workspace } from "@/lib/portal-contract";
 import { SignOutButton } from "./sign-out-button";
-import { ProfileForm, LoadRequestForm } from "./workspace-forms";
+import { ProfileForm, LoadRequestForm, UploadForm } from "./workspace-forms";
 import { CarrierBoard } from "./carrier-board";
 import { WorkspaceDesk } from "./workspace-desk";
 import {
@@ -139,6 +139,7 @@ export function PortalWorkspace({
       : [
           "Your load board",
           "Enter a load",
+          "My documents",
           "Company documents",
           "Company profile",
         ];
@@ -277,7 +278,7 @@ export function PortalWorkspace({
                 className="px-3 py-3 text-sm text-blue-700"
                 onClick={() => void refresh().catch((e) => setError(e.message))}
               >
-                Refresh ↻
+                Refresh ���
               </button>
             </div>
             {desk ? (
@@ -302,6 +303,18 @@ export function PortalWorkspace({
               <CarrierBoard data={data} act={send} busy={busy} />
             ) : selected === "Enter a load" ? (
               <LoadRequestForm act={send} busy={busy} />
+            ) : selected === "My documents" ? (
+              <Panel eyebrow="Your account" title="My documents">
+                <p className="mb-5 text-sm leading-6 text-slate-600">
+                  Upload shipping paperwork to your account — bills of lading,
+                  purchase orders, packing lists. Private files · PDF, JPG or
+                  PNG · up to 3 MB each. Documents stay saved to your account.
+                </p>
+                <UploadForm upload={send} busy={busy} customer />
+                <div className="mt-6">
+                  <DocumentList docs={data.documents} />
+                </div>
+              </Panel>
             ) : selected === "Company documents" ? (
               <Panel eyebrow="Your resource center" title="Company documents">
                 <p className="mb-5 text-sm text-slate-600">

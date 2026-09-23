@@ -48,11 +48,19 @@ export async function POST(request: Request) {
     const form = await request.formData();
     const kind = text(form.get("kind"), 30);
     const company = kind === "company";
-    if (company && !staff)
-      throw new PortalProblem("Agent desk access required.", 403);
-    if (!company) await requireProfile(user.id, "carrier");
-    if (!["company", "packet", "coi", "w9", "noa"].includes(kind))
-      throw new PortalProblem("Choose a document type.");
+    const CARRIER_KINDS = ["packet", "coi", "w9", "noa"];
+    const CUSTOMER_KINDS = ["bol", "po", "packing_list", "other"];
+    if (company) {
+      if (!staff) throw new PortalProblem("Agent desk access required.", 403);
+    } else {
+      // Both carriers and customers upload to their own account (fn_documents, scoped by user_id);
+      // each role may only use its own document kinds.
+      const profile = await requireProfile(user.id);
+      const allowed =
+        profile.role === "carrier" ? CARRIER_KINDS : CUSTOMER_KINDS;
+      if (!allowed.includes(kind))
+        throw new PortalProblem("Choose a document type.");
+    }
     const file = form.get("file");
     if (!(file instanceof File) || file.size === 0 || file.size > 3_145_728)
       throw new PortalProblem("Choose a PDF, JPG or PNG, up to 3 MB.");

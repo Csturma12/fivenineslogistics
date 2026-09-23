@@ -56,7 +56,10 @@ export function previewWorkspace(view: string): Workspace {
           name: `sample-${kind}.pdf`,
           user_id: id,
         }))
-      : [],
+      : [
+          { id: "bol", kind: "bol", name: "sample-bol.pdf", user_id: id },
+          { id: "po", kind: "po", name: "sample-po.pdf", user_id: id },
+        ],
     companyDocuments: [],
     loads: [
       load,
