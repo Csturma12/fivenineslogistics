@@ -17,6 +17,24 @@ import {
   Panel,
 } from "./workspace-ui";
 
+const MAX_UPLOAD_BYTES = 3_145_728;
+
+async function readBody(res: Response): Promise<{ error?: string; [k: string]: unknown }> {
+  const raw = await res.text();
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw);
+  } catch {
+    // Non-JSON response (e.g. platform 413 "Request Entity Too Large" or a proxy error page).
+    return {
+      error:
+        res.status === 413
+          ? "That file is too large to upload. Each file must be 3 MB or smaller."
+          : `Something went wrong (${res.status || "network error"}). Please try again.`,
+    };
+  }
+}
+
 export function PortalWorkspace({
   desk = false,
   previewData,
@@ -37,12 +55,12 @@ export function PortalWorkspace({
     const res = await fetch(`/api/portal/workspace${desk ? "?desk=1" : ""}`, {
       cache: "no-store",
     });
-    const body = await res.json();
+    const body = await readBody(res);
     if (!res.ok) {
       if (res.status === 401) window.location.assign("/portal");
       throw new Error(body.error || "Unable to load your portal.");
     }
-    setData(body);
+    setData(body as unknown as Workspace);
   }, [desk, previewData]);
   useEffect(() => {
     let active = true;
@@ -65,6 +83,13 @@ export function PortalWorkspace({
     setNotice("");
     try {
       const file = body instanceof FormData;
+      if (file) {
+        const chosen = body.get("file");
+        if (chosen instanceof File && chosen.size > MAX_UPLOAD_BYTES)
+          throw new Error(
+            "That file is too large. Each file must be 3 MB or smaller.",
+          );
+      }
       const res = await fetch(
         `/api/portal/${file ? "documents" : "workspace"}`,
         {
@@ -73,7 +98,7 @@ export function PortalWorkspace({
           body: file ? body : JSON.stringify(body),
         },
       );
-      const result = await res.json();
+      const result = await readBody(res);
       if (!res.ok)
         throw new Error(result.error || "Unable to save. Please retry.");
       setNotice(
