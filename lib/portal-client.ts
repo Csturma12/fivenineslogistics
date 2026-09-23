@@ -16,9 +16,9 @@ function record(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-async function readBody(res: Response): Promise<Record<string, unknown>> {
+async function readBody(res: Response, upload = false): Promise<Record<string, unknown>> {
   // A platform rejection can be plain text, HTML, or even an empty body.
-  if (res.status === 413) throw new PortalResponseError(SIZE_ERROR, 413);
+  if (upload && res.status === 413) throw new PortalResponseError(SIZE_ERROR, 413);
   let body: unknown;
   try {
     body = JSON.parse(await res.text());
@@ -30,9 +30,11 @@ async function readBody(res: Response): Promise<Record<string, unknown>> {
       ? body.error
       : res.status === 401
         ? "Sign in to continue."
-        : !res.ok
-          ? `Something went wrong (${res.status}). Please try again.`
-          : UNCONFIRMED;
+        : res.status === 413
+          ? "That request is too large. Reduce the information submitted and try again."
+          : !res.ok
+            ? `Something went wrong (${res.status}). Please try again.`
+            : UNCONFIRMED;
   if (!res.ok || !record(body) || "error" in body)
     throw new PortalResponseError(message, res.status);
   return body;
@@ -92,6 +94,6 @@ export async function sendPortalChange(
     ...(upload ? {} : { headers: { "Content-Type": "application/json" } }),
     body: upload ? body : JSON.stringify(body),
   });
-  const result = await readBody(res);
+  const result = await readBody(res, upload);
   if (result.ok !== true) throw new PortalResponseError(UNCONFIRMED, res.status);
 }

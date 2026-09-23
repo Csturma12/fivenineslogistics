@@ -10,6 +10,16 @@ export const input =
   "mt-1.5 w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:outline-2 focus:outline-blue-500";
 export type Act = (body: Record<string, unknown>) => Promise<boolean>;
 export type Upload = (data: FormData) => Promise<boolean>;
+export const documentKindLabel = (kind: string) =>
+  kind === "packet"
+    ? "Carrier packet"
+    : kind === "coi"
+      ? "Certificate of insurance (COI)"
+      : kind === "w9"
+        ? "W-9"
+        : kind === "noa"
+          ? "Notice of assignment (NOA)"
+          : kind.toUpperCase();
 export function Panel({
   title,
   eyebrow,
@@ -95,8 +105,16 @@ export function DocumentList({
             target="_blank"
             rel="noreferrer"
           >
-            {doc.title || `${doc.kind?.toUpperCase()} · ${doc.name}`}
+            {doc.title ||
+              `${doc.kind === "combined" ? "MASTER PACKET" : doc.kind?.toUpperCase()} · ${doc.name}`}
           </a>
+          {!company && ["combined", "packet"].includes(doc.kind || "") ? (
+            <p className="mt-2 text-xs leading-5 text-slate-600">
+              {doc.reviewed_at
+                ? `Staff reviewed ${doc.reviewed_at.slice(0, 10)} · Confirmed contents: ${doc.included_kinds?.length ? doc.included_kinds.map(documentKindLabel).join(", ") : "none confirmed"}.`
+                : "Received — awaiting staff review of the documents inside."}
+            </p>
+          ) : null}
         </li>
       ))}
     </ul>

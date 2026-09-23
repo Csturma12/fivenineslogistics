@@ -44,12 +44,25 @@ function upload(size: number): FormData {
   return body;
 }
 
+const UNCONFIRMED =
+  "The portal returned an unexpected response. We could not confirm the result. Refresh before retrying.";
+
+function responseError(status: number, message = UNCONFIRMED) {
+  return (error: unknown) => {
+    assert.ok(error instanceof PortalResponseError);
+    assert.equal(error.status, status);
+    assert.equal(error.message, message);
+    return true;
+  };
+}
+
 for (const [label, raw] of [
   ["plain text", "Request Entity Too Large"],
   ["HTML", "<html><body>Upload rejected</body></html>"],
   ["empty", ""],
+  ["JSON", JSON.stringify({ error: "Request body rejected" })],
 ] as const) {
-  test(`${label} 413 responses explain the 3 MB limit in both request paths`, async () => {
+  test(`${label} upload 413 responses explain the 3 MB file limit`, async () => {
     const response = () => new Response(raw, { status: 413 });
     const { fetcher } = transport(response);
     const isSizeError = (error: unknown) => {
@@ -59,10 +72,27 @@ for (const [label, raw] of [
       assert.doesNotMatch(error.message, /Unexpected token|<html>/i);
       return true;
     };
-    await assert.rejects(() => readWorkspaceResponse(response()), isSizeError);
+    await assert.rejects(
+      () => sendPortalChange(upload(10), fetcher),
+      isSizeError,
+    );
+  });
+}
+
+for (const [label, raw, message] of [
+  ["plain text", "Request Entity Too Large", "That request is too large. Reduce the information submitted and try again."],
+  ["HTML", "<html><body>Request rejected</body></html>", "That request is too large. Reduce the information submitted and try again."],
+  ["empty", "", "That request is too large. Reduce the information submitted and try again."],
+  ["JSON", JSON.stringify({ error: "Keep profile details under 15,000 bytes." }), "Keep profile details under 15,000 bytes."],
+] as const) {
+  test(`${label} non-upload 413 responses do not claim a 3 MB file limit`, async () => {
+    const response = () => new Response(raw, { status: 413 });
+    const { fetcher } = transport(response);
+    const isRequestSizeError = responseError(413, message);
+    await assert.rejects(() => readWorkspaceResponse(response()), isRequestSizeError);
     await assert.rejects(
       () => sendPortalChange({ action: "save_profile" }, fetcher),
-      isSizeError,
+      isRequestSizeError,
     );
   });
 }
@@ -115,8 +145,13 @@ const malformedSuccesses: [string, () => Response][] = [
 for (const [label, response] of malformedSuccesses) {
   test(`${label} cannot be treated as a successful save or workspace`, async () => {
     const { fetcher } = transport(response);
-    await assert.rejects(() => readWorkspaceResponse(response()));
-    await assert.rejects(() => sendPortalChange({ action: "save_profile" }, fetcher));
+    const isRejected = responseError(
+      response().status,
+      label === "error object" ? "Not saved" : UNCONFIRMED,
+    );
+    await assert.rejects(() => readWorkspaceResponse(response()), isRejected);
+    await assert.rejects(() => sendPortalChange({ action: "save_profile" }, fetcher), isRejected);
+    await assert.rejects(() => sendPortalChange(upload(10), fetcher), isRejected);
   });
 }
 
@@ -125,7 +160,10 @@ test("only an explicit ok:true mutation response confirms a save", async () => {
   await assert.doesNotReject(() => sendPortalChange({ action: "save_profile" }, valid.fetcher));
   for (const body of [{ ok: false }, { ok: "true" }, { ok: 1 }]) {
     const invalid = transport(() => Response.json(body));
-    await assert.rejects(() => sendPortalChange({ action: "save_profile" }, invalid.fetcher));
+    await assert.rejects(
+      () => sendPortalChange({ action: "save_profile" }, invalid.fetcher),
+      responseError(200),
+    );
   }
 });
 
@@ -143,7 +181,10 @@ test("workspace response requires correctly typed envelope metadata", async () =
     { profile: undefined }, { hint: null }, { company: null },
     { highwayUrl: undefined }, { highwayUrl: 123 },
   ]) {
-    await assert.rejects(() => readWorkspaceResponse(Response.json({ ...workspace(), ...patch })));
+    await assert.rejects(
+      () => readWorkspaceResponse(Response.json({ ...workspace(), ...patch })),
+      responseError(200),
+    );
   }
 });
 
@@ -152,6 +193,7 @@ test("workspace collections must be arrays of records", async () => {
     for (const value of [undefined, null, {}, "not an array", [null], ["row"], [[]]]) {
       await assert.rejects(
         () => readWorkspaceResponse(Response.json({ ...workspace(), [field]: value })),
+        responseError(200),
         `${field} must reject ${JSON.stringify(value)}`,
       );
     }
@@ -160,6 +202,7 @@ test("workspace collections must be arrays of records", async () => {
     for (const value of [null, {}, "not an array", [null], [1], [[]]]) {
       await assert.rejects(
         () => readWorkspaceResponse(Response.json({ ...workspace(), [field]: value })),
+        responseError(200),
         `${field} must reject ${JSON.stringify(value)}`,
       );
     }
@@ -169,7 +212,10 @@ test("workspace collections must be arrays of records", async () => {
 test("a non-null workspace profile must satisfy the profile contract", async () => {
   const valid = previewWorkspace("carrier");
   for (const profile of [[], {}, "carrier", true, 1]) {
-    await assert.rejects(() => readWorkspaceResponse(Response.json({ ...valid, profile })));
+    await assert.rejects(
+      () => readWorkspaceResponse(Response.json({ ...valid, profile })),
+      responseError(200),
+    );
   }
   for (const patch of [
     { role: "staff" }, { details: null }, { details: [] }, { details: "invalid" },
@@ -178,9 +224,12 @@ test("a non-null workspace profile must satisfy the profile contract", async () 
     { highway_status: null }, { review_note: null }, { version: "1" },
     { customer_account_id: undefined }, { customer_account_id: 1 },
   ]) {
-    await assert.rejects(() => readWorkspaceResponse(Response.json({
-      ...valid, profile: { ...valid.profile, ...patch },
-    })));
+    await assert.rejects(
+      () => readWorkspaceResponse(Response.json({
+        ...valid, profile: { ...valid.profile, ...patch },
+      })),
+      responseError(200),
+    );
   }
 });
 
