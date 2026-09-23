@@ -13,7 +13,7 @@ export const site = {
   location: "Houston, TX",
   quotesEmail: "quotes@fivenineslogistics.com",
   dispatchEmail: "dispatch@fivenineslogistics.com",
-  carriersEmail: "carriers@fivenineslogistics.com",
+  carriersEmail: "chris@shipfivenines.com",
 }
 
 export type Mode = {
