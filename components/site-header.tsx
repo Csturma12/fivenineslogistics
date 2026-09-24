@@ -29,8 +29,12 @@ export function SiteHeader() {
               <span className="utility-phone">· {site.phone}</span>
               <ArrowUpRight size={13} aria-hidden="true" />
             </a>
+            <Link href="/portal/customer" className="utility-signin">
+              Shipper sign in
+              <ArrowUpRight size={13} aria-hidden="true" />
+            </Link>
             <Link href="/portal" className="utility-signin">
-              Sign in
+              Carrier sign in
               <ArrowUpRight size={13} aria-hidden="true" />
             </Link>
           </span>
@@ -56,9 +60,6 @@ export function SiteHeader() {
             ))}
           </nav>
           <div className="header-actions">
-            <Link href="/portal/customer" className="portal-link">
-              Shipper Portal
-            </Link>
             <Link href="/request-capacity" className="design-button header-cta">
               Request capacity
               <ArrowUpRight size={16} aria-hidden="true" />
@@ -91,7 +92,12 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link href="/portal/customer" onClick={() => setOpen(false)}>
-              Shipper Portal
+              Shipper sign in
+              <ArrowUpRight size={18} aria-hidden="true" />
+            </Link>
+            <Link href="/portal" onClick={() => setOpen(false)}>
+              Carrier sign in
+              <ArrowUpRight size={18} aria-hidden="true" />
             </Link>
             <Link href="/request-capacity" onClick={() => setOpen(false)}>
               Request capacity
