@@ -56,8 +56,8 @@ export function SiteHeader() {
             ))}
           </nav>
           <div className="header-actions">
-            <Link href="/portal" className="portal-link">
-              Customer & carrier login
+            <Link href="/portal/customer" className="portal-link">
+              Shipper Portal
             </Link>
             <Link href="/request-capacity" className="design-button header-cta">
               Request capacity
@@ -90,8 +90,8 @@ export function SiteHeader() {
                 <ArrowUpRight size={18} aria-hidden="true" />
               </Link>
             ))}
-            <Link href="/portal" onClick={() => setOpen(false)}>
-              Customer & carrier login
+            <Link href="/portal/customer" onClick={() => setOpen(false)}>
+              Shipper Portal
             </Link>
             <Link href="/request-capacity" onClick={() => setOpen(false)}>
               Request capacity

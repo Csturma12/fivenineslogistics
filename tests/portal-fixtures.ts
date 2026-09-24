@@ -27,6 +27,7 @@ export function previewWorkspace(view: string): Workspace {
   };
   const load = {
     id: "22222222-2222-4222-8222-222222222222",
+    external_id: "FN-10428",
     origin_city: "Houston",
     origin_state: "TX",
     dest_city: "Dallas",
@@ -55,13 +56,17 @@ export function previewWorkspace(view: string): Workspace {
           name: `sample-${kind}.pdf`,
           user_id: id,
         }))
-      : [],
+      : [
+          { id: "bol", kind: "bol", name: "sample-bol.pdf", user_id: id },
+          { id: "po", kind: "po", name: "sample-po.pdf", user_id: id },
+        ],
     companyDocuments: [],
     loads: [
       load,
       {
         ...load,
         id: "33333333-3333-4333-8333-333333333333",
+        external_id: "FN-10429",
         origin_city: "Atlanta",
         origin_state: "GA",
         dest_city: "Nashville",

@@ -1,9 +1,10 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import type { Workspace } from "@/lib/portal-contract";
+import { DOCUMENT_BUCKET, type Workspace } from "@/lib/portal-contract";
+import { createClient } from "@/lib/supabase/client";
 import { SignOutButton } from "./sign-out-button";
-import { ProfileForm, LoadRequestForm } from "./workspace-forms";
+import { ProfileForm, LoadRequestForm, UploadForm } from "./workspace-forms";
 import { CarrierBoard } from "./carrier-board";
 import { WorkspaceDesk } from "./workspace-desk";
 import {
@@ -16,6 +17,95 @@ import {
   LoadFacts,
   Panel,
 } from "./workspace-ui";
+
+const MAX_UPLOAD_BYTES = 15_728_640; // 15 MB
+
+async function readBody(res: Response): Promise<{ error?: string; [k: string]: unknown }> {
+  const raw = await res.text();
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw);
+  } catch {
+    // Non-JSON response (e.g. platform 413 "Request Entity Too Large" or a proxy error page).
+    return {
+      error:
+        res.status === 413
+          ? "That file is too large to upload. Each file must be 15 MB or smaller."
+          : `Something went wrong (${res.status || "network error"}). Please try again.`,
+    };
+  }
+}
+
+// Direct-to-storage upload. The file bytes go straight to Supabase Storage via a
+// one-time signed URL, so they never pass through the API route (which is capped
+// at ~4.5 MB on Vercel and lower behind the preview proxy). The route only issues
+// the signed URL and, afterwards, records the verified metadata.
+async function uploadDocument(form: FormData): Promise<string> {
+  const file = form.get("file");
+  const kind = String(form.get("kind") || "");
+  const title = String(form.get("title") || "");
+  const split = String(form.get("split") || "") === "yes";
+  if (!(file instanceof File) || file.size === 0)
+    throw new Error("Choose a PDF, JPG or PNG to upload.");
+  if (file.size > MAX_UPLOAD_BYTES)
+    throw new Error("That file is too large. Each file must be 15 MB or smaller.");
+  if (split && file.type !== "application/pdf")
+    throw new Error("Auto-split needs a PDF. Upload a PDF or turn off splitting.");
+
+  const signRes = await fetch("/api/portal/documents", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "sign", kind, name: file.name, title }),
+  });
+  const signed = await readBody(signRes);
+  if (!signRes.ok)
+    throw new Error(signed.error || "Upload could not start. Please retry.");
+  const { path, token } = signed as { path: string; token: string };
+
+  const { error: uploadError } = await createClient()
+    .storage.from(DOCUMENT_BUCKET)
+    .uploadToSignedUrl(path, token, file, {
+      contentType: file.type || undefined,
+    });
+  if (uploadError)
+    throw new Error(
+      "The file could not be uploaded. Check your connection and retry.",
+    );
+
+  if (split) {
+    const splitRes = await fetch("/api/portal/documents", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "split", path }),
+    });
+    const result = await readBody(splitRes);
+    if (!splitRes.ok)
+      throw new Error(
+        result.error || "The packet could not be split. Please retry.",
+      );
+    const created = Array.isArray(result.created)
+      ? (result.created as { label: string; pages: number }[])
+      : [];
+    if (created.length === 0)
+      return "Upload complete, but no separate documents were detected.";
+    const summary = created
+      .map((doc) => `${doc.label} (${doc.pages} pg)`)
+      .join(", ");
+    return `Split into ${created.length} document${created.length === 1 ? "" : "s"}: ${summary}.`;
+  }
+
+  const recordRes = await fetch("/api/portal/documents", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "record", kind, path, name: file.name, title }),
+  });
+  const recorded = await readBody(recordRes);
+  if (!recordRes.ok)
+    throw new Error(
+      recorded.error || "The document could not be saved. Please retry.",
+    );
+  return "Document uploaded securely.";
+}
 
 export function PortalWorkspace({
   desk = false,
@@ -37,12 +127,12 @@ export function PortalWorkspace({
     const res = await fetch(`/api/portal/workspace${desk ? "?desk=1" : ""}`, {
       cache: "no-store",
     });
-    const body = await res.json();
+    const body = await readBody(res);
     if (!res.ok) {
       if (res.status === 401) window.location.assign("/portal");
       throw new Error(body.error || "Unable to load your portal.");
     }
-    setData(body);
+    setData(body as unknown as Workspace);
   }, [desk, previewData]);
   useEffect(() => {
     let active = true;
@@ -65,22 +155,19 @@ export function PortalWorkspace({
     setNotice("");
     try {
       const file = body instanceof FormData;
-      const res = await fetch(
-        `/api/portal/${file ? "documents" : "workspace"}`,
-        {
+      if (file) {
+        setNotice(await uploadDocument(body));
+      } else {
+        const res = await fetch("/api/portal/workspace", {
           method: "POST",
-          ...(file ? {} : { headers: { "Content-Type": "application/json" } }),
-          body: file ? body : JSON.stringify(body),
-        },
-      );
-      const result = await res.json();
-      if (!res.ok)
-        throw new Error(result.error || "Unable to save. Please retry.");
-      setNotice(
-        file
-          ? "Document uploaded securely."
-          : "Saved. Any required notifications are queued for delivery.",
-      );
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const result = await readBody(res);
+        if (!res.ok)
+          throw new Error(result.error || "Unable to save. Please retry.");
+        setNotice("Saved. Any required notifications are queued for delivery.");
+      }
       try {
         await refresh();
       } catch {
@@ -114,6 +201,7 @@ export function PortalWorkspace({
       : [
           "Your load board",
           "Enter a load",
+          "My documents",
           "Company documents",
           "Company profile",
         ];
@@ -252,7 +340,7 @@ export function PortalWorkspace({
                 className="px-3 py-3 text-sm text-blue-700"
                 onClick={() => void refresh().catch((e) => setError(e.message))}
               >
-                Refresh ↻
+                Refresh ���
               </button>
             </div>
             {desk ? (
@@ -277,6 +365,18 @@ export function PortalWorkspace({
               <CarrierBoard data={data} act={send} busy={busy} />
             ) : selected === "Enter a load" ? (
               <LoadRequestForm act={send} busy={busy} />
+            ) : selected === "My documents" ? (
+              <Panel eyebrow="Your account" title="My documents">
+                <p className="mb-5 text-sm leading-6 text-slate-600">
+                  Upload shipping paperwork to your account — bills of lading,
+                  purchase orders, packing lists. Private files · PDF, JPG or
+                  PNG · up to 15 MB each. Documents stay saved to your account.
+                </p>
+                <UploadForm upload={send} busy={busy} customer />
+                <div className="mt-6">
+                  <DocumentList docs={data.documents} />
+                </div>
+              </Panel>
             ) : selected === "Company documents" ? (
               <Panel eyebrow="Your resource center" title="Company documents">
                 <p className="mb-5 text-sm text-slate-600">
@@ -315,8 +415,15 @@ export function PortalWorkspace({
                           key={load.id}
                           className="rounded-lg border p-5"
                         >
-                          <div className="flex flex-wrap justify-between gap-3">
-                            <h3 className="font-semibold">{lane(load)}</h3>
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                              {load.external_id ? (
+                                <p className="font-mono text-[11px] uppercase tracking-[.2em] text-blue-600">
+                                  Ref {load.external_id}
+                                </p>
+                              ) : null}
+                              <h3 className="font-semibold">{lane(load)}</h3>
+                            </div>
                             <Badge value={load.status} />
                           </div>
                           <LoadFacts load={load} />

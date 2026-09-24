@@ -270,7 +270,7 @@ export function ProfileForm({
             </Panel>
             <Panel title="Carrier documents">
               <p className="mb-4 text-sm text-slate-600">
-                Private files · PDF, JPG or PNG · up to 3 MB each. Save your
+                Private files · PDF, JPG or PNG · up to 15 MB each. Save your
                 draft before uploading.
               </p>
               <UploadForm upload={upload} busy={busy} />
@@ -294,10 +294,12 @@ export function UploadForm({
   upload,
   busy,
   company = false,
+  customer = false,
 }: {
   upload: Upload;
   busy: boolean;
   company?: boolean;
+  customer?: boolean;
 }) {
   return (
     <form
@@ -319,6 +321,16 @@ export function UploadForm({
               maxLength={150}
             />
           </>
+        ) : customer ? (
+          <label className="block text-sm">
+            Document type
+            <select name="kind" className={input}>
+              <option value="bol">Bill of lading (BOL)</option>
+              <option value="po">Purchase order (PO)</option>
+              <option value="packing_list">Packing list</option>
+              <option value="other">Other document</option>
+            </select>
+          </label>
         ) : (
           <label className="block text-sm">
             Document type
@@ -340,6 +352,16 @@ export function UploadForm({
             required
           />
         </label>
+        {!company && !customer ? (
+          <label className="flex gap-2 text-sm leading-5 text-slate-600">
+            <input className="mt-0.5 size-4" type="checkbox" name="split" value="yes" />
+            <span>
+              This is one combined PDF — detect and split it into separate
+              documents (packet, COI, W-9, NOA). The document type above is
+              ignored when this is on.
+            </span>
+          </label>
+        ) : null}
         <button className={secondary}>Upload securely</button>
       </fieldset>
     </form>

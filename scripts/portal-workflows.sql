@@ -17,7 +17,7 @@ create table if not exists public.fn_profiles (
 create table if not exists public.fn_documents (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.fn_profiles(user_id),
-  kind text not null check (kind in ('packet','coi','w9','noa')),
+  kind text not null check (kind in ('packet','coi','w9','noa','bol','po','packing_list','other')),
   path text not null unique,
   name text not null,
   created_at timestamptz not null default now()
