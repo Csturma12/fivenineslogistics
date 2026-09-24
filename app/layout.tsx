@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { RequestCapacityProvider } from "@/components/request-capacity-panel";
 import "./globals.css";
 import "./redesign.css";
 
@@ -51,7 +52,7 @@ export default function RootLayout({
       <body
         className={`${_geistSans.variable} ${_geistMono.variable} antialiased font-sans`}
       >
-        {children}
+        <RequestCapacityProvider>{children}</RequestCapacityProvider>
         {process.env.NODE_ENV === "production" && (
           <>
             <Analytics />

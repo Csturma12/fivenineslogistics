@@ -25,14 +25,20 @@ const labelClass = "mb-2 block font-mono text-[11px] uppercase tracking-wider te
 
 const initialState: RequestState = { status: "idle" }
 
-export function RequestCapacityForm() {
+export function RequestCapacityForm({
+  bare = false,
+  onClose,
+}: {
+  bare?: boolean
+  onClose?: () => void
+} = {}) {
   const [state, formAction, pending] = useActionState(submitRequestCapacity, initialState)
   const [mode, setMode] = useState(modes[0])
   const [cadence, setCadence] = useState(cadences[0])
 
   if (state.status === "success") {
     return (
-      <div className="rounded-xl border border-border bg-card/50 p-8">
+      <div className={bare ? "" : "rounded-xl border border-border bg-card/50 p-8"}>
         <div className="flex items-center gap-3">
           <span className="flex size-9 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary">
             <Check className="size-4" />
@@ -47,16 +53,22 @@ export function RequestCapacityForm() {
           against the same five-nines SLA as live freight.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button render={<Link href="/" />} nativeButton={false} variant="outline" className="font-medium">
-            Back to home
-          </Button>
+          {onClose ? (
+            <Button type="button" onClick={onClose} variant="outline" className="font-medium">
+              Close
+            </Button>
+          ) : (
+            <Button render={<Link href="/" />} nativeButton={false} variant="outline" className="font-medium">
+              Back to home
+            </Button>
+          )}
         </div>
       </div>
     )
   }
 
   return (
-    <form action={formAction} className="rounded-xl border border-border bg-card/50 p-6 sm:p-8">
+    <form action={formAction} className={bare ? "" : "rounded-xl border border-border bg-card/50 p-6 sm:p-8"}>
       <input type="hidden" name="requestType" value="capacity" />
       <input type="hidden" name="mode" value={mode} />
       <input type="hidden" name="cadence" value={cadence} />
