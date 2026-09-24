@@ -24,7 +24,7 @@ export async function PortalEntry({ role }: { role: PortalRole }) {
           <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
             <div className="mb-8 flex flex-wrap items-start justify-between gap-5">
               <div>
-                <p className="font-mono text-xs uppercase tracking-wider text-primary">Five Nines · Secure access</p>
+                <p className="font-mono text-xs uppercase tracking-wider text-primary">Ship Five Nines · Secure access</p>
                 <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
                   {role === "carrier" ? "Carrier portal" : "Customer portal"}
                 </h1>

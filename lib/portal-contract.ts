@@ -1,3 +1,4 @@
+export const DOCUMENT_BUCKET = "fn-private-documents";
 export type PortalRole = "carrier" | "customer";
 export type Profile = {
   user_id: string;

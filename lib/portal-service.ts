@@ -3,9 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPortalEmail } from "@/lib/portal-mail";
 import { notificationHtml } from "@/lib/portal-notification";
-import { PortalProblem, type Profile } from "@/lib/portal-contract";
+import { DOCUMENT_BUCKET, PortalProblem, type Profile } from "@/lib/portal-contract";
 
-export const BUCKET = "fn-private-documents";
+export const BUCKET = DOCUMENT_BUCKET;
 export async function portalIdentity() {
   const {
     data: { user },
