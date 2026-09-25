@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPortalEmail } from "@/lib/portal-mail";
 import { notificationHtml } from "@/lib/portal-notification";
 import { DOCUMENT_BUCKET, PortalProblem, type Profile } from "@/lib/portal-contract";
+import { verifiedPortalIdentity } from "@/lib/portal-access-policy";
 
 export const BUCKET = DOCUMENT_BUCKET;
 export async function portalIdentity() {
@@ -11,14 +12,7 @@ export async function portalIdentity() {
     data: { user },
     error,
   } = await (await createClient()).auth.getUser();
-  if (error || !user || !user.email || !user.email_confirmed_at)
-    throw new PortalProblem("Sign in to continue.", 401);
-  const staffEmails = (
-    process.env.PORTAL_STAFF_EMAILS || "sturma@blbxcritical.com"
-  )
-    .split(",")
-    .map((s) => s.trim().toLowerCase());
-  return { user, staff: staffEmails.includes(user.email.toLowerCase()) };
+  return verifiedPortalIdentity(user, error);
 }
 export function sameOrigin(req: Request) {
   if (req.headers.get("origin") !== new URL(req.url).origin)

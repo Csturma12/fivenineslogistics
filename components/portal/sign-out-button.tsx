@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { LogOut } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
-export function SignOutButton() {
+export function SignOutButton({ redirectTo = "/portal" }: { redirectTo?: "/portal" | "/agent-desk" }) {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
 
@@ -13,7 +13,7 @@ export function SignOutButton() {
     setBusy(true)
     const supabase = createClient()
     await supabase.auth.signOut()
-    router.replace("/portal")
+    router.replace(redirectTo)
     router.refresh()
   }
 

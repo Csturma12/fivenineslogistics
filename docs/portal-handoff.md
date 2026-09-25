@@ -58,7 +58,7 @@ as already live; this follow-up does not claim a new end-to-end delivery test.
 | --- | --- | --- |
 | Portal screens | Setup/profile, packet uploads, Highway invitation fallback, safe carrier board, bids/counters, customer shipment board, company documents and requests | `components/portal/workspace*.tsx`, `carrier-board.tsx`, `app/portal/home/page.tsx` |
 | Agent desk | Profile/document review, exact customer-account mapping, accept/deny/counter, reservation inbox, customer requests, company uploads, pending-email visibility | `app/agent-desk/page.tsx`, `components/portal/workspace-desk.tsx` |
-| Protected backend | Server-verified identity, staff allowlist, private files, approved-carrier checks, ownership isolation, validated inputs | `app/api/portal/workspace/route.ts`, `documents/route.ts`, `lib/portal-contract.ts`, `portal-service.ts` |
+| Protected backend | Server-verified identity, verified exact `@shipfivenines.com` staff domain, private files, approved-carrier checks, ownership isolation, validated inputs | `app/api/portal/workspace/route.ts`, `documents/route.ts`, `lib/portal-contract.ts`, `portal-service.ts`, `portal-access-policy.ts` |
 | Database | Approval state, bids, exclusive reservations, requests, durable email outbox, safe feed upsert | `scripts/portal-workflows.sql` (already applied) |
 | TAI feed interface | Explicit status, dimensions, freshness, customer account ID, separate opt-in carrier offer; preserves reservations and rejects older snapshots | `app/api/tms/loads/route.ts`, `lib/portal-ingest.ts` |
 | Close old bypasses | Public load page redirects to carrier login; signup-only legacy booking action cannot book | `app/loads/page.tsx`, `app/actions/book-load.ts` |
@@ -93,9 +93,16 @@ The development preview returns 404 outside development and never bypasses API a
 
 1. Configure the website deployment to use the approved website Supabase project and its
    existing server-only credential. Do not use the Primary Freight project or expose the service credential.
-2. Keep the existing Supabase/Resend configuration in the hosting secret settings. Set
-   `PORTAL_STAFF_EMAILS` deliberately (default owner inbox: `sturma@blbxcritical.com`).
-   This is a staff authorization list, separate from a profile's customer/carrier role.
+2. Keep the existing Supabase/Resend configuration in the hosting secret settings.
+   Agent-desk access requires a signed-in, email-confirmed, non-anonymous Supabase user
+   whose actual email has the exact `shipfivenines.com` domain. The server checks this
+   before rendering `/agent-desk`, and the same policy protects staff data/actions.
+   `PORTAL_STAFF_EMAILS` is no longer used; profile roles and editable metadata do not
+   grant staff access. Staff create an account or sign in at `/agent-desk`; staff signup
+   accepts only the company domain and emails a confirmation link before access opens.
+   Other portal users retain their customer/carrier access and ownership restrictions.
+   Staff password recovery returns to the desk. Auth confirmation/callback redirects
+   accept only the app destinations in `lib/portal-auth-routing.ts`.
    Optional `HIGHWAY_SETUP_URL` accepts only HTTPS Highway domains; otherwise manual invitation text is shown.
 3. Connect an authenticated upstream feed to `POST /api/tms/loads` using the existing
    server-side `TMS_INGEST_TOKEN`. This is a **new payload contract**, not an automatic connection.
@@ -145,6 +152,16 @@ Only a positive, explicit carrier offer plus `auto_book: true` enables reservati
 
 ## Verification evidence and limitations
 
+- Agent-desk access: run `pnpm test` for policy/routing regressions and
+  `pnpm test:access` for a production build plus HTTP page/API checks against an
+  isolated synthetic auth/data server. The build and server receive the same
+  synthetic endpoint. A preload blocks non-local fetch/HTTP/HTTPS requests;
+  this is an HTTP test guard, not a system-wide network firewall. The checks
+  assert that denied staff requests never reach the data layer.
+  They also cover staff recovery routing and confirmation/callback redirects;
+  they do not send email or verify hosted mail delivery.
+  `pnpm test:access:webpack` is the explicit Windows fallback if the default
+  Turbopack build hits the previously observed OS permission error.
 - TypeScript check passed.
 - 16 local PGlite/Postgres and validation tests passed: carrier summary snapshots/rendering,
   recipient and sensitive-field protection, permission boundaries, private projection,
