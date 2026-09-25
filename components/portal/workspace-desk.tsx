@@ -86,11 +86,12 @@ export function WorkspaceDesk({
                       accountId: f.get("accountId"),
                       status: f.get("status"),
                       note: f.get("note"),
-                      documentReviews: packets
-                        .filter((doc) => f.get(`confirm:${doc.id}`) === "yes")
-                        .map((doc) => ({
+                      documentReviews: packets.map((doc) => ({
                           id: doc.id,
-                          included_kinds: f.getAll(`packet:${doc.id}`),
+                          confirmed: f.get(`confirm:${doc.id}`) === "yes",
+                          included_kinds: f.get(`confirm:${doc.id}`) === "yes"
+                            ? f.getAll(`packet:${doc.id}`)
+                            : [],
                         })),
                     });
                   }}
@@ -138,6 +139,11 @@ export function WorkspaceDesk({
                           />
                           I opened this file and confirmed these documents.
                         </label>
+                        {doc.reviewed_at ? (
+                          <p className="mt-2 text-xs text-slate-600">
+                            Uncheck this and save a review needing changes to withdraw the earlier confirmation.
+                          </p>
+                        ) : null}
                       </fieldset>
                     ))}
                     {p.role === "carrier" ? (

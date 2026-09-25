@@ -51,7 +51,7 @@ export type PortalDoc = {
   reviewed_at?: string | null;
 };
 export const DOCUMENT_KINDS = ["packet", "coi", "w9", "noa"] as const;
-export type PacketReview = { id: string; included_kinds: string[] };
+export type PacketReview = { id: string; confirmed: boolean; included_kinds: string[] };
 
 // The server supplies the owned documents. Never trust caller-supplied coverage
 // or turn a carrier's upload selection into staff confirmation.
@@ -67,13 +67,18 @@ export function packetReviews(value: unknown, docs: PortalDoc[]): PacketReview[]
     if (!doc || !["packet", "combined"].includes(doc.kind || "") || seen.has(id))
       throw new PortalProblem("Packet changed. Refresh before reviewing.", 409);
     seen.add(id);
+    const confirmed = entry.confirmed;
+    if (typeof confirmed !== "boolean")
+      throw new PortalProblem("Confirm whether the packet was reviewed.");
     const kinds = entry.included_kinds;
     if (
       !Array.isArray(kinds) || kinds.length > DOCUMENT_KINDS.length ||
       kinds.some((kind) => !DOCUMENT_KINDS.includes(kind)) ||
       new Set(kinds).size !== kinds.length
     ) throw new PortalProblem("Choose only the documents you confirmed in the packet.");
-    return { id, included_kinds: DOCUMENT_KINDS.filter((kind) => kinds.includes(kind)) };
+    if (!confirmed && kinds.length)
+      throw new PortalProblem("Uncheck the document types before withdrawing packet review.");
+    return { id, confirmed, included_kinds: DOCUMENT_KINDS.filter((kind) => kinds.includes(kind)) };
   });
 }
 export type PortalRequest = {

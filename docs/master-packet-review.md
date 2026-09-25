@@ -18,7 +18,9 @@ website API and predates customer uploads and packet splitting.
   but never grants load-board, bid or booking access. Staff opens the private
   file and confirms only the document types actually present. The checklist
   and profile decision commit in one transaction; a stale review cannot approve
-  a newly changed profile. A replacement combined packet needs its own review.
+  a newly changed profile. Staff can withdraw a prior combined-packet review;
+  its confirmed coverage is cleared in the same transaction. A replacement
+  combined packet needs its own review.
 - Individual files and existing customer documents retain their current paths
   and permissions. Uploading a document never confirms insurance validity or
   Highway status.

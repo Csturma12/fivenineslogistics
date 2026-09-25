@@ -51,20 +51,22 @@ test("one packet does not waive profile details or current insurance", () => {
 });
 
 test("staff packet selection is allowlisted and belongs to the fetched carrier documents", () => {
-  assert.deepEqual(packetReviews([{ id: packetId, included_kinds: ["w9", "packet"] }], [pending]), [
-    { id: packetId, included_kinds: ["packet", "w9"] },
+  assert.deepEqual(packetReviews([{ id: packetId, confirmed: true, included_kinds: ["w9", "packet"] }], [pending]), [
+    { id: packetId, confirmed: true, included_kinds: ["packet", "w9"] },
   ]);
-  assert.deepEqual(packetReviews([{ id: packetId, included_kinds: [] }], [pending]), [
-    { id: packetId, included_kinds: [] },
+  assert.deepEqual(packetReviews([{ id: packetId, confirmed: false, included_kinds: [] }], [reviewed]), [
+    { id: packetId, confirmed: false, included_kinds: [] },
   ]);
   for (const value of [
     null, {}, "packet", [null],
-    [{ id: otherId, included_kinds: ["packet"] }],
-    [{ id: packetId, included_kinds: "packet" }],
-    [{ id: packetId, included_kinds: [null] }],
-    [{ id: packetId, included_kinds: ["coi", "coi"] }],
-    [{ id: packetId, included_kinds: ["approved"] }],
-    [{ id: packetId, included_kinds: [] }, { id: packetId, included_kinds: [] }],
+    [{ id: otherId, confirmed: true, included_kinds: ["packet"] }],
+    [{ id: packetId, confirmed: true, included_kinds: "packet" }],
+    [{ id: packetId, confirmed: true, included_kinds: [null] }],
+    [{ id: packetId, confirmed: true, included_kinds: ["coi", "coi"] }],
+    [{ id: packetId, confirmed: true, included_kinds: ["approved"] }],
+    [{ id: packetId, confirmed: false, included_kinds: ["packet"] }],
+    [{ id: packetId, included_kinds: [] }],
+    [{ id: packetId, confirmed: true, included_kinds: [] }, { id: packetId, confirmed: true, included_kinds: [] }],
   ]) assert.throws(() => packetReviews(value, [pending]));
-  assert.throws(() => packetReviews([{ id: packetId, included_kinds: ["coi"] }], [{ ...pending, kind: "coi" }]));
+  assert.throws(() => packetReviews([{ id: packetId, confirmed: true, included_kinds: ["coi"] }], [{ ...pending, kind: "coi" }]));
 });

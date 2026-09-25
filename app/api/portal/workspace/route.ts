@@ -383,10 +383,13 @@ export async function POST(request: Request) {
         throw new PortalProblem("Only carrier packets can be reviewed.");
       const reviewedDocs = docs.map((doc) => {
         const review = reviews.find((r) => r.id === doc.id);
-        return review ? {
-          ...doc, kind: "combined", included_kinds: review.included_kinds,
-          reviewed_at: new Date().toISOString(),
-        } : doc;
+        if (!review || (!review.confirmed && doc.kind !== "combined")) return doc;
+        return review.confirmed
+          ? {
+              ...doc, kind: "combined", included_kinds: review.included_kinds,
+              reviewed_at: new Date().toISOString(),
+            }
+          : { ...doc, included_kinds: [], reviewed_at: null };
       });
       if (status === "approved") {
         const missing = setupMissing(p, reviewedDocs, centralToday());

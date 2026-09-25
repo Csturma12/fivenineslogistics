@@ -92,7 +92,10 @@ async function review(user: string, reviews: unknown = [], options: Options = {}
   ]);
 }
 function checklist(id: string, kinds = ["packet", "coi", "w9"]) {
-  return [{ id, included_kinds: kinds }];
+  return [{ id, confirmed: true, included_kinds: kinds }];
+}
+function revoke(id: string) {
+  return [{ id, confirmed: false, included_kinds: [] }];
 }
 async function load() {
   const id = randomUUID();
@@ -279,12 +282,46 @@ test("an empty staff checklist is recorded but grants no document coverage", asy
   assert.equal(await ready(user), false);
 });
 
+test("revoking a reviewed packet removes readiness and cannot be approved in the same transaction", async () => {
+  const user = await carrier();
+  const id = await document(user);
+  await review(user, checklist(id));
+  const reviewed = await doc(id);
+  const approved = await profile(user);
+  assert.equal(await ready(user), true);
+
+  await assert.rejects(() => review(user, revoke(id)), /Approval needs/);
+  assert.deepEqual(await doc(id), reviewed);
+  assert.deepEqual(await profile(user), approved);
+  assert.equal(await ready(user), true);
+
+  await review(user, revoke(id), { status: "changes_requested" });
+  const revoked = await doc(id);
+  assert.equal(revoked.kind, "combined");
+  assert.deepEqual(revoked.included_kinds, []);
+  assert.equal(revoked.reviewed_by, null);
+  assert.equal(revoked.reviewed_at, null);
+  assert.equal((await profile(user)).status, "changes_requested");
+  assert.equal(await ready(user), false);
+  await assert.rejects(() => review(user), /Approval needs/);
+});
+
+test("unconfirming a legacy standalone packet leaves it unchanged", async () => {
+  const user = await carrier();
+  const id = await document(user, "packet", "legacy-packet.pdf");
+  const before = await doc(id);
+  await review(user, revoke(id), { status: "changes_requested" });
+  assert.deepEqual(await doc(id), before);
+});
+
 test("malformed, duplicate and arbitrary checklist entries are rejected atomically", async () => {
   const user = await carrier();
   const id = await document(user);
   const invalid: unknown[] = [
     null, {}, [null], [{ id }], [{ id, included_kinds: null }],
     [{ id, included_kinds: [null] }], [{ id, included_kinds: [1] }],
+    [{ id, confirmed: "false", included_kinds: [] }],
+    [{ id, confirmed: false, included_kinds: ["packet"] }],
     checklist(id, ["banking"]), checklist(id, ["packet", "packet"]),
     [...checklist(id), ...checklist(id)], [{ id: "invalid", included_kinds: [] }],
   ];

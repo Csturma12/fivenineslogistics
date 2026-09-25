@@ -114,6 +114,7 @@ begin
   for item in select value from jsonb_array_elements(p_document_reviews) loop
     if jsonb_typeof(item) is distinct from 'object'
       or jsonb_typeof(item->'id') is distinct from 'string'
+      or jsonb_typeof(item->'confirmed') is distinct from 'boolean'
       or jsonb_typeof(item->'included_kinds') is distinct from 'array'
       then raise exception 'Invalid document review'; end if;
     doc_id:=(item->>'id')::uuid;
@@ -131,6 +132,17 @@ begin
     select * into d from fn_documents where id=doc_id and user_id=p_user for update;
     if not found or d.kind not in ('packet','combined')
       then raise exception 'Packet not found for this carrier'; end if;
+    if (item->>'confirmed')::boolean is false then
+      if cardinality(coverage)<>0
+        then raise exception 'An unconfirmed packet cannot include document kinds'; end if;
+      -- Revocation is part of this transaction. A legacy standalone packet has
+      -- no staff coverage to revoke and retains its original kind.
+      if d.kind='combined' then
+        update fn_documents set included_kinds='{}',reviewed_by=null,reviewed_at=null
+          where id=d.id;
+      end if;
+      continue;
+    end if;
     -- Legacy packet files can be classified without reuploading. Staff inspects
     -- the actual private file; a filename is not proof of its contents or MIME.
     if d.kind='packet' or d.reviewed_by is null or d.included_kinds is distinct from coverage then
