@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { RequestCapacityButton } from "@/components/request-capacity-trigger";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { NetworkCta } from "@/components/network-cta";
@@ -43,15 +44,10 @@ export default function ModesPage() {
               services outside their own coverage.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button
-                render={<Link href="/request-capacity" />}
-                nativeButton={false}
-                size="lg"
-                className="font-medium"
-              >
+              <RequestCapacityButton size="lg" className="font-medium">
                 Request Capacity
                 <ArrowRight className="size-4" data-icon="inline-end" />
-              </Button>
+              </RequestCapacityButton>
               <Button
                 render={<Link href="/loads" />}
                 nativeButton={false}
