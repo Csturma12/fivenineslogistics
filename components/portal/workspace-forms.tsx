@@ -319,6 +319,7 @@ export function UploadForm({
   customer?: boolean;
 }) {
   const [kind, setKind] = useState("packet");
+  const [split, setSplit] = useState(false);
   return (
     <form
       className="space-y-3"
@@ -328,6 +329,7 @@ export function UploadForm({
         if (await upload(new FormData(form))) {
           form.reset();
           setKind("packet");
+          setSplit(false);
         }
       }}
     >
@@ -379,7 +381,7 @@ export function UploadForm({
             className="mt-2 block w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-blue-50 file:p-2 file:text-blue-800"
             type="file"
             name="file"
-            accept={!company && !customer && kind === "combined"
+            accept={!company && !customer && (kind === "combined" || split)
               ? "application/pdf"
               : "application/pdf,image/jpeg,image/png"}
             required
@@ -387,11 +389,19 @@ export function UploadForm({
         </label>
         {!company && !customer ? (
           <label className="flex gap-2 text-sm leading-5 text-slate-600">
-            <input className="mt-0.5 size-4" type="checkbox" name="split" value="yes" />
+            <input
+              className="mt-0.5 size-4"
+              type="checkbox"
+              name="split"
+              value="yes"
+              checked={split}
+              onChange={(event) => setSplit(event.target.checked)}
+            />
             <span>
               This is one combined PDF — detect and split it into separate
               documents (packet, COI, W-9, NOA). When selected, automatic
-              splitting replaces staff review of a combined packet.
+              splitting replaces staff review of a combined packet and ignores
+              the document type above.
             </span>
           </label>
         ) : null}

@@ -25,11 +25,12 @@ test("a 4 MB packet uses sign, direct Storage upload, then record without sendin
         ? { path: "owner/id/master.pdf", token: "one-time-token" }
         : { ok: true });
     }) as typeof fetch,
-    uploadBytes: async (path, token, uploaded) => {
+    uploadBytes: async (path, token, uploaded, contentType) => {
       assert.equal(path, "owner/id/master.pdf");
       assert.equal(token, "one-time-token");
       assert.equal(uploaded, file);
       assert.equal(uploaded.size, 4 * 1024 * 1024);
+      assert.equal(contentType, "application/pdf");
       return { error: null };
     },
   });
@@ -67,6 +68,88 @@ test("oversized files and non-PDF combined packets fail before any network call"
     uploadDocument(uploadForm(new File(["jpeg"], "packet.jpg", { type: "image/jpeg" })), { fetcher: noNetwork }),
     /must be a PDF/,
   );
+  await assert.rejects(
+    uploadDocument(uploadForm(new File(["pdf"], "packet.pdf", { type: "text/plain" })), { fetcher: noNetwork }),
+    /valid PDF, JPG or PNG/,
+  );
+  await assert.rejects(
+    uploadDocument(uploadForm(new File(["pdf"], "packet.exe", { type: "application/pdf" })), { fetcher: noNetwork }),
+    /valid PDF, JPG or PNG/,
+  );
+});
+
+test("an upload with an unknown browser MIME uses its validated file extension", async () => {
+  const file = new File(["%PDF-1.7"], "carrier.PDF");
+  let contentType = "";
+  await uploadDocument(uploadForm(file), {
+    fetcher: (async (_url, init) => Response.json(
+      JSON.parse(init?.body as string).action === "sign"
+        ? { path: "owner/id/carrier.PDF", token: "token" }
+        : { ok: true },
+    )) as typeof fetch,
+    uploadBytes: async (_path, _token, _file, mime) => {
+      contentType = mime;
+      return { error: null };
+    },
+  });
+  assert.equal(contentType, "application/pdf");
+});
+
+test("a lost record response retries the same path once and accepts an already-recorded reply", async () => {
+  const calls: Record<string, unknown>[] = [];
+  let recordAttempts = 0;
+  const message = await uploadDocument(
+    uploadForm(new File(["%PDF-1.7"], "carrier.pdf", { type: "application/pdf" })),
+    {
+      fetcher: (async (_url, init) => {
+        const body = JSON.parse(init?.body as string) as Record<string, unknown>;
+        calls.push(body);
+        if (body.action === "sign")
+          return Response.json({ path: "owner/id/carrier.pdf", token: "token" });
+        recordAttempts += 1;
+        if (recordAttempts === 1) throw new TypeError("Reply lost");
+        return Response.json({ ok: true, alreadyRecorded: true });
+      }) as typeof fetch,
+      uploadBytes: async () => ({ error: null }),
+    },
+  );
+  assert.deepEqual(calls.map((call) => call.action), ["sign", "record", "record"]);
+  assert.deepEqual(calls[1], calls[2]);
+  assert.match(message, /Add another file/);
+});
+
+test("a lost split response is not retried because it may have created documents", async () => {
+  const calls: string[] = [];
+  await assert.rejects(uploadDocument(
+    uploadForm(new File(["%PDF-1.7"], "packet.pdf", { type: "application/pdf" }), "packet", true),
+    {
+      fetcher: (async (_url, init) => {
+        const action = JSON.parse(init?.body as string).action as string;
+        calls.push(action);
+        if (action === "sign") return Response.json({ path: "owner/id/packet.pdf", token: "token" });
+        throw new TypeError("Reply lost");
+      }) as typeof fetch,
+      uploadBytes: async () => ({ error: null }),
+    },
+  ), /Refresh your documents before uploading it again/);
+  assert.deepEqual(calls, ["sign", "split"]);
+});
+
+test("two lost record responses ask for a refresh before another upload", async () => {
+  const calls: string[] = [];
+  await assert.rejects(uploadDocument(
+    uploadForm(new File(["%PDF-1.7"], "carrier.pdf", { type: "application/pdf" })),
+    {
+      fetcher: (async (_url, init) => {
+        const action = JSON.parse(init?.body as string).action as string;
+        calls.push(action);
+        if (action === "sign") return Response.json({ path: "owner/id/carrier.pdf", token: "token" });
+        throw new TypeError("Reply lost");
+      }) as typeof fetch,
+      uploadBytes: async () => ({ error: null }),
+    },
+  ), /Refresh your documents before uploading it again/);
+  assert.deepEqual(calls, ["sign", "record", "record"]);
 });
 
 test("a plain-text 413 and an unconfirmed success never appear as a saved upload", async () => {
@@ -82,5 +165,5 @@ test("a plain-text 413 and an unconfirmed success never appear as a saved upload
       )) as typeof fetch,
       uploadBytes: async () => ({ error: null }),
     },
-  ), /could not be saved/);
+  ), /Refresh your documents before uploading it again/);
 });

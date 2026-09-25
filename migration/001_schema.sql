@@ -1,6 +1,10 @@
 --
 -- PostgreSQL database dump
 --
+-- HISTORICAL SNAPSHOT: fn_documents below predates combined packets and
+-- customer document kinds. For a fresh website restore, apply
+-- scripts/portal-master-packet-upgrade.sql after this dump and before running
+-- current portal code. Do not treat this dump as the final portal schema.
 
 \restrict 956oiD4RXbwoVegXoRcpXwHrblX8TXDquCerY6FOhd4TDL0FVFdgtRXZsybTRsg
 

@@ -5,8 +5,26 @@ export const MAX_UPLOAD_BYTES = 15_728_640;
 
 type UploadDeps = {
   fetcher?: typeof fetch;
-  uploadBytes?: (path: string, token: string, file: File) => Promise<{ error: unknown }>;
+  uploadBytes?: (path: string, token: string, file: File, contentType: string) => Promise<{ error: unknown }>;
 };
+
+const MIME_BY_EXT: Record<string, string> = {
+  pdf: "application/pdf",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+};
+
+const UNCONFIRMED_UPLOAD =
+  "The upload may have finished, but confirmation was lost. Refresh your documents before uploading it again.";
+
+function uploadMime(file: File): string {
+  const extension = file.name.split(".").pop()?.toLowerCase() || "";
+  const expected = MIME_BY_EXT[extension];
+  if (!expected || (file.type && file.type !== expected))
+    throw new Error("Choose a valid PDF, JPG or PNG file.");
+  return expected;
+}
 
 export async function readPortalBody(res: Response): Promise<Record<string, unknown>> {
   const raw = await res.text();
@@ -35,7 +53,8 @@ export async function uploadDocument(form: FormData, deps: UploadDeps = {}): Pro
     throw new Error("Choose a PDF, JPG or PNG to upload.");
   if (file.size > MAX_UPLOAD_BYTES)
     throw new Error("That file is too large. Each file must be 15 MB or smaller.");
-  if ((split || kind === "combined") && file.type !== "application/pdf")
+  const contentType = uploadMime(file);
+  if ((split || kind === "combined") && contentType !== "application/pdf")
     throw new Error("A combined packet or auto-split upload must be a PDF.");
 
   const fetcher = deps.fetcher ?? fetch;
@@ -51,25 +70,44 @@ export async function uploadDocument(form: FormData, deps: UploadDeps = {}): Pro
   if (typeof path !== "string" || typeof token !== "string" || !path || !token)
     throw new Error("Upload could not start. Refresh before retrying.");
 
-  const uploadBytes = deps.uploadBytes ?? (async (uploadPath, uploadToken, uploadFile) =>
+  const uploadBytes = deps.uploadBytes ?? (async (uploadPath, uploadToken, uploadFile, mime) =>
     createClient().storage.from(DOCUMENT_BUCKET).uploadToSignedUrl(
-      uploadPath, uploadToken, uploadFile, { contentType: uploadFile.type || undefined },
+      uploadPath, uploadToken, uploadFile, { contentType: mime },
     ));
-  const { error: uploadError } = await uploadBytes(path, token, file);
+  const { error: uploadError } = await uploadBytes(path, token, file, contentType);
   if (uploadError)
     throw new Error("The file could not be uploaded. Check your connection and retry.");
 
   const action = split ? "split" : "record";
-  const finishRes = await fetcher("/api/portal/documents", {
+  const finishRequest: RequestInit = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(split
       ? { action, path }
       : { action, kind, path, name: file.name, title }),
-  });
-  const finished = await readPortalBody(finishRes);
+  };
+  let finishRes: Response;
+  let finished: Record<string, unknown>;
+  try {
+    finishRes = await fetcher("/api/portal/documents", finishRequest);
+    finished = await readPortalBody(finishRes);
+  } catch {
+    if (split) throw new Error(UNCONFIRMED_UPLOAD);
+    // A lost reply may follow a committed record. Retry the same path once;
+    // the record endpoint treats an already-recorded matching path as success.
+    try {
+      finishRes = await fetcher("/api/portal/documents", finishRequest);
+      finished = await readPortalBody(finishRes);
+    } catch {
+      throw new Error(UNCONFIRMED_UPLOAD);
+    }
+  }
   if (!finishRes.ok || finished.error || finished.ok !== true)
-    throw new Error(String(finished.error || "The document could not be saved. Refresh before retrying."));
+    throw new Error(
+      finished.error
+        ? `${String(finished.error)} Refresh your documents before uploading again.`
+        : UNCONFIRMED_UPLOAD,
+    );
   if (!split) return "Document uploaded securely. Add another file if needed.";
 
   const created = Array.isArray(finished.created)

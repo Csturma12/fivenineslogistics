@@ -13,9 +13,7 @@ before(async () => {
   await db.exec(`create schema auth; create table auth.users(id uuid primary key);
     create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
     create role anon; create role authenticated; create role service_role bypassrls;
-    grant usage on schema public to anon,authenticated,service_role;
-    grant usage on schema auth to service_role;
-    grant select on auth.users to service_role;`);
+    grant usage on schema public to anon,authenticated,service_role;`);
   await db.exec(await readFile(new URL("../scripts/portal-workflows.sql", import.meta.url), "utf8"));
   await db.query("insert into auth.users values($1)", [legacyCustomerId]);
   await db.query(`insert into fn_profiles(user_id,email,role,company)
@@ -112,7 +110,7 @@ test("one explicitly reviewed combined packet can satisfy setup and allow biddin
   assert.equal(await ready(user), true);
   assert.equal((await profile(user)).version, before.version + 1);
   const saved = await doc(id);
-  assert.deepEqual(saved.included_kinds, ["coi", "packet", "w9"]);
+  assert.deepEqual(saved.included_kinds, ["packet", "coi", "w9"]);
   assert.equal(saved.reviewed_by, staffId);
   assert.ok(saved.reviewed_at);
   const result = await db.query<{ bid: string }>(
@@ -226,11 +224,15 @@ test("anonymous and authenticated roles cannot execute review even with forged s
 test("service-only review rejects false/null staff flags and unknown actors", async () => {
   const user = await carrier();
   const id = await document(user);
+  assert.equal((await db.query<{ allowed: boolean }>(
+    "select has_table_privilege('service_role','auth.users','select') as allowed",
+  )).rows[0].allowed, false);
   await db.exec("set role service_role");
   try {
-    for (const options of [{ staff: false }, { staff: null }, { actor: null }, { actor: randomUUID() }]) {
+    for (const options of [{ staff: false }, { staff: null }, { actor: null }]) {
       await assert.rejects(() => review(user, checklist(id), options), /Staff required/);
     }
+    await assert.rejects(() => review(user, checklist(id), { actor: randomUUID() }), /foreign key/);
     await review(user, checklist(id));
   } finally { await db.exec("reset role"); }
   assert.equal(await ready(user), true);
@@ -269,8 +271,17 @@ test("unchanged review preserves the original reviewer/time; changed coverage up
   await review(user, checklist(id, ["w9", "coi", "packet"]), { actor: secondStaff });
   assert.deepEqual(await doc(id), original);
   assert.equal((await profile(user)).version, version + 1);
+
+  // Pre-existing rows may use the old alphabetical order. The same contents
+  // must not transfer audit ownership merely because their array order differs.
+  await db.query("update fn_documents set included_kinds=array['coi','packet','w9'] where id=$1", [id]);
+  const legacyOrder = await doc(id);
+  await review(user, checklist(id), { actor: secondStaff });
+  assert.deepEqual(await doc(id), legacyOrder);
+
   await review(user, checklist(id, ["packet", "coi", "w9", "noa"]), { actor: secondStaff });
   assert.equal((await doc(id)).reviewed_by, secondStaff);
+  assert.deepEqual((await doc(id)).included_kinds, ["packet", "coi", "w9", "noa"]);
 });
 
 test("an empty staff checklist is recorded but grants no document coverage", async () => {
@@ -414,5 +425,20 @@ test("reapplying the upgrade preserves reviewed data, service-only functions and
     assert.equal((await db.query<{ allowed: boolean }>(
       "select has_function_privilege($1,'fn_review_profile(uuid,boolean,uuid,integer,text,text,text,text,jsonb)','execute') as allowed", [role],
     )).rows[0].allowed, false);
+  }
+});
+
+test("historical baselines refuse to replace upgraded carrier readiness", async () => {
+  const before = (await db.query<{ body: string }>(
+    "select pg_get_functiondef('public.fn_carrier_ready(uuid)'::regprocedure) as body",
+  )).rows[0].body;
+  for (const name of ["portal-workflows.sql", "website-project-baseline.sql"]) {
+    const sql = await readFile(new URL(`../scripts/${name}`, import.meta.url), "utf8");
+    await assert.rejects(() => db.exec(sql), /Master-packet upgrade is installed/);
+    await db.exec("rollback");
+    const after = (await db.query<{ body: string }>(
+      "select pg_get_functiondef('public.fn_carrier_ready(uuid)'::regprocedure) as body",
+    )).rows[0].body;
+    assert.equal(after, before, `${name} must not replace carrier readiness`);
   }
 });

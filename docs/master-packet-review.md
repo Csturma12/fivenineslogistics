@@ -14,6 +14,10 @@ website API and predates customer uploads and packet splitting.
   carrier `split` action remains available for a combined PDF. Splitting is
   limited to 60 pages; all uploads are limited to 15 MiB. A combined PDF saved
   for staff review is not automatically classified or split.
+- A lost `record` reply retries once against the same private path; the API
+  returns success for an already saved matching path. A lost `split` reply is
+  not retried because split files may already exist. In either uncertain case,
+  users are asked to refresh their documents before uploading again.
 - A pending combined packet allows the carrier to submit a completed profile,
   but never grants load-board, bid or booking access. Staff opens the private
   file and confirms only the document types actually present. The checklist
@@ -33,7 +37,8 @@ this script against the Primary Freight operations database.
 `scripts/portal-workflows.sql` and `scripts/website-project-baseline.sql` are
 bootstrap-only scripts. Run them before the upgrade on a new database; never
 rerun them after the upgrade. Both now stop before making changes if the
-master-packet schema or review function is already installed.
+master-packet schema or review function is already installed. If using `psql`
+for setup, use `--set ON_ERROR_STOP=1` so a rejected rerun exits with an error.
 
 1. Review and apply `scripts/portal-master-packet-upgrade.sql` to the website
    database before deploying code that selects the new document columns or

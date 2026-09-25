@@ -76,6 +76,8 @@ end $$;
 
 -- This RPC is called only by the website's authenticated staff route, using its
 -- service-role client. Never pass p_staff or p_actor through from a browser.
+-- The route verifies p_actor with Auth; this invoker function must not SELECT
+-- auth.users because service_role is not guaranteed that table privilege.
 -- Profile first, then owned documents: the same order as fn_add_document.
 -- Approval and the reviewed-document checklist commit or roll back together.
 create or replace function public.fn_review_profile(
@@ -88,7 +90,6 @@ declare
   seen uuid[]:='{}'; coverage text[]; account_id text;
 begin
   if p_staff is distinct from true or p_actor is null
-    or not exists(select 1 from auth.users where id=p_actor)
     then raise exception 'Staff required'; end if;
   if p_status is null or p_status not in ('approved','changes_requested','suspended')
     then raise exception 'Choose a review outcome'; end if;
@@ -125,7 +126,9 @@ begin
       where jsonb_typeof(entry.value)<>'string'
         or (entry.value#>>'{}') not in ('packet','coi','w9','noa')
     ) then raise exception 'Invalid included document kind'; end if;
-    select coalesce(array_agg(value order by value),'{}'::text[])
+    -- Match DOCUMENT_KINDS in the portal contract, independent of input order.
+    select coalesce(array_agg(value order by
+      array_position(array['packet','coi','w9','noa']::text[],value)),'{}'::text[])
       into coverage from jsonb_array_elements_text(item->'included_kinds') entry(value);
     if cardinality(coverage)<>(select count(distinct value) from unnest(coverage) entry(value))
       then raise exception 'Duplicate included document kind'; end if;
@@ -145,7 +148,11 @@ begin
     end if;
     -- Legacy packet files can be classified without reuploading. Staff inspects
     -- the actual private file; a filename is not proof of its contents or MIME.
-    if d.kind='packet' or d.reviewed_by is null or d.included_kinds is distinct from coverage then
+    -- Compare coverage as a set so older alphabetical arrays keep their audit
+    -- timestamp when staff submits the same confirmed contents again.
+    if d.kind='packet' or d.reviewed_by is null
+      or cardinality(d.included_kinds)<>cardinality(coverage)
+      or not (d.included_kinds @> coverage and d.included_kinds <@ coverage) then
       update fn_documents set kind='combined',included_kinds=coverage,
         reviewed_by=p_actor,reviewed_at=now() where id=d.id;
     end if;

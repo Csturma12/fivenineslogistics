@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { packetReviews, setupMissing, type PortalDoc } from "../lib/portal-contract";
+import { packetReviews, setupMissing, PortalProblem, type PortalDoc } from "../lib/portal-contract";
 import { previewWorkspace } from "./portal-fixtures";
 
 const packetId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
@@ -59,14 +59,19 @@ test("staff packet selection is allowlisted and belongs to the fetched carrier d
   ]);
   for (const value of [
     null, {}, "packet", [null],
-    [{ id: otherId, confirmed: true, included_kinds: ["packet"] }],
     [{ id: packetId, confirmed: true, included_kinds: "packet" }],
     [{ id: packetId, confirmed: true, included_kinds: [null] }],
     [{ id: packetId, confirmed: true, included_kinds: ["coi", "coi"] }],
     [{ id: packetId, confirmed: true, included_kinds: ["approved"] }],
     [{ id: packetId, confirmed: false, included_kinds: ["packet"] }],
     [{ id: packetId, included_kinds: [] }],
+  ]) assert.throws(() => packetReviews(value, [pending]), PortalProblem);
+  for (const value of [
+    [{ id: otherId, confirmed: true, included_kinds: ["packet"] }],
     [{ id: packetId, confirmed: true, included_kinds: [] }, { id: packetId, confirmed: true, included_kinds: [] }],
-  ]) assert.throws(() => packetReviews(value, [pending]));
-  assert.throws(() => packetReviews([{ id: packetId, confirmed: true, included_kinds: ["coi"] }], [{ ...pending, kind: "coi" }]));
+  ]) assert.throws(
+    () => packetReviews(value, [pending]),
+    (error) => error instanceof PortalProblem && error.status === 409,
+  );
+  assert.throws(() => packetReviews([{ id: packetId, confirmed: true, included_kinds: ["coi"] }], [{ ...pending, kind: "coi" }]), PortalProblem);
 });

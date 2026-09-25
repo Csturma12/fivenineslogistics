@@ -10,6 +10,7 @@ import {
 import {
   failure,
   portalIdentity,
+  recordedDocumentState,
   requireProfile,
   result,
   sameOrigin,
@@ -202,6 +203,14 @@ export async function POST(request: Request) {
       await db.storage.from(DOCUMENT_BUCKET).remove([path]);
       throw new PortalProblem("Enter a document title.");
     }
+    const record = () => recordedDocumentState({
+      db, company, path, userId: user.id, kind, name: fileName, title,
+    });
+    const existing = await record();
+    if (existing === "matching")
+      return Response.json({ ok: true, alreadyRecorded: true });
+    if (existing === "conflict")
+      throw new PortalProblem("This upload was already saved with different details.", 409);
     const saved = company
       ? await db.from("fn_company_documents").insert({ title, path })
       : await db.rpc("fn_add_document", {
@@ -211,6 +220,13 @@ export async function POST(request: Request) {
           p_name: fileName,
         });
     if (saved.error) {
+      // Another request may have committed this path while this one waited.
+      // Never delete an object already referenced by a saved document row.
+      const afterError = await record();
+      if (afterError === "matching")
+        return Response.json({ ok: true, alreadyRecorded: true });
+      if (afterError === "conflict")
+        throw new PortalProblem("This upload was already saved with different details.", 409);
       await db.storage.from(DOCUMENT_BUCKET).remove([path]);
       throw new PortalProblem(
         "Document could not be saved. Please try again.",
