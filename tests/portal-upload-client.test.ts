@@ -95,6 +95,29 @@ test("an upload with an unknown browser MIME uses its validated file extension",
   assert.equal(contentType, "application/pdf");
 });
 
+test("common browser MIME aliases upload with the canonical Storage content type", async () => {
+  for (const [name, reportedType, canonicalType] of [
+    ["packet.pdf", "application/x-pdf", "application/pdf"],
+    ["insurance.jpg", "image/pjpeg", "image/jpeg"],
+    ["license.png", "image/x-png", "image/png"],
+    ["w9.pdf", "application/octet-stream", "application/pdf"],
+  ]) {
+    let storedType = "";
+    await uploadDocument(uploadForm(new File(["file bytes"], name, { type: reportedType }), name === "packet.pdf" ? "combined" : "other"), {
+      fetcher: (async (_url, init) => Response.json(
+        JSON.parse(init?.body as string).action === "sign"
+          ? { path: `owner/id/${name}`, token: "token" }
+          : { ok: true },
+      )) as typeof fetch,
+      uploadBytes: async (_path, _token, _file, contentType) => {
+        storedType = contentType;
+        return { error: null };
+      },
+    });
+    assert.equal(storedType, canonicalType, name);
+  }
+});
+
 test("a failed Storage transfer never records a document", async () => {
   const actions: string[] = [];
   await assert.rejects(uploadDocument(

@@ -15,13 +15,22 @@ const MIME_BY_EXT: Record<string, string> = {
   png: "image/png",
 };
 
+// Browsers and operating systems can report these types for otherwise valid
+// files. Storage receives the canonical type derived from the allowed suffix.
+const MIME_ALIASES: Record<string, readonly string[]> = {
+  "application/pdf": ["application/pdf", "application/x-pdf"],
+  "image/jpeg": ["image/jpeg", "image/pjpeg"],
+  "image/png": ["image/png", "image/x-png"],
+};
+
 const UNCONFIRMED_UPLOAD =
   "The upload may have finished, but confirmation was lost. Refresh your documents before uploading it again.";
 
 function uploadMime(file: File): string {
   const extension = file.name.split(".").pop()?.toLowerCase() || "";
   const expected = MIME_BY_EXT[extension];
-  if (!expected || (file.type && file.type !== expected))
+  const reported = file.type.toLowerCase();
+  if (!expected || (reported && reported !== "application/octet-stream" && !MIME_ALIASES[expected].includes(reported)))
     throw new Error("Choose a valid PDF, JPG or PNG file.");
   return expected;
 }
