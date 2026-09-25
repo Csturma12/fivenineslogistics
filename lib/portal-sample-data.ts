@@ -42,7 +42,8 @@ export function samplePortalWorkspace(view: string): Workspace {
     auto_book: false,
     carrier_offer_usd: null,
     tracking_location: "Huntsville, TX",
-    tracking_at: "2026-09-23T15:30:00Z",
+    // Samples render on both server and client; omit timezone-sensitive times.
+    tracking_at: null,
   };
   return {
     email: profile.email,

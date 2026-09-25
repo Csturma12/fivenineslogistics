@@ -161,8 +161,11 @@ async function stopChild(child) {
             }
         }
         assert.equal((await request('/portal/preview', 'company')).status, 404);
-        assert.equal(calls.filter(x => x.type === 'data').length, 0, 'sample pages must never query profile, shipment, or document data');
-        console.log('PASS owner-only sample views; others denied; development preview stays 404; zero data calls');
+        // This harness fetches HTML; it does not run client hydration/effects.
+        // Complement it with the browser network assertion documented in
+        // docs/evidence/portal-sample-browser.md before releasing sample UI changes.
+        assert.equal(calls.filter(x => x.type === 'data').length, 0, 'server-rendered sample pages must never query profile, shipment, or document data');
+        console.log('PASS owner-only sample HTML; others denied; development preview stays 404; zero server data calls');
         const external = await request('/agent-desk', 'external', undefined, true);
         assert.equal(external.status, 200);
         assert.match(external.text, /Agent desk access restricted/);

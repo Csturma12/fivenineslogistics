@@ -7,6 +7,7 @@ import { verifiedPortalIdentity } from "../lib/portal-access-policy";
 import { canUsePortalSamples, portalSampleView } from "../lib/portal-sample-access";
 import { samplePortalWorkspace } from "../lib/portal-sample-data";
 import { DocumentList } from "../components/portal/workspace-ui";
+import { PortalWorkspace } from "../components/portal/workspace";
 
 function user(email: string, changes: Partial<User> = {}): User {
   return { id: "sample-auth-user", aud: "authenticated", email,
@@ -56,4 +57,23 @@ test("sample document labels never link to the live document API", () => {
   assert.doesNotMatch(sample, /href=|\/api\/portal\/documents/);
   const ordinary = renderToStaticMarkup(createElement(DocumentList, { docs }));
   assert.match(ordinary, /\/api\/portal\/documents\?id=/);
+});
+
+test("customer samples render the same tracking text across server and browser timezones", () => {
+  const originalTimezone = process.env.TZ;
+  try {
+    process.env.TZ = "UTC";
+    const serverMarkup = renderToStaticMarkup(createElement(PortalWorkspace, {
+      previewData: samplePortalWorkspace("customer"),
+    }));
+    process.env.TZ = "America/Los_Angeles";
+    const browserMarkup = renderToStaticMarkup(createElement(PortalWorkspace, {
+      previewData: samplePortalWorkspace("customer"),
+    }));
+    assert.match(serverMarkup, /Last reported: Huntsville, TX/);
+    assert.equal(serverMarkup, browserMarkup);
+  } finally {
+    if (originalTimezone === undefined) delete process.env.TZ;
+    else process.env.TZ = originalTimezone;
+  }
 });
