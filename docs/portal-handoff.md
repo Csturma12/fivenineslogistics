@@ -103,7 +103,12 @@ The development preview returns 404 outside development and never bypasses API a
    Other portal users retain their customer/carrier access and ownership restrictions.
    Staff password recovery returns to the desk. Auth confirmation/callback redirects
    accept only the app destinations in `lib/portal-auth-routing.ts`.
-   Optional `HIGHWAY_SETUP_URL` accepts only HTTPS Highway domains; otherwise manual invitation text is shown.
+   Carriers currently request Highway setup by emailing `onboarding@shipfivenines.com`
+   from the checklist, verification panel or blocked load board. The mailto action
+   opens a draft; it does not send or change verification/approval. Optional
+   `HIGHWAY_SETUP_URL` still accepts only HTTPS Highway domains and remains in the
+   API/config for later use. The UI temporarily hides that link so email is the only
+   Highway setup action. Dispatch must still record verification before approval.
 3. Connect an authenticated upstream feed to `POST /api/tms/loads` using the existing
    server-side `TMS_INGEST_TOKEN`. This is a **new payload contract**, not an automatic connection.
    Do not rotate any TAI credentials. Map real data from the approved TAI integration.
