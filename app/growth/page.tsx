@@ -8,6 +8,7 @@ import {
   Truck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { RequestCapacityButton } from "@/components/request-capacity-trigger"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 
@@ -242,10 +243,10 @@ export default function GrowthPage() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button render={<Link href="/request-capacity" />} nativeButton={false} size="lg">
+                <RequestCapacityButton size="lg">
                   Talk with Five Nines
                   <ArrowRight data-icon="inline-end" />
-                </Button>
+                </RequestCapacityButton>
                 <Button render={<Link href="/carriers" />} nativeButton={false} size="lg" variant="outline">
                   Partner with us
                 </Button>

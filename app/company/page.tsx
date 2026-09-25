@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowRight, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { RequestCapacityButton } from "@/components/request-capacity-trigger"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { Method } from "@/components/method"
@@ -32,15 +33,10 @@ export default function CompanyPage() {
               {companyPage.intro}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button
-                render={<Link href="/request-capacity" />}
-                nativeButton={false}
-                size="lg"
-                className="font-medium"
-              >
+              <RequestCapacityButton size="lg" className="font-medium">
                 Request Capacity
                 <ArrowRight className="size-4" data-icon="inline-end" />
-              </Button>
+              </RequestCapacityButton>
               <Button
                 render={<Link href={site.phoneHref} />}
                 nativeButton={false}

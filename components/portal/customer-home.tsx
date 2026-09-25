@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight, FileText, Mail, Phone, ShieldCheck } from "lucide-react"
 import { site } from "@/lib/site"
+import { RequestCapacityTrigger } from "@/components/request-capacity-trigger"
 
 export function CustomerHome({ company }: { company: string }) {
   return (
@@ -23,13 +24,10 @@ export function CustomerHome({ company }: { company: string }) {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <Link
-            href="/request-capacity"
-            className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 font-mono text-[11px] uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          >
+          <RequestCapacityTrigger className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 font-mono text-[11px] uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
             Request capacity
             <ArrowRight className="size-3.5" aria-hidden="true" />
-          </Link>
+          </RequestCapacityTrigger>
           <a
             href={site.phoneHref}
             className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-border px-4 py-3 font-mono text-[11px] uppercase tracking-wider text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"

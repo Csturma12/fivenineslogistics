@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FiveNinesForged } from "@/components/five-nines-forged";
+import { RequestCapacityTrigger } from "@/components/request-capacity-trigger";
 import { site } from "@/lib/site";
 const groups = [
   {
@@ -8,7 +9,7 @@ const groups = [
     links: [
       { href: "/modes", label: "Modes & equipment" },
       { href: "/consulting", label: "Supply chain consulting" },
-      { href: "/request-capacity", label: "Request capacity" },
+      { href: "/request-capacity", label: "Request capacity", panel: true },
     ],
   },
   {
@@ -57,11 +58,17 @@ export function SiteFooter() {
             {groups.map((group) => (
               <div className="footer-links" key={group.label}>
                 <h2>{group.label}</h2>
-                {group.links.map((link) => (
-                  <Link key={link.href} href={link.href}>
-                    {link.label}
-                  </Link>
-                ))}
+                {group.links.map((link) =>
+                  "panel" in link && link.panel ? (
+                    <RequestCapacityTrigger key={link.href} className="footer-link-button">
+                      {link.label}
+                    </RequestCapacityTrigger>
+                  ) : (
+                    <Link key={link.href} href={link.href}>
+                      {link.label}
+                    </Link>
+                  ),
+                )}
               </div>
             ))}
           </nav>

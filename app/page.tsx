@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { RequestCapacityTrigger } from "@/components/request-capacity-trigger";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -88,10 +89,10 @@ export default function Page() {
               accountable.
             </p>
             <div className="hero-actions">
-              <Link href="/request-capacity" className="design-button">
+              <RequestCapacityTrigger className="design-button">
                 Plan your shipment
                 <ArrowUpRight size={19} aria-hidden="true" />
-              </Link>
+              </RequestCapacityTrigger>
               <a href={site.phoneHref} className="text-link">
                 Talk to dispatch
                 <ArrowRight size={17} aria-hidden="true" />
@@ -363,10 +364,10 @@ export default function Page() {
               </p>
             </div>
             <div className="closing-actions">
-              <Link href="/request-capacity" className="design-button">
+              <RequestCapacityTrigger className="design-button">
                 Request capacity
                 <ArrowUpRight size={20} aria-hidden="true" />
-              </Link>
+              </RequestCapacityTrigger>
               <a href={site.phoneHref}>{site.phone}</a>
               <span>Dispatch, around the clock.</span>
             </div>

@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { ArrowRight, Truck, PackageCheck } from "lucide-react"
+import { RequestCapacityTrigger } from "@/components/request-capacity-trigger"
 
 export function TwoDoors() {
   return (
@@ -20,10 +21,7 @@ export function TwoDoors() {
 
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
           {/* Shipper door */}
-          <Link
-            href="/request-capacity"
-            className="group flex flex-col rounded-xl border border-border bg-card p-8 transition-colors hover:border-primary/60 sm:p-10"
-          >
+          <RequestCapacityTrigger className="group flex w-full flex-col rounded-xl border border-border bg-card p-8 text-left transition-colors hover:border-primary/60 sm:p-10">
             <span className="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <PackageCheck className="size-5" />
             </span>
@@ -36,9 +34,9 @@ export function TwoDoors() {
             </p>
             <span className="mt-6 inline-flex items-center gap-2 font-medium text-primary">
               Request capacity
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
             </span>
-          </Link>
+          </RequestCapacityTrigger>
 
           {/* Carrier door */}
           <Link

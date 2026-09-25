@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { RequestCapacityButton } from "@/components/request-capacity-trigger"
 import { CoverageMap } from "@/components/coverage-map"
 import { hubs } from "@/lib/site"
 
@@ -35,15 +36,10 @@ export function NetworkCta() {
             </div>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-              <Button
-                render={<Link href="/request-capacity" />}
-                nativeButton={false}
-                size="lg"
-                className="font-medium"
-              >
+              <RequestCapacityButton size="lg" className="font-medium">
                 Request Capacity
                 <ArrowRight className="size-4" data-icon="inline-end" />
-              </Button>
+              </RequestCapacityButton>
               <Button
                 render={<Link href="mailto:dispatch@fivenineslogistics.com" />}
                 nativeButton={false}

@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import { FiveNinesMark } from "@/components/five-nines-mark"
 import { createClient } from "@/lib/supabase/client"
+import { RequestCapacityTrigger } from "@/components/request-capacity-trigger"
 
 type Role = "customer" | "carrier"
 type Mode = "signin" | "register"
@@ -376,13 +377,10 @@ export function PortalSignIn({ role }: { role: Role }) {
             Not yet working with Five Nines?
           </p>
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <Link
-              href="/request-capacity"
-              className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Building2 className="size-4" aria-hidden="true" />
-              Request capacity
-            </Link>
+              <RequestCapacityTrigger className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <Building2 className="size-4" aria-hidden="true" />
+                Request capacity
+              </RequestCapacityTrigger>
             <Link
               href="/carriers"
               className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-medium text-primary transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
