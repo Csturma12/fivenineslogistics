@@ -8,7 +8,8 @@
     "start": "next start",
     "check": "tsc --noEmit",
     "test": "node --import tsx --test tests/portal.test.ts tests/portal-master-packet.test.ts tests/portal-packet-contract.test.ts tests/portal-upload-client.test.ts tests/portal-access-policy.test.ts tests/portal-auth-routing.test.ts",
-    "test:access": "next build --webpack && node tests/portal-access-http.cjs"
+    "test:access": "node tests/portal-access-http.cjs",
+    "test:access:webpack": "node tests/portal-access-http.cjs --webpack"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

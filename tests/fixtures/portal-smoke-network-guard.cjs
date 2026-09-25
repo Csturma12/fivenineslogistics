@@ -1,3 +1,5 @@
+// Scope: the app's fetch/http/https clients only, not arbitrary sockets or an
+// operating-system firewall. Other host spellings intentionally fail closed.
 const allowed = ['127.0.0.1', 'localhost', '::1', '[::1]'];
 const check = input => {
     const host = typeof input === 'string' || input instanceof URL ? new URL(input).hostname : input.url ? new URL(input.url).hostname : input.hostname || input.host;

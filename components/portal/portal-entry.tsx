@@ -2,14 +2,22 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { createClient } from "@/lib/supabase/server";
-import { profileFor } from "@/lib/portal-service";
-import type { PortalRole } from "@/lib/portal-contract";
+import { portalIdentity, profileFor } from "@/lib/portal-service";
+import { PortalProblem, type PortalRole } from "@/lib/portal-contract";
 import { PortalSignIn } from "./portal-access";
 import { PortalWorkspace } from "./workspace";
 
 export async function PortalEntry({ role }: { role: PortalRole }) {
-  const { data: { user } } = await (await createClient()).auth.getUser();
+  let identity: Awaited<ReturnType<typeof portalIdentity>> | null = null;
+  try {
+    identity = await portalIdentity();
+  } catch (error) {
+    if (!(error instanceof PortalProblem) || error.status !== 401) throw error;
+  }
+  // Match the API's verified-session policy before mounting its workspace.
+  // An unconfirmed or anonymous cookie must show sign-in instead of looping
+  // between the workspace's 401 redirect and this same page.
+  const user = identity?.user;
   // Persisted onboarding role wins over a URL or a legacy account-view hint.
   const profile = user ? await profileFor(user.id) : null;
   const accountRole = profile?.role || user?.app_metadata?.role;

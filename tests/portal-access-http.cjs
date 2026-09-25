@@ -3,9 +3,9 @@ const { spawn } = require('node:child_process');
 const { once } = require('node:events');
 const path = require('node:path');
 const assert = require('node:assert/strict');
-const { existsSync } = require('node:fs');
 const cwd = path.resolve(__dirname, '..');
-assert.ok(existsSync(path.join(cwd, '.next', 'BUILD_ID')), 'Build the app before running the HTTP access tests.');
+const args = process.argv.slice(2);
+assert.ok(args.every(arg => arg === '--webpack'), 'Only the optional --webpack build flag is supported.');
 const calls = [];
 const user = { id: '11111111-1111-4111-8111-111111111111', aud: 'authenticated', role: 'authenticated', created_at: '2026-01-01T00:00:00Z', email_confirmed_at: '2026-01-01T00:00:00Z', app_metadata: {}, user_metadata: {}, is_anonymous: false };
 const users = {
@@ -34,36 +34,82 @@ const stub = http.createServer((req, res) => {
         }
         return res.end(JSON.stringify(users[kind]));
     }
+    if (req.method === 'POST' && url.pathname.startsWith('/storage/v1/object/upload/sign/fn-private-documents/company/')) {
+        calls.push({ type: 'storage-sign', method: req.method, path: url.pathname });
+        // This fake response only issues a token. No document bytes or rows are created.
+        return res.end(JSON.stringify({ url: `${url.pathname.replace('/storage/v1', '')}?token=synthetic-upload-only` }));
+    }
     calls.push({ type: 'data', method: req.method, path: url.pathname });
     if (req.method !== 'GET' && req.method !== 'HEAD') {
         res.statusCode = 500;
         return res.end('{"message":"Unexpected write"}');
     }
-    if (url.pathname.startsWith('/rest/v1/'))
+    if (url.pathname.startsWith('/rest/v1/')) {
+        res.setHeader('Content-Range', '*/0');
         return res.end('[]');
+    }
     res.statusCode = 404;
     res.end('{}');
 });
 const delay = ms => new Promise(r => setTimeout(r, ms));
 async function listen(server) { server.listen(0, '127.0.0.1'); await once(server, 'listening'); return server.address().port; }
+async function stopChild(child) {
+    if (!child || child.exitCode !== null || child.signalCode !== null) return;
+    const stopped = once(child, 'exit');
+    if (process.platform === 'win32') {
+        // Stop only the process tree spawned by this harness, including a stuck
+        // compiler worker. No other Next/dev processes are selected by name.
+        const kill = spawn('taskkill.exe', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true, stdio: 'ignore' });
+        await once(kill, 'exit');
+    } else child.kill('SIGTERM');
+    await stopped;
+}
 (async () => {
     let child, logs = '';
     try {
-        const supabasePort = await listen(stub), reservation = http.createServer(), port = await listen(reservation);
-        await new Promise(r => reservation.close(r));
-        // NextURL canonicalizes loopback hosts to localhost. Use that same
-        // origin so redirect assertions check the exact effective app origin.
-        const origin = `http://localhost:${port}`;
-        // Only synthetic credentials enter this isolated child. The preload rejects
-        // non-local traffic even if a future built bundle contains an inlined URL.
-        const env = { PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, TEMP: process.env.TEMP, TMP: process.env.TMP, NODE_ENV: 'production', NEXT_TELEMETRY_DISABLED: '1', NEXT_PUBLIC_SUPABASE_URL: `http://127.0.0.1:${supabasePort}`, NEXT_PUBLIC_SUPABASE_ANON_KEY: 'synthetic-anon-key-for-local-smoke', SUPABASE_SERVICE_ROLE_KEY: 'synthetic-service-key-for-local-smoke', NODE_OPTIONS: `--require=${JSON.stringify(path.join(__dirname, 'fixtures', 'portal-smoke-network-guard.cjs'))}` };
-        child = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '-H', '127.0.0.1', '-p', String(port)], { cwd, env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+        const supabasePort = await listen(stub);
+        // Build and runtime use the same local Auth endpoint because Next inlines
+        // NEXT_PUBLIC variables during the build. Do not reuse a hosted build.
+        const env = { PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, TEMP: process.env.TEMP, TMP: process.env.TMP, NODE_ENV: 'production', NEXT_TELEMETRY_DISABLED: '1', NEXT_PUBLIC_SUPABASE_URL: `http://127.0.0.1:${supabasePort}`, NEXT_PUBLIC_SUPABASE_ANON_KEY: 'synthetic-anon-key-for-local-smoke', SUPABASE_SERVICE_ROLE_KEY: 'synthetic-service-key-for-local-smoke' };
+        console.log(`Building production app with synthetic Auth settings${args.includes('--webpack') ? ' (webpack)' : ''}...`);
+        child = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'build', ...args], { cwd, env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
         child.stdout.on('data', x => logs += x);
         child.stderr.on('data', x => logs += x);
+        let buildTimer;
+        const exit = once(child, 'exit');
+        let buildExit;
+        try {
+            [buildExit] = await Promise.race([
+                exit,
+                new Promise((_, reject) => {
+                    buildTimer = setTimeout(() => reject(new Error('Production build timed out after 5 minutes.')), 300_000);
+                }),
+            ]);
+        } finally {
+            clearTimeout(buildTimer);
+        }
+        assert.equal(buildExit, 0, 'Production build failed.');
+        console.log('Production build passed. Starting isolated HTTP checks...');
+        logs = '';
+        // Only the runtime child uses this guard. It restricts fetch/http/https;
+        // it is not an OS firewall. Build-time public font downloads are allowed.
+        const runtimeEnv = { ...env, NODE_OPTIONS: `--require=${JSON.stringify(path.join(__dirname, 'fixtures', 'portal-smoke-network-guard.cjs'))}` };
+        // Let the OS assign the app's port directly, without a release/rebind race.
+        child = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '-H', '127.0.0.1', '-p', '0'], { cwd, env: runtimeEnv, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+        child.stdout.on('data', x => logs += x);
+        child.stderr.on('data', x => logs += x);
+        let origin;
         let ready = false;
         for (let i = 0; i < 80; i++) {
             if (child.exitCode !== null)
                 throw Error('Next exited');
+            const listening = logs.match(/Local:\s+http:\/\/127\.0\.0\.1:(\d+)(?:\s|$)/);
+            if (!listening) {
+                await delay(250);
+                continue;
+            }
+            // NextURL canonicalizes loopback hosts to localhost.
+            origin = `http://localhost:${listening[1]}`;
             try {
                 await fetch(origin + '/api/portal/workspace', { signal: AbortSignal.timeout(1000) });
                 ready = true;
@@ -82,6 +128,13 @@ async function listen(server) { server.listen(0, '127.0.0.1'); await once(server
             assert.doesNotMatch(r.text, /Portal review desk/);
             assert.equal((await request('/api/portal/workspace?desk=1', kind)).status, 401);
             console.log(`PASS ${kind || 'logged-out'} page => staff sign-in wall, desk absent; desk API 401`);
+            for (const [entry, label] of [['/portal', 'Carrier'], ['/portal/customer', 'Customer']]) {
+                const portal = await request(entry, kind);
+                assert.equal(portal.status, 200);
+                assert.match(portal.text, new RegExp(`${label} portal sign in`));
+                assert.doesNotMatch(portal.text, /Loading your workspace|Welcome to your portal/);
+                console.log(`PASS ${kind || 'logged-out'} ${entry} => sign-in wall; workspace absent`);
+            }
         }
         assert.equal(calls.filter(x => x.type === 'data').length, 0, 'unauthenticated/unverified access must not reach data');
         const external = await request('/agent-desk', 'external', undefined, true);
@@ -117,6 +170,13 @@ async function listen(server) { server.listen(0, '127.0.0.1'); await once(server
         assert.equal(desk.status, 200, desk.text);
         assert.equal(JSON.parse(desk.text).staff, true);
         console.log('PASS confirmed mixed-case company desk GET => 200 staff:true');
+        const signed = await request('/api/portal/documents', 'company', { action: 'sign', kind: 'company', name: 'synthetic.pdf', size: 50, title: 'Synthetic only' });
+        assert.equal(signed.status, 200, signed.text);
+        const signedBody = JSON.parse(signed.text);
+        assert.match(signedBody.path, /^company\/[0-9a-f-]+\/synthetic\.pdf$/);
+        assert.equal(signedBody.token, 'synthetic-upload-only');
+        assert.equal(calls.filter(x => x.type === 'storage-sign').length, 1);
+        console.log('PASS confirmed company document sign => 200 private company path; one local token response, no upload');
         const ordinary = await request('/api/portal/workspace', 'external', undefined, true);
         assert.equal(ordinary.status, 200, ordinary.text);
         assert.equal(JSON.parse(ordinary.text).staff, false);
@@ -142,7 +202,7 @@ async function listen(server) { server.listen(0, '127.0.0.1'); await once(server
             console.log(`PASS ${route} success + attacker next => same-origin ${target.pathname}`);
         }
         assert.equal(calls.filter(x => x.type === 'data' && !['GET', 'HEAD'].includes(x.method)).length, 0);
-        console.log(`SUCCESS final build: auth requests=${calls.filter(x => x.type === 'auth').length}; data reads=${calls.filter(x => x.type === 'data').length}; writes=0; local synthetic backend only; no real signup/email attempts`);
+        console.log(`SUCCESS final build: auth requests=${calls.filter(x => x.type === 'auth').length}; data reads=${calls.filter(x => x.type === 'data').length}; data writes=0; synthetic storage signatures=1; no real signup/email/upload attempts`);
     }
     catch (e) {
         console.error(e.stack || e);
@@ -150,11 +210,7 @@ async function listen(server) { server.listen(0, '127.0.0.1'); await once(server
         process.exitCode = 1;
     }
     finally {
-        if (child && child.exitCode === null) {
-            const stopped = once(child, 'exit');
-            child.kill();
-            await stopped;
-        }
+        await stopChild(child);
         await new Promise(r => stub.close(r));
         console.log('Servers stopped.');
     }

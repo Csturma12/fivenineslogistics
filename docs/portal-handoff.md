@@ -154,10 +154,14 @@ Only a positive, explicit carrier offer plus `auto_book: true` enables reservati
 
 - Agent-desk access: run `pnpm test` for policy/routing regressions and
   `pnpm test:access` for a production build plus HTTP page/API checks against an
-  isolated synthetic auth/data server. The HTTP checks block non-local network
-  access and assert that denied staff requests never reach the data layer.
+  isolated synthetic auth/data server. The build and server receive the same
+  synthetic endpoint. A preload blocks non-local fetch/HTTP/HTTPS requests;
+  this is an HTTP test guard, not a system-wide network firewall. The checks
+  assert that denied staff requests never reach the data layer.
   They also cover staff recovery routing and confirmation/callback redirects;
   they do not send email or verify hosted mail delivery.
+  `pnpm test:access:webpack` is the explicit Windows fallback if the default
+  Turbopack build hits the previously observed OS permission error.
 - TypeScript check passed.
 - 16 local PGlite/Postgres and validation tests passed: carrier summary snapshots/rendering,
   recipient and sensitive-field protection, permission boundaries, private projection,
