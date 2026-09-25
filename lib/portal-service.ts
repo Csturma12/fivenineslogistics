@@ -6,6 +6,25 @@ import { notificationHtml } from "@/lib/portal-notification";
 import { DOCUMENT_BUCKET, PortalProblem, type Profile } from "@/lib/portal-contract";
 
 export const BUCKET = DOCUMENT_BUCKET;
+const STAFF_EMAILS = (process.env.PORTAL_STAFF_EMAILS || "sturma@blbxcritical.com")
+  .split(",")
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean);
+// Verified users on these domains get staff-level access: either portal, no
+// approval/paperwork gate. Temporary bridge while carrier onboarding paperwork
+// is finalized. Override with PORTAL_STAFF_DOMAINS (comma-separated).
+const STAFF_DOMAINS = (
+  process.env.PORTAL_STAFF_DOMAINS || "shipfivenines.com,primarycompanies.com"
+)
+  .split(",")
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean);
+export function isPortalStaff(email?: string | null): boolean {
+  if (!email) return false;
+  const e = email.toLowerCase();
+  if (STAFF_EMAILS.includes(e)) return true;
+  return STAFF_DOMAINS.includes(e.split("@")[1] || "");
+}
 export async function portalIdentity() {
   const {
     data: { user },
@@ -13,12 +32,7 @@ export async function portalIdentity() {
   } = await (await createClient()).auth.getUser();
   if (error || !user || !user.email || !user.email_confirmed_at)
     throw new PortalProblem("Sign in to continue.", 401);
-  const staffEmails = (
-    process.env.PORTAL_STAFF_EMAILS || "sturma@blbxcritical.com"
-  )
-    .split(",")
-    .map((s) => s.trim().toLowerCase());
-  return { user, staff: staffEmails.includes(user.email.toLowerCase()) };
+  return { user, staff: isPortalStaff(user.email) };
 }
 export function sameOrigin(req: Request) {
   if (req.headers.get("origin") !== new URL(req.url).origin)

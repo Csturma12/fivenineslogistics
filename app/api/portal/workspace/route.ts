@@ -30,9 +30,17 @@ export async function GET(request: Request) {
     const { user, staff } = await portalIdentity();
     const db = createAdminClient();
     const profile = await profileFor(user.id);
-    const desk = new URL(request.url).searchParams.get("desk") === "1";
+    const params = new URL(request.url).searchParams;
+    const desk = params.get("desk") === "1";
     if (desk && !staff)
       throw new PortalProblem("Agent desk access required.", 403);
+    // Staff may view either portal by request; non-staff always follow their
+    // persisted profile role.
+    const requestedRole = params.get("role");
+    const viewRole =
+      staff && (requestedRole === "carrier" || requestedRole === "customer")
+        ? requestedRole
+        : profile?.role;
     const companyDocuments =
       result(
         await db.from("fn_company_documents").select("id,title").order("title"),
@@ -135,7 +143,7 @@ export async function GET(request: Request) {
           .order("created_at", { ascending: false })
           .limit(200),
       ) || [];
-    if (profile.role === "carrier") {
+    if (viewRole === "carrier") {
       const bids =
         result(
           await db
@@ -167,9 +175,10 @@ export async function GET(request: Request) {
       );
       let loads: ReturnType<typeof carrierLoad>[] = [];
       if (
-        profile.status === "approved" &&
-        profile.highway_status === "verified" &&
-        setupMissing(profile, documents, centralToday()).length === 0
+        staff ||
+        (profile.status === "approved" &&
+          profile.highway_status === "verified" &&
+          setupMissing(profile, documents, centralToday()).length === 0)
       ) {
         const rows =
           result(
@@ -191,7 +200,7 @@ export async function GET(request: Request) {
       );
     }
     const rows =
-      profile.status === "approved" && profile.customer_account_id
+      (staff || profile.status === "approved") && profile.customer_account_id
         ? result(
             await db
               .from("fn_loads")
@@ -292,22 +301,24 @@ export async function POST(request: Request) {
         throw new PortalProblem("Agent desk access required.", 403);
       if (!isStaffAction) {
         const p = await requireProfile(user.id, "carrier");
-        const docs =
-          result(
-            await db
-              .from("fn_documents")
-              .select("id,kind")
-              .eq("user_id", user.id),
-          ) || [];
-        if (
-          p.status !== "approved" ||
-          p.highway_status !== "verified" ||
-          setupMissing(p, docs, centralToday()).length
-        )
-          throw new PortalProblem(
-            "Complete approved carrier setup before bidding or booking.",
-            403,
-          );
+        if (!staff) {
+          const docs =
+            result(
+              await db
+                .from("fn_documents")
+                .select("id,kind")
+                .eq("user_id", user.id),
+            ) || [];
+          if (
+            p.status !== "approved" ||
+            p.highway_status !== "verified" ||
+            setupMissing(p, docs, centralToday()).length
+          )
+            throw new PortalProblem(
+              "Complete approved carrier setup before bidding or booking.",
+              403,
+            );
+        }
       }
       result(
         await db.rpc("fn_bid_action", {
