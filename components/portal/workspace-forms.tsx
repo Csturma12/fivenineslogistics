@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { Profile, Workspace } from "@/lib/portal-contract";
 import { centralToday, setupMissing } from "@/lib/portal-contract";
+import { HIGHWAY_ONBOARDING_EMAIL, highwayOnboardingMailto } from "@/lib/portal-highway-onboarding";
 import {
   Panel,
   Field,
@@ -17,10 +18,10 @@ import {
 export function ProfileForm({
   profile,
   documents,
-  highwayUrl,
   act,
   upload,
   busy,
+  readOnlySamples = false,
 }: {
   profile: Profile;
   documents: Workspace["documents"];
@@ -28,8 +29,11 @@ export function ProfileForm({
   act: Act;
   upload: Upload;
   busy: boolean;
+  readOnlySamples?: boolean;
 }) {
   const carrier = profile.role === "carrier";
+  const highwayVerified = profile.highway_status === "verified";
+  const highwayEmail = highwayOnboardingMailto(profile.company, highwayVerified ? "help" : "setup");
   const d = profile.details;
   const missing = setupMissing(
     profile,
@@ -234,7 +238,11 @@ export function ProfileForm({
                   2. Add one file at a time: packet, COI, W-9 and NOA if you
                   factor. A combined PDF can be reviewed by dispatch.
                 </li>
-                <li>3. Complete Highway setup and submit for review.</li>
+                <li>
+                  {highwayVerified ? "3. Highway is verified. Submit your setup for review." : (
+                    <>3. Email <a className="underline" href={highwayEmail}>{HIGHWAY_ONBOARDING_EMAIL}</a> to complete Highway setup, then submit for review.</>
+                  )}
+                </li>
                 <li>
                   4. Dispatch verifies your setup and opens load-board access.
                 </li>
@@ -259,31 +267,19 @@ export function ProfileForm({
             <Panel title="Highway verification">
               <Badge value={profile.highway_status} />
               <p className="my-4 text-sm leading-6 text-slate-600">
-                Your profile information is stored here for our team. Highway is
-                a separate secure verification process.
+                {highwayVerified
+                  ? "Your Highway verification is complete. If you need help with your setup, contact our onboarding team."
+                  : <>To complete Highway setup, email {HIGHWAY_ONBOARDING_EMAIL} with your company name and DOT/MC number. Our onboarding team will send you the next steps.</>}
               </p>
-              {highwayUrl ? (
-                <a
-                  className={button}
-                  href={highwayUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Complete Highway setup ↗
+              <div className="flex flex-wrap gap-3">
+                <a className={button} href={highwayEmail}>
+                  {highwayVerified ? "Contact onboarding" : "Email onboarding"}
                 </a>
-              ) : (
-                <p className="rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600">
-                  Dispatch will send your secure Highway invitation separately.
-                  Need an invitation?{" "}
-                  <a
-                    className="underline"
-                    href="mailto:chris@shipfivenines.com?subject=Highway%20setup%20invitation"
-                  >
-                    Contact carrier setup
-                  </a>
-                  .
-                </p>
-              )}
+              </div>
+              <p className="mt-4 text-xs leading-5 text-slate-500">
+                Dispatch confirms Highway verification and portal approval after
+                setup is complete. Sending an email does not open load-board access.
+              </p>
             </Panel>
             <Panel title="Carrier documents">
               <p className="mb-4 text-sm text-slate-600">
@@ -291,7 +287,7 @@ export function ProfileForm({
                 draft before uploading.
               </p>
               <UploadForm upload={upload} busy={busy} />
-              <DocumentList docs={documents} />
+              <DocumentList docs={documents} readOnlySamples={readOnlySamples} />
             </Panel>
           </>
         ) : (

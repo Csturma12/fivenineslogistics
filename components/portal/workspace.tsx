@@ -59,7 +59,7 @@ export function PortalWorkspace({
   }, [refresh]);
   const send = async (body: Record<string, unknown> | FormData) => {
     if (previewData) {
-      setNotice("Local preview only. No data is saved or email sent.");
+      setNotice("Test mode: this workspace action does not save, upload, book or send email.");
       return false;
     }
     if (inFlight.current) return false;
@@ -130,8 +130,8 @@ export function PortalWorkspace({
     <section className="min-h-[70vh] border-t border-slate-200 bg-grid-technical text-[#14365b]">
       {previewData ? (
         <p className="bg-amber-100 px-6 py-3 text-center text-sm text-amber-900">
-          LOCAL PREVIEW · Sample data only. Actions do not save data or send
-          email.
+          TEST MODE · Sample data only. Workspace actions do not save, upload, book
+          or send automatically. Email links open your email app.
         </p>
       ) : null}
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-14">
@@ -271,6 +271,7 @@ export function PortalWorkspace({
                 profile={p!}
                 documents={data.documents}
                 highwayUrl={data.highwayUrl}
+                readOnlySamples={!!previewData}
                 act={send}
                 upload={send}
                 busy={busy}
@@ -288,7 +289,7 @@ export function PortalWorkspace({
                 </p>
                 <UploadForm upload={send} busy={busy} customer />
                 <div className="mt-6">
-                  <DocumentList docs={data.documents} />
+                  <DocumentList docs={data.documents} readOnlySamples={!!previewData} />
                 </div>
               </Panel>
             ) : selected === "Company documents" ? (
@@ -297,7 +298,7 @@ export function PortalWorkspace({
                   Download our current company documents securely. If a document
                   is missing, contact your coordinator.
                 </p>
-                <DocumentList docs={data.companyDocuments} company />
+                <DocumentList docs={data.companyDocuments} company readOnlySamples={!!previewData} />
               </Panel>
             ) : (
               <div className="space-y-6">

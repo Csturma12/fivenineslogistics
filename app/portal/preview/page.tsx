@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { PortalWorkspace } from "@/components/portal/workspace";
-import { previewWorkspace } from "@/tests/portal-fixtures";
+import { samplePortalWorkspace } from "@/lib/portal-sample-data";
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Local portal preview",
@@ -20,7 +20,7 @@ export default async function Preview({
       <SiteHeader />
       <PortalWorkspace
         desk={view === "desk"}
-        previewData={previewWorkspace(view)}
+        previewData={samplePortalWorkspace(view)}
       />
     </main>
   );

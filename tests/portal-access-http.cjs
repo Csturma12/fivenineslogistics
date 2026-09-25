@@ -10,6 +10,7 @@ const calls = [];
 const user = { id: '11111111-1111-4111-8111-111111111111', aud: 'authenticated', role: 'authenticated', created_at: '2026-01-01T00:00:00Z', email_confirmed_at: '2026-01-01T00:00:00Z', app_metadata: {}, user_metadata: {}, is_anonymous: false };
 const users = {
     company: { ...user, email: 'Chris@ShipFiveNines.COM' },
+    colleague: { ...user, email: 'dispatch@shipfivenines.com', app_metadata: { owner: true, email: 'chris@shipfivenines.com' } },
     external: { ...user, email: 'outsider@example.test', app_metadata: { staff: true, role: 'staff' }, user_metadata: { staff: true, email: 'chris@shipfivenines.com' } },
     unconfirmed: { ...user, email: 'chris@shipfivenines.com', email_confirmed_at: null },
     anonymous: { ...user, email: 'chris@shipfivenines.com', is_anonymous: true }
@@ -137,6 +138,34 @@ async function stopChild(child) {
             }
         }
         assert.equal(calls.filter(x => x.type === 'data').length, 0, 'unauthenticated/unverified access must not reach data');
+        for (const kind of [null, 'unconfirmed', 'anonymous']) {
+            const denied = await request('/portal/test', kind);
+            assert.ok([307, 308].includes(denied.status));
+            assert.equal(new URL(denied.location, origin).pathname, '/agent-desk');
+            assert.doesNotMatch(denied.text, /Sample Carrier|Sample Customer/);
+        }
+        for (const kind of ['external', 'colleague']) {
+            const denied = await request('/portal/test', kind, undefined, true);
+            assert.equal(denied.status, 404);
+            assert.doesNotMatch(denied.text, /Sample Carrier|Sample Customer/);
+        }
+        for (const view of ['setup', 'carrier', 'customer']) {
+            const sample = await request(`/portal/test?view=${view}`, 'company');
+            assert.equal(sample.status, 200, sample.text);
+            assert.match(sample.text, /TEST MODE/);
+            assert.match(sample.text, view === 'customer' ? /Customer portal/ : /Carrier portal/);
+            assert.doesNotMatch(sample.text, /\/api\/portal\/documents\?id=/);
+            if (view === 'setup') {
+                assert.match(sample.text, /onboarding@shipfivenines\.com/);
+                assert.match(sample.text, /awaiting_invitation/);
+            }
+        }
+        assert.equal((await request('/portal/preview', 'company')).status, 404);
+        // This harness fetches HTML; it does not run client hydration/effects.
+        // Complement it with the browser network assertion documented in
+        // docs/evidence/portal-sample-browser.md before releasing sample UI changes.
+        assert.equal(calls.filter(x => x.type === 'data').length, 0, 'server-rendered sample pages must never query profile, shipment, or document data');
+        console.log('PASS owner-only sample HTML; others denied; development preview stays 404; zero server data calls');
         const external = await request('/agent-desk', 'external', undefined, true);
         assert.equal(external.status, 200);
         assert.match(external.text, /Agent desk access restricted/);
@@ -164,8 +193,12 @@ async function stopChild(child) {
         const company = await request('/agent-desk', 'company');
         assert.equal(company.status, 200);
         assert.match(company.text, /Portal review desk/);
+        assert.match(company.text, /href="\/portal\/test"/);
         assert.doesNotMatch(company.text, /Agent desk access restricted/);
         console.log('PASS company page => Portal review desk');
+        const colleague = await request('/agent-desk', 'colleague');
+        assert.equal(colleague.status, 200);
+        assert.doesNotMatch(colleague.text, /href="\/portal\/test"/);
         const desk = await request('/api/portal/workspace?desk=1', 'company');
         assert.equal(desk.status, 200, desk.text);
         assert.equal(JSON.parse(desk.text).staff, true);
