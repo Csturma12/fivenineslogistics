@@ -49,10 +49,10 @@ export function CarrierHome({ company }: { company: string }) {
             <div>
               <h3 className="text-sm font-semibold text-foreground">Carrier relations</h3>
               <a
-                href={`mailto:${site.carriersEmail}`}
+                href={`mailto:${site.onboardingEmail}`}
                 className="mt-1 block break-all text-[13px] text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
-                {site.carriersEmail}
+                {site.onboardingEmail}
               </a>
             </div>
           </div>

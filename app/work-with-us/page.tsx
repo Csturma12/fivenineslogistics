@@ -81,7 +81,7 @@ const applyBody = [
   "",
   "Please attach your résumé to this email.",
 ].join("\n")
-const applyHref = `mailto:${site.dispatchEmail}?subject=${encodeURIComponent(applySubject)}&body=${encodeURIComponent(applyBody)}`
+const applyHref = `mailto:${site.infoEmail}?subject=${encodeURIComponent(applySubject)}&body=${encodeURIComponent(applyBody)}`
 
 export default function WorkWithUsPage() {
   return (

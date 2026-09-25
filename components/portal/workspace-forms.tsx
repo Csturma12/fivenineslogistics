@@ -260,7 +260,7 @@ export function ProfileForm({
                   Need an invitation?{" "}
                   <a
                     className="underline"
-                    href="mailto:chris@shipfivenines.com?subject=Highway%20setup%20invitation"
+                    href="mailto:onboarding@shipfivenines.com?subject=Highway%20setup%20invitation"
                   >
                     Contact carrier setup
                   </a>
