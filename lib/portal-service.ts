@@ -57,6 +57,37 @@ export function result<T>(response: {
     );
   return response.data;
 }
+
+// A lost API response may follow a committed document insert. Verify the
+// owner's stored path before retrying or cleaning up its Storage object.
+export async function recordedDocumentState(input: {
+  db: ReturnType<typeof createAdminClient>;
+  company: boolean;
+  path: string;
+  userId: string;
+  kind: string;
+  name: string;
+  title: string;
+}): Promise<"absent" | "matching" | "conflict"> {
+  const { db, company, path, userId, kind, name, title } = input;
+  if (company) {
+    const { data, error } = await db.from("fn_company_documents")
+      .select("id,title").eq("path", path).maybeSingle();
+    if (error) throw new PortalProblem(
+      "Upload status could not be verified. Refresh the page before retrying.", 503,
+    );
+    if (!data) return "absent";
+    return data.title === title ? "matching" : "conflict";
+  }
+  const { data, error } = await db.from("fn_documents")
+    .select("id,user_id,kind,name").eq("path", path).maybeSingle();
+  if (error) throw new PortalProblem(
+    "Upload status could not be verified. Refresh the page before retrying.", 503,
+  );
+  if (!data) return "absent";
+  return data.user_id === userId && data.kind === kind && data.name === name
+    ? "matching" : "conflict";
+}
 export function failure(error: unknown) {
   const known = error instanceof PortalProblem;
   return Response.json(
