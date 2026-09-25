@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { FiveNinesForged } from "@/components/five-nines-forged";
+import { useRequestCapacity } from "@/components/request-capacity-panel";
 import { site } from "@/lib/site";
 const links = [
   { href: "/who-we-serve", label: "Who we serve" },
@@ -12,6 +13,7 @@ const links = [
 ];
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { openPanel } = useRequestCapacity();
   return (
     <>
       <a className="skip-link" href="#page-content">
@@ -29,8 +31,12 @@ export function SiteHeader() {
               <span className="utility-phone">· {site.phone}</span>
               <ArrowUpRight size={13} aria-hidden="true" />
             </a>
+            <Link href="/portal/customer" className="utility-signin">
+              Shipper sign in
+              <ArrowUpRight size={13} aria-hidden="true" />
+            </Link>
             <Link href="/portal" className="utility-signin">
-              Sign in
+              Carrier sign in
               <ArrowUpRight size={13} aria-hidden="true" />
             </Link>
           </span>
@@ -56,13 +62,14 @@ export function SiteHeader() {
             ))}
           </nav>
           <div className="header-actions">
-            <Link href="/portal/customer" className="portal-link">
-              Shipper Portal
-            </Link>
-            <Link href="/request-capacity" className="design-button header-cta">
+            <button
+              type="button"
+              onClick={openPanel}
+              className="design-button header-cta"
+            >
               Request capacity
               <ArrowUpRight size={16} aria-hidden="true" />
-            </Link>
+            </button>
             <button
               className="menu-toggle"
               aria-label={open ? "Close navigation" : "Open navigation"}
@@ -91,11 +98,23 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link href="/portal/customer" onClick={() => setOpen(false)}>
-              Shipper Portal
+              Shipper sign in
+              <ArrowUpRight size={18} aria-hidden="true" />
             </Link>
-            <Link href="/request-capacity" onClick={() => setOpen(false)}>
+            <Link href="/portal" onClick={() => setOpen(false)}>
+              Carrier sign in
+              <ArrowUpRight size={18} aria-hidden="true" />
+            </Link>
+            <button
+              type="button"
+              className="design-button"
+              onClick={() => {
+                setOpen(false);
+                openPanel();
+              }}
+            >
               Request capacity
-            </Link>
+            </button>
           </nav>
         )}
       </header>
