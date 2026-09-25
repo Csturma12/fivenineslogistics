@@ -47,7 +47,35 @@ export type PortalDoc = {
   title?: string;
   user_id?: string;
   created_at?: string;
+  included_kinds?: string[];
+  reviewed_at?: string | null;
 };
+export const DOCUMENT_KINDS = ["packet", "coi", "w9", "noa"] as const;
+export type PacketReview = { id: string; included_kinds: string[] };
+
+// The server supplies the owned documents. Never trust caller-supplied coverage
+// or turn a carrier's upload selection into staff confirmation.
+export function packetReviews(value: unknown, docs: PortalDoc[]): PacketReview[] {
+  if (!Array.isArray(value) || value.length > 100)
+    throw new PortalProblem("Check the packet review and try again.");
+  const seen = new Set<string>();
+  return value.map((entry) => {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry))
+      throw new PortalProblem("Check the packet review and try again.");
+    const id = uuid(entry.id);
+    const doc = docs.find((d) => d.id === id);
+    if (!doc || !["packet", "combined"].includes(doc.kind || "") || seen.has(id))
+      throw new PortalProblem("Packet changed. Refresh before reviewing.", 409);
+    seen.add(id);
+    const kinds = entry.included_kinds;
+    if (
+      !Array.isArray(kinds) || kinds.length > DOCUMENT_KINDS.length ||
+      kinds.some((kind) => !DOCUMENT_KINDS.includes(kind)) ||
+      new Set(kinds).size !== kinds.length
+    ) throw new PortalProblem("Choose only the documents you confirmed in the packet.");
+    return { id, included_kinds: DOCUMENT_KINDS.filter((kind) => kinds.includes(kind)) };
+  });
+}
 export type PortalRequest = {
   id: string;
   kind: string;
@@ -167,6 +195,7 @@ export function setupMissing(
   profile: Pick<Profile, "role" | "company" | "details">,
   docs: PortalDoc[],
   today: string,
+  mode: "approval" | "submission" = "approval",
 ): string[] {
   const missing: string[] = [];
   if (!profile.company) missing.push("Company name");
@@ -175,13 +204,20 @@ export function setupMissing(
   if (profile.role === "carrier") {
     for (const key of ["dot", "equipment", "lanes"])
       if (!profile.details[key]) missing.push(key);
+    const pendingPacket = mode === "submission" && docs.some(
+      (doc) => ["packet", "combined"].includes(doc.kind || "") && !doc.reviewed_at,
+    );
+    if (mode === "approval" && docs.some((doc) => doc.kind === "combined" && !doc.reviewed_at))
+      missing.push("Master packet review");
     for (const kind of [
       "packet",
       "coi",
       "w9",
       ...(profile.details.factoring === "yes" ? ["noa"] : []),
     ])
-      if (!docs.some((d) => d.kind === kind)) missing.push(kind.toUpperCase());
+      if (!pendingPacket && !docs.some((d) => d.kind === kind || (
+        d.kind === "combined" && !!d.reviewed_at && d.included_kinds?.includes(kind)
+      ))) missing.push(kind.toUpperCase());
     if (!["yes", "no"].includes(profile.details.factoring))
       missing.push("Factoring selection");
     if (

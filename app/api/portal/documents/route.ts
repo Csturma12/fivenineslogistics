@@ -22,7 +22,7 @@ export const runtime = "nodejs";
 // writes several files, so allow well beyond the default handler budget.
 export const maxDuration = 60;
 
-const CARRIER_KINDS = ["packet", "coi", "w9", "noa"];
+const CARRIER_KINDS = ["combined", "packet", "coi", "w9", "noa"];
 const CUSTOMER_KINDS = ["bol", "po", "packing_list", "other"];
 const MAX_BYTES = 15_728_640; // 15 MB — covers scanned BOLs and phone photos of PODs/COIs.
 const MIME_BY_EXT: Record<string, string> = {
@@ -145,6 +145,8 @@ export async function POST(request: Request) {
       const ext = extensionOf(rawName);
       if (!MIME_BY_EXT[ext])
         throw new PortalProblem("Upload a PDF, JPG or PNG.");
+      if (kind === "combined" && ext !== "pdf")
+        throw new PortalProblem("Upload the combined carrier packet as one PDF.");
       if (company && !text(payload.title, 150))
         throw new PortalProblem("Enter a document title.");
 
@@ -175,6 +177,8 @@ export async function POST(request: Request) {
     const ext = extensionOf(fileName);
     const expectedMime = MIME_BY_EXT[ext];
     if (!expectedMime) throw new PortalProblem("Upload a PDF, JPG or PNG.");
+    if (kind === "combined" && expectedMime !== "application/pdf")
+      throw new PortalProblem("Upload the combined carrier packet as one PDF.");
 
     const dir = path.slice(0, path.lastIndexOf("/"));
     const listed = result(await db.storage.from(DOCUMENT_BUCKET).list(dir));

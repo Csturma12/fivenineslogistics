@@ -1,8 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { DOCUMENT_BUCKET, type Workspace } from "@/lib/portal-contract";
-import { createClient } from "@/lib/supabase/client";
+import type { Workspace } from "@/lib/portal-contract";
+import { readPortalBody, uploadDocument } from "@/lib/portal-upload-client";
 import { SignOutButton } from "./sign-out-button";
 import { ProfileForm, LoadRequestForm, UploadForm } from "./workspace-forms";
 import { CarrierBoard } from "./carrier-board";
@@ -17,95 +17,6 @@ import {
   LoadFacts,
   Panel,
 } from "./workspace-ui";
-
-const MAX_UPLOAD_BYTES = 15_728_640; // 15 MB
-
-async function readBody(res: Response): Promise<{ error?: string; [k: string]: unknown }> {
-  const raw = await res.text();
-  if (!raw) return {};
-  try {
-    return JSON.parse(raw);
-  } catch {
-    // Non-JSON response (e.g. platform 413 "Request Entity Too Large" or a proxy error page).
-    return {
-      error:
-        res.status === 413
-          ? "That file is too large to upload. Each file must be 15 MB or smaller."
-          : `Something went wrong (${res.status || "network error"}). Please try again.`,
-    };
-  }
-}
-
-// Direct-to-storage upload. The file bytes go straight to Supabase Storage via a
-// one-time signed URL, so they never pass through the API route (which is capped
-// at ~4.5 MB on Vercel and lower behind the preview proxy). The route only issues
-// the signed URL and, afterwards, records the verified metadata.
-async function uploadDocument(form: FormData): Promise<string> {
-  const file = form.get("file");
-  const kind = String(form.get("kind") || "");
-  const title = String(form.get("title") || "");
-  const split = String(form.get("split") || "") === "yes";
-  if (!(file instanceof File) || file.size === 0)
-    throw new Error("Choose a PDF, JPG or PNG to upload.");
-  if (file.size > MAX_UPLOAD_BYTES)
-    throw new Error("That file is too large. Each file must be 15 MB or smaller.");
-  if (split && file.type !== "application/pdf")
-    throw new Error("Auto-split needs a PDF. Upload a PDF or turn off splitting.");
-
-  const signRes = await fetch("/api/portal/documents", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "sign", kind, name: file.name, title }),
-  });
-  const signed = await readBody(signRes);
-  if (!signRes.ok)
-    throw new Error(signed.error || "Upload could not start. Please retry.");
-  const { path, token } = signed as { path: string; token: string };
-
-  const { error: uploadError } = await createClient()
-    .storage.from(DOCUMENT_BUCKET)
-    .uploadToSignedUrl(path, token, file, {
-      contentType: file.type || undefined,
-    });
-  if (uploadError)
-    throw new Error(
-      "The file could not be uploaded. Check your connection and retry.",
-    );
-
-  if (split) {
-    const splitRes = await fetch("/api/portal/documents", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "split", path }),
-    });
-    const result = await readBody(splitRes);
-    if (!splitRes.ok)
-      throw new Error(
-        result.error || "The packet could not be split. Please retry.",
-      );
-    const created = Array.isArray(result.created)
-      ? (result.created as { label: string; pages: number }[])
-      : [];
-    if (created.length === 0)
-      return "Upload complete, but no separate documents were detected.";
-    const summary = created
-      .map((doc) => `${doc.label} (${doc.pages} pg)`)
-      .join(", ");
-    return `Split into ${created.length} document${created.length === 1 ? "" : "s"}: ${summary}.`;
-  }
-
-  const recordRes = await fetch("/api/portal/documents", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "record", kind, path, name: file.name, title }),
-  });
-  const recorded = await readBody(recordRes);
-  if (!recordRes.ok)
-    throw new Error(
-      recorded.error || "The document could not be saved. Please retry.",
-    );
-  return "Document uploaded securely.";
-}
 
 export function PortalWorkspace({
   desk = false,
@@ -127,10 +38,10 @@ export function PortalWorkspace({
     const res = await fetch(`/api/portal/workspace${desk ? "?desk=1" : ""}`, {
       cache: "no-store",
     });
-    const body = await readBody(res);
+    const body = await readPortalBody(res);
     if (!res.ok) {
       if (res.status === 401) window.location.assign("/portal");
-      throw new Error(body.error || "Unable to load your portal.");
+      throw new Error(String(body.error || "Unable to load your portal."));
     }
     setData(body as unknown as Workspace);
   }, [desk, previewData]);
@@ -163,9 +74,9 @@ export function PortalWorkspace({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
-        const result = await readBody(res);
+        const result = await readPortalBody(res);
         if (!res.ok)
-          throw new Error(result.error || "Unable to save. Please retry.");
+          throw new Error(String(result.error || "Unable to save. Please retry."));
         setNotice("Saved. Any required notifications are queued for delivery.");
       }
       try {

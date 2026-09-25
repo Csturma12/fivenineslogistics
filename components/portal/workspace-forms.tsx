@@ -31,7 +31,15 @@ export function ProfileForm({
 }) {
   const carrier = profile.role === "carrier";
   const d = profile.details;
-  const missing = setupMissing(profile, documents, centralToday());
+  const missing = setupMissing(
+    profile,
+    documents,
+    centralToday(),
+    carrier ? "submission" : "approval",
+  );
+  const packetAwaitingReview = documents.some(
+    (doc) => doc.kind === "combined" && !doc.reviewed_at,
+  );
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
       <Panel
@@ -222,7 +230,10 @@ export function ProfileForm({
             <Panel eyebrow="Setup checklist" title="Your next steps">
               <ol className="space-y-4 text-sm leading-6 text-slate-600">
                 <li>1. Save your business and operating details.</li>
-                <li>2. Upload the packet, COI, W9 and NOA if you factor.</li>
+                <li>
+                  2. Add one file at a time: packet, COI, W-9 and NOA if you
+                  factor. A combined PDF can be reviewed by dispatch.
+                </li>
                 <li>3. Complete Highway setup and submit for review.</li>
                 <li>
                   4. Dispatch verifies your setup and opens load-board access.
@@ -238,6 +249,12 @@ export function ProfileForm({
                   review.
                 </p>
               )}
+              {packetAwaitingReview ? (
+                <p className="mt-4 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+                  Combined packet received. Dispatch will check the documents
+                  inside before approving access.
+                </p>
+              ) : null}
             </Panel>
             <Panel title="Highway verification">
               <Badge value={profile.highway_status} />
@@ -301,16 +318,24 @@ export function UploadForm({
   company?: boolean;
   customer?: boolean;
 }) {
+  const [kind, setKind] = useState("packet");
   return (
     <form
       className="space-y-3"
       onSubmit={async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-        if (await upload(new FormData(form))) form.reset();
+        if (await upload(new FormData(form))) {
+          form.reset();
+          setKind("packet");
+        }
       }}
     >
       <fieldset disabled={busy} className="space-y-3">
+        <p className="text-sm leading-6 text-slate-600">
+          Add one file at a time. Choose its document type, upload it, then
+          repeat for any other files.
+        </p>
         {company ? (
           <>
             <input type="hidden" name="kind" value="company" />
@@ -334,21 +359,29 @@ export function UploadForm({
         ) : (
           <label className="block text-sm">
             Document type
-            <select name="kind" className={input}>
+            <select
+              name="kind"
+              className={input}
+              value={kind}
+              onChange={(event) => setKind(event.target.value)}
+            >
               <option value="packet">Carrier packet</option>
+              <option value="combined">Combined packet (one PDF for staff review)</option>
               <option value="coi">Certificate of insurance (COI)</option>
-              <option value="w9">W9</option>
+              <option value="w9">W-9</option>
               <option value="noa">Notice of assignment (NOA)</option>
             </select>
           </label>
         )}
         <label className="block text-sm">
-          Choose file
+          Choose one file
           <input
             className="mt-2 block w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-blue-50 file:p-2 file:text-blue-800"
             type="file"
             name="file"
-            accept="application/pdf,image/jpeg,image/png"
+            accept={!company && !customer && kind === "combined"
+              ? "application/pdf"
+              : "application/pdf,image/jpeg,image/png"}
             required
           />
         </label>
@@ -357,8 +390,8 @@ export function UploadForm({
             <input className="mt-0.5 size-4" type="checkbox" name="split" value="yes" />
             <span>
               This is one combined PDF — detect and split it into separate
-              documents (packet, COI, W-9, NOA). The document type above is
-              ignored when this is on.
+              documents (packet, COI, W-9, NOA). When selected, automatic
+              splitting replaces staff review of a combined packet.
             </span>
           </label>
         ) : null}
