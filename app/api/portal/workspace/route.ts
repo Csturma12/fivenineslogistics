@@ -31,11 +31,11 @@ const DOCUMENT_CHECK_FIELDS = "id,kind,included_kinds,reviewed_at";
 export async function GET(request: Request) {
   try {
     const { user, staff } = await portalIdentity();
-    const db = createAdminClient();
-    const profile = await profileFor(user.id);
     const desk = new URL(request.url).searchParams.get("desk") === "1";
     if (desk && !staff)
       throw new PortalProblem("Agent desk access required.", 403);
+    const db = createAdminClient();
+    const profile = await profileFor(user.id);
     const companyDocuments =
       result(
         await db.from("fn_company_documents").select("id,title").order("title"),

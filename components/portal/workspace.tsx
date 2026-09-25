@@ -40,7 +40,10 @@ export function PortalWorkspace({
     });
     const body = await readPortalBody(res);
     if (!res.ok) {
-      if (res.status === 401) window.location.assign("/portal");
+      if (res.status === 401 || (desk && res.status === 403)) {
+        setData(null);
+        window.location.assign(desk ? "/agent-desk" : "/portal");
+      }
       throw new Error(String(body.error || "Unable to load your portal."));
     }
     setData(body as unknown as Workspace);
@@ -160,7 +163,7 @@ export function PortalWorkspace({
                   {desk ? "My portal" : "Review portal submissions"}
                 </Link>
               ) : null}
-              {!previewData ? <SignOutButton /> : null}
+              {!previewData ? <SignOutButton redirectTo={desk ? "/agent-desk" : "/portal"} /> : null}
             </div>
           ) : null}
         </div>

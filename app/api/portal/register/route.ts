@@ -1,8 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendPortalEmail, verifyEmailHtml } from "@/lib/portal-mail"
+import { isAgentDeskEmail } from "@/lib/portal-access-policy"
 
-type Role = "customer" | "carrier"
+type Role = "customer" | "carrier" | "staff"
 
 function isEmail(v: unknown): v is string {
   return typeof v === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
@@ -34,8 +35,11 @@ export async function POST(req: NextRequest) {
   if (password.length < 8) {
     return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 })
   }
-  if (requestedRole !== "customer" && requestedRole !== "carrier") {
+  if (requestedRole !== "customer" && requestedRole !== "carrier" && requestedRole !== "staff") {
     return NextResponse.json({ error: "Choose a valid portal." }, { status: 400 })
+  }
+  if (requestedRole === "staff" && !isAgentDeskEmail(email)) {
+    return NextResponse.json({ error: "Use your @shipfivenines.com work email for the agent desk." }, { status: 400 })
   }
 
   const role: Role = requestedRole
@@ -74,10 +78,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Could not create your account. Try again." }, { status: 500 })
   }
 
-  // Role/company are trust-neutral here (they only pick the portal view), but
-  // still belong in protected app_metadata, never user-editable user_metadata.
+  // Role/company only pick the portal view. Staff access is always derived
+  // from the verified Auth email; this metadata does not grant access.
   const { error: metaErr } = await supabase.auth.admin.updateUserById(userId, {
-    app_metadata: { role, company: company ?? (role === "carrier" ? "Your authority" : "Your account") },
+    app_metadata: { role, company: company ?? (role === "staff" ? "Five Nines Logistics" : role === "carrier" ? "Your authority" : "Your account") },
   })
   if (metaErr) {
     console.error("[v0] register metadata error:", metaErr.message)
@@ -85,7 +89,7 @@ export async function POST(req: NextRequest) {
   }
 
   const confirmUrl = `${req.nextUrl.origin}/auth/confirm?token_hash=${hashedToken}&type=signup&next=${encodeURIComponent(
-    "/portal/home",
+    role === "staff" ? "/agent-desk" : "/portal/home",
   )}`
 
   const { error: mailErr } = await sendPortalEmail({

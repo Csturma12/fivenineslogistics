@@ -93,9 +93,14 @@ The development preview returns 404 outside development and never bypasses API a
 
 1. Configure the website deployment to use the approved website Supabase project and its
    existing server-only credential. Do not use the Primary Freight project or expose the service credential.
-2. Keep the existing Supabase/Resend configuration in the hosting secret settings. Set
-   `PORTAL_STAFF_EMAILS` deliberately (default owner inbox: `sturma@blbxcritical.com`).
-   This is a staff authorization list, separate from a profile's customer/carrier role.
+2. Keep the existing Supabase/Resend configuration in the hosting secret settings.
+   Agent-desk access requires a signed-in, email-confirmed, non-anonymous Supabase user
+   whose actual email has the exact `shipfivenines.com` domain. The server checks this
+   before rendering `/agent-desk`, and the same policy protects staff data/actions.
+   `PORTAL_STAFF_EMAILS` is no longer used; profile roles and editable metadata do not
+   grant staff access. Staff create an account or sign in at `/agent-desk`; staff signup
+   accepts only the company domain and emails a confirmation link before access opens.
+   other portal users retain their customer/carrier access and ownership restrictions.
    Optional `HIGHWAY_SETUP_URL` accepts only HTTPS Highway domains; otherwise manual invitation text is shown.
 3. Connect an authenticated upstream feed to `POST /api/tms/loads` using the existing
    server-side `TMS_INGEST_TOKEN`. This is a **new payload contract**, not an automatic connection.

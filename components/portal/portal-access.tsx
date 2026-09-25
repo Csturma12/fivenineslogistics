@@ -14,12 +14,25 @@ import {
 import { FiveNinesMark } from "@/components/five-nines-mark"
 import { createClient } from "@/lib/supabase/client"
 import { RequestCapacityTrigger } from "@/components/request-capacity-trigger"
+import { isAgentDeskEmail } from "@/lib/portal-access-policy"
 
-type Role = "customer" | "carrier"
+type Role = "customer" | "carrier" | "staff"
 type Mode = "signin" | "register"
 type Status = "idle" | "submitting" | "confirm" | "recovered" | "error"
 
 const roleCopy = {
+  staff: {
+    eyebrow: "Five Nines team access",
+    title: "Your operations desk.",
+    description: "Create or sign in to your verified Five Nines work account to review portal submissions and coordinate operations.",
+    steps: [
+      "Use your @shipfivenines.com work email.",
+      "Your email must be verified before access opens.",
+      "Sign in to continue directly to the agent desk.",
+    ],
+    emailPlaceholder: "you@shipfivenines.com",
+    companyPlaceholder: "Five Nines Logistics",
+  },
   customer: {
     eyebrow: "Customer access",
     title: "A direct line to your freight team.",
@@ -82,13 +95,13 @@ export function PortalSignIn({ role }: { role: Role }) {
 
   async function handleSignIn() {
     const supabase = createClient()
-    const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password })
+    const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
     if (signInErr) {
       setStatus("error")
       setError(messageForSignIn(signInErr.message))
       return
     }
-    router.replace("/portal/home")
+    router.replace(role === "staff" ? "/agent-desk" : "/portal/home")
     router.refresh()
   }
 
@@ -112,6 +125,11 @@ export function PortalSignIn({ role }: { role: Role }) {
     if (status === "submitting") return
     setStatus("submitting")
     setError("")
+    if (role === "staff" && !isAgentDeskEmail(email.trim())) {
+      setStatus("error")
+      setError("Use your @shipfivenines.com work email for the agent desk.")
+      return
+    }
     try {
       if (mode === "signin") {
         await handleSignIn()
@@ -252,7 +270,7 @@ export function PortalSignIn({ role }: { role: Role }) {
             </div>
 
             <h2 className="mt-6 text-2xl font-semibold tracking-tight text-foreground">
-              {mode === "signin"
+              {role === "staff" ? (mode === "signin" ? "Sign in with your work account" : "Create your work account") : mode === "signin"
                 ? role === "carrier"
                   ? "Carrier portal sign in"
                   : "Customer portal sign in"
@@ -261,7 +279,9 @@ export function PortalSignIn({ role }: { role: Role }) {
                   : "Create customer account"}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              {mode === "signin"
+              {role === "staff" ? (mode === "signin"
+                ? "Enter your verified @shipfivenines.com email and password."
+                : "Use your @shipfivenines.com email. You must confirm it before the agent desk opens.") : mode === "signin"
                 ? "Enter your email and password to reach your portal."
                 : "Set up your account. We'll email a link to confirm it before your first sign in."}
             </p>
@@ -312,7 +332,7 @@ export function PortalSignIn({ role }: { role: Role }) {
                       className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
                     />
                   </label>
-                  <label className="flex flex-col gap-1.5">
+                  {role !== "staff" && <label className="flex flex-col gap-1.5">
                     <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
                       Company <span className="text-muted-foreground/50">· optional</span>
                     </span>
@@ -324,7 +344,7 @@ export function PortalSignIn({ role }: { role: Role }) {
                       placeholder={copy.companyPlaceholder}
                       className="min-h-11 rounded-lg border border-input bg-background px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30 sm:text-sm"
                     />
-                  </label>
+                  </label>}
                 </div>
               )}
 
@@ -372,7 +392,7 @@ export function PortalSignIn({ role }: { role: Role }) {
           </p>
         </div>
 
-        <div className="mt-6 border-t border-border pt-5">
+        {role !== "staff" && <div className="mt-6 border-t border-border pt-5">
           <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
             Not yet working with Five Nines?
           </p>
@@ -389,7 +409,7 @@ export function PortalSignIn({ role }: { role: Role }) {
               Haul for us
             </Link>
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   )
