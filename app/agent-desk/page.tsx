@@ -1,10 +1,12 @@
 import { SiteHeader } from "@/components/site-header";
+import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { PortalWorkspace } from "@/components/portal/workspace";
 import { PortalSignIn } from "@/components/portal/portal-access";
 import { SignOutButton } from "@/components/portal/sign-out-button";
 import { portalIdentity } from "@/lib/portal-service";
 import { PortalProblem } from "@/lib/portal-contract";
+import { canUsePortalSamples } from "@/lib/portal-sample-access";
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Agent desk — Five Nines Logistics",
@@ -20,6 +22,11 @@ export default async function AgentDeskPage() {
   return (
     <main>
       <SiteHeader />
+      {canUsePortalSamples(identity) ? (
+        <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+          <Link className="text-sm font-medium text-primary underline underline-offset-4" href="/portal/test">Test carrier and customer portals with sample data →</Link>
+        </div>
+      ) : null}
       {identity?.staff ? <PortalWorkspace desk /> : (
         <section className="border-t border-border bg-grid-technical">
           <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">

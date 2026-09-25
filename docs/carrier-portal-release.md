@@ -34,6 +34,8 @@ This is the current release checklist. Earlier handoff and migration-status note
    complete. Email is temporarily the only Highway setup action; the optional
    validated Highway URL remains in the API/config for a later workflow but is not
    rendered. Staff-recorded Highway verification and portal approval remain mandatory.
+   Already verified carriers see **Contact onboarding**, which opens a support
+   draft instead of requesting another setup.
 
 ## Verification recorded locally
 

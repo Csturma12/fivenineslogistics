@@ -91,15 +91,21 @@ export function Field({
 export function DocumentList({
   docs,
   company = false,
+  readOnlySamples = false,
 }: {
   docs: PortalDoc[];
   company?: boolean;
+  readOnlySamples?: boolean;
 }) {
   return docs.length ? (
     <ul className="divide-y divide-slate-100">
       {docs.map((doc) => (
         <li key={doc.id} className="py-3">
-          <a
+          {readOnlySamples ? (
+            <span className="text-sm font-medium text-slate-600">
+              {doc.title || `${doc.kind === "combined" ? "MASTER PACKET" : doc.kind?.toUpperCase()} · ${doc.name}`} · Sample only
+            </span>
+          ) : <a
             className="text-sm font-medium text-blue-700 underline underline-offset-4"
             href={`/api/portal/documents?id=${doc.id}${company ? "&company=1" : ""}`}
             target="_blank"
@@ -107,7 +113,7 @@ export function DocumentList({
           >
             {doc.title ||
               `${doc.kind === "combined" ? "MASTER PACKET" : doc.kind?.toUpperCase()} · ${doc.name}`}
-          </a>
+          </a>}
           {!company && doc.kind === "combined" ? (
             <p className="mt-2 text-xs leading-5 text-slate-600">
               {doc.reviewed_at

@@ -21,6 +21,7 @@ export function ProfileForm({
   act,
   upload,
   busy,
+  readOnlySamples = false,
 }: {
   profile: Profile;
   documents: Workspace["documents"];
@@ -28,10 +29,11 @@ export function ProfileForm({
   act: Act;
   upload: Upload;
   busy: boolean;
+  readOnlySamples?: boolean;
 }) {
   const carrier = profile.role === "carrier";
   const highwayVerified = profile.highway_status === "verified";
-  const highwayEmail = highwayOnboardingMailto(profile.company);
+  const highwayEmail = highwayOnboardingMailto(profile.company, highwayVerified ? "help" : "setup");
   const d = profile.details;
   const missing = setupMissing(
     profile,
@@ -271,7 +273,7 @@ export function ProfileForm({
               </p>
               <div className="flex flex-wrap gap-3">
                 <a className={button} href={highwayEmail}>
-                  Email onboarding
+                  {highwayVerified ? "Contact onboarding" : "Email onboarding"}
                 </a>
               </div>
               <p className="mt-4 text-xs leading-5 text-slate-500">
@@ -285,7 +287,7 @@ export function ProfileForm({
                 draft before uploading.
               </p>
               <UploadForm upload={upload} busy={busy} />
-              <DocumentList docs={documents} />
+              <DocumentList docs={documents} readOnlySamples={readOnlySamples} />
             </Panel>
           </>
         ) : (

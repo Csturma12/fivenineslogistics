@@ -13,7 +13,7 @@ database write, or signup was used.
 | Setup, configured `https://app.highway.com/setup` | Direct Highway link; no email action | Same onboarding email actions; zero direct Highway links |
 | Blocked load board, Highway incomplete | Zero email links | One link to `onboarding@shipfivenines.com` |
 | Email subject | Generic invitation request | `Highway setup request - Example Carrier & Sons` |
-| Carrier already verified in Highway | Status badge and generic setup instructions | States that verification is complete; no instruction to complete it again |
+| Carrier already verified in Highway | Status badge and generic setup instructions | States that verification is complete; **Contact onboarding** opens a support draft rather than a setup request |
 
 The after render contains:
 
@@ -26,6 +26,22 @@ containing query-like text and line breaks stays encoded within the subject/body
 the recipient remains exactly `onboarding@shipfivenines.com` and there are only
 two query fields (`subject` and `body`). An empty company uses the subject
 `Highway setup request`.
+
+For a verified carrier, the rendered action instead uses the subject
+`Highway setup support - Example Carrier & Sons` and body
+`I need help with my existing Highway setup.` Render assertions checked the
+label, decoded subject and body for both verified and unverified states. The
+verified draft does not ask the carrier to complete setup again.
+
+The five focused regressions are runnable from the repository root:
+
+```sh
+node --import tsx --test tests/portal-highway-onboarding.test.ts
+```
+
+They render both carrier states without full-page snapshots, assert the decoded
+draft contents and recipient encoding, verify that the configured direct link
+stays hidden, and cover the blocked load-board contact action.
 
 All render assertions passed, including the configured-link case and verified
 carrier case. Email is temporarily the sole setup action. `HIGHWAY_SETUP_URL`

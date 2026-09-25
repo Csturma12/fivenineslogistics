@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { portalIdentity, profileFor } from "@/lib/portal-service";
 import { PortalProblem, type PortalRole } from "@/lib/portal-contract";
+import { canUsePortalSamples } from "@/lib/portal-sample-access";
 import { PortalSignIn } from "./portal-access";
 import { PortalWorkspace } from "./workspace";
 
@@ -27,6 +28,11 @@ export async function PortalEntry({ role }: { role: PortalRole }) {
   return (
     <main>
       <SiteHeader />
+      {canUsePortalSamples(identity) ? (
+        <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+          <Link className="text-sm font-medium text-primary underline underline-offset-4" href="/portal/test">Test carrier and customer portals with sample data →</Link>
+        </div>
+      ) : null}
       {user ? <PortalWorkspace initialRole={role} /> : (
         <section className="border-t border-border bg-grid-technical">
           <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
