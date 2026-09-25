@@ -95,6 +95,22 @@ test("an upload with an unknown browser MIME uses its validated file extension",
   assert.equal(contentType, "application/pdf");
 });
 
+test("a failed Storage transfer never records a document", async () => {
+  const actions: string[] = [];
+  await assert.rejects(uploadDocument(
+    uploadForm(new File(["%PDF-1.7"], "carrier.pdf", { type: "application/pdf" })),
+    {
+      fetcher: (async (_url, init) => {
+        const action = JSON.parse(init?.body as string).action as string;
+        actions.push(action);
+        return Response.json({ path: "owner/id/carrier.pdf", token: "token" });
+      }) as typeof fetch,
+      uploadBytes: async () => ({ error: new Error("Storage unavailable") }),
+    },
+  ), /could not be uploaded/);
+  assert.deepEqual(actions, ["sign"]);
+});
+
 test("a lost record response retries the same path once and accepts an already-recorded reply", async () => {
   const calls: Record<string, unknown>[] = [];
   let recordAttempts = 0;
