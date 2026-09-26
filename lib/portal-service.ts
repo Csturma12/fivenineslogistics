@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPortalEmail } from "@/lib/portal-mail";
 import { notificationHtml } from "@/lib/portal-notification";
 import { DOCUMENT_BUCKET, PortalProblem, type Profile } from "@/lib/portal-contract";
+import { verifiedPortalIdentity } from "@/lib/portal-access-policy";
 
 export const BUCKET = DOCUMENT_BUCKET;
 const STAFF_EMAILS = (process.env.PORTAL_STAFF_EMAILS || "sturma@blbxcritical.com")
@@ -30,9 +31,7 @@ export async function portalIdentity() {
     data: { user },
     error,
   } = await (await createClient()).auth.getUser();
-  if (error || !user || !user.email || !user.email_confirmed_at)
-    throw new PortalProblem("Sign in to continue.", 401);
-  return { user, staff: isPortalStaff(user.email) };
+  return verifiedPortalIdentity(user, error);
 }
 export function sameOrigin(req: Request) {
   if (req.headers.get("origin") !== new URL(req.url).origin)
@@ -70,6 +69,37 @@ export function result<T>(response: {
       409,
     );
   return response.data;
+}
+
+// A lost API response may follow a committed document insert. Verify the
+// owner's stored path before retrying or cleaning up its Storage object.
+export async function recordedDocumentState(input: {
+  db: ReturnType<typeof createAdminClient>;
+  company: boolean;
+  path: string;
+  userId: string;
+  kind: string;
+  name: string;
+  title: string;
+}): Promise<"absent" | "matching" | "conflict"> {
+  const { db, company, path, userId, kind, name, title } = input;
+  if (company) {
+    const { data, error } = await db.from("fn_company_documents")
+      .select("id,title").eq("path", path).maybeSingle();
+    if (error) throw new PortalProblem(
+      "Upload status could not be verified. Refresh the page before retrying.", 503,
+    );
+    if (!data) return "absent";
+    return data.title === title ? "matching" : "conflict";
+  }
+  const { data, error } = await db.from("fn_documents")
+    .select("id,user_id,kind,name").eq("path", path).maybeSingle();
+  if (error) throw new PortalProblem(
+    "Upload status could not be verified. Refresh the page before retrying.", 503,
+  );
+  if (!data) return "absent";
+  return data.user_id === userId && data.kind === kind && data.name === name
+    ? "matching" : "conflict";
 }
 export function failure(error: unknown) {
   const known = error instanceof PortalProblem;

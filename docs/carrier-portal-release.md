@@ -27,7 +27,15 @@ This is the current release checklist. Earlier handoff and migration-status note
 4. Configure a new random bridge secret of at least 32 characters server-side: Fly `WEBSITE_PORTAL_BRIDGE_TOKEN`, website `TMS_INGEST_TOKEN`, same value. Never place it in browser variables, source, logs or this document. Do not rotate any TAI credentials.
 5. Deploy the Fly bridge, initially no auto-book. Confirm the authenticated Agent Desk reports a successful sync and appropriate available-load count.
 6. Use owner-controlled accounts to verify signup/login, setup save, private upload/download, staff review, bid, counter, carrier consent and email delivery. Confirm an unrelated account cannot view a document or another carrier's bid. Do not make real bookings as a test.
-7. When supplied, configure the Highway link or continue manual invitations. Keep staff-recorded verification mandatory.
+7. The current Highway onboarding step asks carriers to email `onboarding@shipfivenines.com`.
+   The setup checklist, verification panel and blocked load board share a mailto draft
+   with the carrier name in the subject and prompts for DOT/MC/contact details. This
+   opens the carrier's email app; the portal does not send the email or mark setup
+   complete. Email is temporarily the only Highway setup action; the optional
+   validated Highway URL remains in the API/config for a later workflow but is not
+   rendered. Staff-recorded Highway verification and portal approval remain mandatory.
+   Already verified carriers see **Contact onboarding**, which opens a support
+   draft instead of requesting another setup.
 
 ## Verification recorded locally
 

@@ -1,5 +1,6 @@
 "use client";
 import type { Workspace } from "@/lib/portal-contract";
+import { DOCUMENT_KINDS } from "@/lib/portal-contract";
 import {
   Badge,
   button,
@@ -8,6 +9,7 @@ import {
   Empty,
   Field,
   DocumentList,
+  documentKindLabel,
   lane,
   Panel,
   usd,
@@ -43,7 +45,12 @@ export function WorkspaceDesk({
           come from your trusted customer record, never from signup details.
         </p>
         <div className="space-y-4">
-          {data.profiles?.map((p) => (
+          {data.profiles?.map((p) => {
+            const documents = data.documents.filter((d) => d.user_id === p.user_id);
+            const packets = p.role === "carrier"
+              ? documents.filter((d) => ["packet", "combined"].includes(d.kind || ""))
+              : [];
+            return (
             <details
               key={`${p.user_id}/${p.version}`}
               className="rounded-lg border p-4"
@@ -65,9 +72,7 @@ export function WorkspaceDesk({
                       </div>
                     ))}
                 </dl>
-                <DocumentList
-                  docs={data.documents.filter((d) => d.user_id === p.user_id)}
-                />
+                <DocumentList docs={documents} />
                 <form
                   className="mt-5"
                   onSubmit={async (e) => {
@@ -77,7 +82,17 @@ export function WorkspaceDesk({
                       action: "review_profile",
                       userId: p.user_id,
                       version: p.version,
-                      ...Object.fromEntries(f.entries()),
+                      highway: f.get("highway"),
+                      accountId: f.get("accountId"),
+                      status: f.get("status"),
+                      note: f.get("note"),
+                      documentReviews: packets.map((doc) => ({
+                          id: doc.id,
+                          confirmed: f.get(`confirm:${doc.id}`) === "yes",
+                          included_kinds: f.get(`confirm:${doc.id}`) === "yes"
+                            ? f.getAll(`packet:${doc.id}`)
+                            : [],
+                        })),
                     });
                   }}
                 >
@@ -85,6 +100,52 @@ export function WorkspaceDesk({
                     disabled={busy}
                     className="grid gap-4 sm:grid-cols-2"
                   >
+                    {packets.map((doc) => (
+                      <fieldset
+                        key={`${doc.id}/${doc.reviewed_at || "pending"}/${doc.included_kinds?.join(",") || ""}`}
+                        className="rounded-lg border border-slate-200 bg-slate-50 p-4 sm:col-span-2"
+                      >
+                        <legend className="px-1 text-sm font-semibold text-[#14365b]">
+                          Confirm packet contents: {doc.name}
+                        </legend>
+                        <p className="mb-3 text-xs leading-5 text-slate-600">
+                          Open the file above and check only the documents you
+                          verified inside. One PDF can satisfy multiple document
+                          requirements; its contents are not detected automatically.
+                        </p>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          {DOCUMENT_KINDS.map((kind) => (
+                            <label key={kind} className="flex items-start gap-2 text-sm">
+                              <input
+                                className="mt-0.5 size-4"
+                                type="checkbox"
+                                name={`packet:${doc.id}`}
+                                value={kind}
+                                defaultChecked={doc.reviewed_at
+                                  ? doc.included_kinds?.includes(kind)
+                                  : doc.kind === "packet" && kind === "packet"}
+                              />
+                              {documentKindLabel(kind)}
+                            </label>
+                          ))}
+                        </div>
+                        <label className="mt-4 flex items-start gap-2 border-t border-slate-200 pt-3 text-sm font-medium">
+                          <input
+                            className="mt-0.5 size-4"
+                            type="checkbox"
+                            name={`confirm:${doc.id}`}
+                            value="yes"
+                            defaultChecked={Boolean(doc.reviewed_at)}
+                          />
+                          I opened this file and confirmed these documents.
+                        </label>
+                        {doc.reviewed_at ? (
+                          <p className="mt-2 text-xs text-slate-600">
+                            Uncheck this and save a review needing changes to withdraw the earlier confirmation.
+                          </p>
+                        ) : null}
+                      </fieldset>
+                    ))}
                     {p.role === "carrier" ? (
                       <label className="text-sm">
                         Highway status
@@ -134,7 +195,8 @@ export function WorkspaceDesk({
                 </form>
               </div>
             </details>
-          ))}
+            );
+          })}
         </div>
         {!data.profiles?.length ? (
           <Empty>No profiles submitted yet.</Empty>

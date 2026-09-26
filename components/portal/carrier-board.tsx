@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { HIGHWAY_ONBOARDING_EMAIL, highwayOnboardingMailto } from "@/lib/portal-highway-onboarding";
 import {
   centralToday,
   setupMissing,
@@ -52,6 +53,14 @@ export function CarrierBoard({
           <Empty>
             Load-board access opens after your documents, insurance and Highway
             setup are approved. Visit Setup & profile to finish your packet.
+            {p.highway_status !== "verified" ? (
+              <span className="mt-3 block">
+                To complete Highway setup, email{" "}
+                <a className="underline" href={highwayOnboardingMailto(p.company)}>
+                  {HIGHWAY_ONBOARDING_EMAIL}
+                </a>.
+              </span>
+            ) : null}
           </Empty>
         ) : (
           <>

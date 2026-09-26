@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { Profile, Workspace } from "@/lib/portal-contract";
 import { centralToday, setupMissing } from "@/lib/portal-contract";
+import { HIGHWAY_ONBOARDING_EMAIL, highwayOnboardingMailto } from "@/lib/portal-highway-onboarding";
 import {
   Panel,
   Field,
@@ -17,10 +18,10 @@ import {
 export function ProfileForm({
   profile,
   documents,
-  highwayUrl,
   act,
   upload,
   busy,
+  readOnlySamples = false,
 }: {
   profile: Profile;
   documents: Workspace["documents"];
@@ -28,10 +29,21 @@ export function ProfileForm({
   act: Act;
   upload: Upload;
   busy: boolean;
+  readOnlySamples?: boolean;
 }) {
   const carrier = profile.role === "carrier";
+  const highwayVerified = profile.highway_status === "verified";
+  const highwayEmail = highwayOnboardingMailto(profile.company, highwayVerified ? "help" : "setup");
   const d = profile.details;
-  const missing = setupMissing(profile, documents, centralToday());
+  const missing = setupMissing(
+    profile,
+    documents,
+    centralToday(),
+    carrier ? "submission" : "approval",
+  );
+  const packetAwaitingReview = documents.some(
+    (doc) => doc.kind === "combined" && !doc.reviewed_at,
+  );
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
       <Panel
@@ -222,8 +234,15 @@ export function ProfileForm({
             <Panel eyebrow="Setup checklist" title="Your next steps">
               <ol className="space-y-4 text-sm leading-6 text-slate-600">
                 <li>1. Save your business and operating details.</li>
-                <li>2. Upload the packet, COI, W9 and NOA if you factor.</li>
-                <li>3. Complete Highway setup and submit for review.</li>
+                <li>
+                  2. Add one file at a time: packet, COI, W-9 and NOA if you
+                  factor. A combined PDF can be reviewed by dispatch.
+                </li>
+                <li>
+                  {highwayVerified ? "3. Highway is verified. Submit your setup for review." : (
+                    <>3. Email <a className="underline" href={highwayEmail}>{HIGHWAY_ONBOARDING_EMAIL}</a> to complete Highway setup, then submit for review.</>
+                  )}
+                </li>
                 <li>
                   4. Dispatch verifies your setup and opens load-board access.
                 </li>
@@ -238,35 +257,29 @@ export function ProfileForm({
                   review.
                 </p>
               )}
+              {packetAwaitingReview ? (
+                <p className="mt-4 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+                  Combined packet received. Dispatch will check the documents
+                  inside before approving access.
+                </p>
+              ) : null}
             </Panel>
             <Panel title="Highway verification">
               <Badge value={profile.highway_status} />
               <p className="my-4 text-sm leading-6 text-slate-600">
-                Your profile information is stored here for our team. Highway is
-                a separate secure verification process.
+                {highwayVerified
+                  ? "Your Highway verification is complete. If you need help with your setup, contact our onboarding team."
+                  : <>To complete Highway setup, email {HIGHWAY_ONBOARDING_EMAIL} with your company name and DOT/MC number. Our onboarding team will send you the next steps.</>}
               </p>
-              {highwayUrl ? (
-                <a
-                  className={button}
-                  href={highwayUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Complete Highway setup ↗
+              <div className="flex flex-wrap gap-3">
+                <a className={button} href={highwayEmail}>
+                  {highwayVerified ? "Contact onboarding" : "Email onboarding"}
                 </a>
-              ) : (
-                <p className="rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600">
-                  Dispatch will send your secure Highway invitation separately.
-                  Need an invitation?{" "}
-                  <a
-                    className="underline"
-                    href="mailto:onboarding@shipfivenines.com?subject=Highway%20setup%20invitation"
-                  >
-                    Contact carrier setup
-                  </a>
-                  .
-                </p>
-              )}
+              </div>
+              <p className="mt-4 text-xs leading-5 text-slate-500">
+                Dispatch confirms Highway verification and portal approval after
+                setup is complete. Sending an email does not open load-board access.
+              </p>
             </Panel>
             <Panel title="Carrier documents">
               <p className="mb-4 text-sm text-slate-600">
@@ -274,7 +287,7 @@ export function ProfileForm({
                 draft before uploading.
               </p>
               <UploadForm upload={upload} busy={busy} />
-              <DocumentList docs={documents} />
+              <DocumentList docs={documents} readOnlySamples={readOnlySamples} />
             </Panel>
           </>
         ) : (
@@ -301,16 +314,26 @@ export function UploadForm({
   company?: boolean;
   customer?: boolean;
 }) {
+  const [kind, setKind] = useState("packet");
+  const [split, setSplit] = useState(false);
   return (
     <form
       className="space-y-3"
       onSubmit={async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-        if (await upload(new FormData(form))) form.reset();
+        if (await upload(new FormData(form))) {
+          form.reset();
+          setKind("packet");
+          setSplit(false);
+        }
       }}
     >
       <fieldset disabled={busy} className="space-y-3">
+        <p className="text-sm leading-6 text-slate-600">
+          Add one file at a time. Choose its document type, upload it, then
+          repeat for any other files.
+        </p>
         {company ? (
           <>
             <input type="hidden" name="kind" value="company" />
@@ -334,31 +357,47 @@ export function UploadForm({
         ) : (
           <label className="block text-sm">
             Document type
-            <select name="kind" className={input}>
+            <select
+              name="kind"
+              className={input}
+              value={kind}
+              onChange={(event) => setKind(event.target.value)}
+            >
               <option value="packet">Carrier packet</option>
+              <option value="combined">Combined packet (one PDF for staff review)</option>
               <option value="coi">Certificate of insurance (COI)</option>
-              <option value="w9">W9</option>
+              <option value="w9">W-9</option>
               <option value="noa">Notice of assignment (NOA)</option>
             </select>
           </label>
         )}
         <label className="block text-sm">
-          Choose file
+          Choose one file
           <input
             className="mt-2 block w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-blue-50 file:p-2 file:text-blue-800"
             type="file"
             name="file"
-            accept="application/pdf,image/jpeg,image/png"
+            accept={!company && !customer && (kind === "combined" || split)
+              ? "application/pdf"
+              : "application/pdf,image/jpeg,image/png"}
             required
           />
         </label>
         {!company && !customer ? (
           <label className="flex gap-2 text-sm leading-5 text-slate-600">
-            <input className="mt-0.5 size-4" type="checkbox" name="split" value="yes" />
+            <input
+              className="mt-0.5 size-4"
+              type="checkbox"
+              name="split"
+              value="yes"
+              checked={split}
+              onChange={(event) => setSplit(event.target.checked)}
+            />
             <span>
               This is one combined PDF — detect and split it into separate
-              documents (packet, COI, W-9, NOA). The document type above is
-              ignored when this is on.
+              documents (packet, COI, W-9, NOA). When selected, automatic
+              splitting replaces staff review of a combined packet and ignores
+              the document type above.
             </span>
           </label>
         ) : null}

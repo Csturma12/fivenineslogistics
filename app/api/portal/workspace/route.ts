@@ -6,6 +6,7 @@ import {
   money,
   profileDetails,
   setupMissing,
+  packetReviews,
   safeHighwayUrl,
   text,
   uuid,
@@ -25,22 +26,16 @@ import {
 export const dynamic = "force-dynamic";
 const LOAD_FIELDS =
   "id,status,origin_city,origin_state,dest_city,dest_state,pickup_date,delivery_date,equipment,weight_lbs,dimensions,auto_book,carrier_offer_usd";
+const DOCUMENT_FIELDS = "id,user_id,kind,name,created_at,included_kinds,reviewed_at";
+const DOCUMENT_CHECK_FIELDS = "id,kind,included_kinds,reviewed_at";
 export async function GET(request: Request) {
   try {
-    const { user, staff } = await portalIdentity();
-    const db = createAdminClient();
-    const profile = await profileFor(user.id);
-    const params = new URL(request.url).searchParams;
-    const desk = params.get("desk") === "1";
+    const { user, staff } = await portalIdentity()
+    const desk = new URL(request.url).searchParams.get("desk") === "1";
     if (desk && !staff)
       throw new PortalProblem("Agent desk access required.", 403);
-    // Staff may view either portal by request; non-staff always follow their
-    // persisted profile role.
-    const requestedRole = params.get("role");
-    const viewRole =
-      staff && (requestedRole === "carrier" || requestedRole === "customer")
-        ? requestedRole
-        : profile?.role;
+    const db = createAdminClient();
+    const profile = await profileFor(user.id);
     const companyDocuments =
       result(
         await db.from("fn_company_documents").select("id,title").order("title"),
@@ -76,7 +71,7 @@ export async function GET(request: Request) {
           .limit(200),
         db
           .from("fn_documents")
-          .select("id,user_id,kind,name,created_at")
+          .select(DOCUMENT_FIELDS)
           .order("created_at", { ascending: false })
           .limit(1000),
         db
@@ -130,7 +125,7 @@ export async function GET(request: Request) {
       result(
         await db
           .from("fn_documents")
-          .select("id,kind,name,created_at")
+          .select(DOCUMENT_FIELDS)
           .eq("user_id", user.id)
           .order("created_at", { ascending: false }),
       ) || [];
@@ -267,13 +262,14 @@ export async function POST(request: Request) {
           result(
             await db
               .from("fn_documents")
-              .select("id,kind")
+              .select(DOCUMENT_CHECK_FIELDS)
               .eq("user_id", user.id),
           ) || [];
         const missing = setupMissing(
           { ...profile, company, details },
           docs,
           centralToday(),
+          "submission",
         );
         if (missing.length)
           throw new PortalProblem(`Please complete: ${missing.join(", ")}.`);
@@ -301,24 +297,22 @@ export async function POST(request: Request) {
         throw new PortalProblem("Agent desk access required.", 403);
       if (!isStaffAction) {
         const p = await requireProfile(user.id, "carrier");
-        if (!staff) {
-          const docs =
-            result(
-              await db
-                .from("fn_documents")
-                .select("id,kind")
-                .eq("user_id", user.id),
-            ) || [];
-          if (
-            p.status !== "approved" ||
-            p.highway_status !== "verified" ||
-            setupMissing(p, docs, centralToday()).length
-          )
-            throw new PortalProblem(
-              "Complete approved carrier setup before bidding or booking.",
-              403,
-            );
-        }
+        const docs =
+          result(
+            await db
+              .from("fn_documents")
+              .select(DOCUMENT_CHECK_FIELDS)
+              .eq("user_id", user.id),
+          ) || [];
+        if (
+          p.status !== "approved" ||
+          p.highway_status !== "verified" ||
+          setupMissing(p, docs, centralToday()).length
+        )
+          throw new PortalProblem(
+            "Complete approved carrier setup before bidding or booking.",
+            403,
+          );
       }
       result(
         await db.rpc("fn_bid_action", {
@@ -380,15 +374,26 @@ export async function POST(request: Request) {
         ? body.highway
         : p.highway_status;
       const account = text(body.accountId || "", 120);
+      if (!Number.isSafeInteger(body.version) || body.version < 1)
+        throw new PortalProblem("Profile changed. Refresh before reviewing.", 409);
+      const docs = result(
+        await db.from("fn_documents").select(DOCUMENT_CHECK_FIELDS).eq("user_id", p.user_id),
+      ) || [];
+      const reviews = packetReviews(body.documentReviews ?? [], docs);
+      if (p.role !== "carrier" && reviews.length)
+        throw new PortalProblem("Only carrier packets can be reviewed.");
+      const reviewedDocs = docs.map((doc) => {
+        const review = reviews.find((r) => r.id === doc.id);
+        if (!review || (!review.confirmed && doc.kind !== "combined")) return doc;
+        return review.confirmed
+          ? {
+              ...doc, kind: "combined", included_kinds: review.included_kinds,
+              reviewed_at: new Date().toISOString(),
+            }
+          : { ...doc, included_kinds: [], reviewed_at: null };
+      });
       if (status === "approved") {
-        const docs =
-          result(
-            await db
-              .from("fn_documents")
-              .select("id,kind")
-              .eq("user_id", p.user_id),
-          ) || [];
-        const missing = setupMissing(p, docs, centralToday());
+        const missing = setupMissing(p, reviewedDocs, centralToday());
         if (p.role === "carrier" && highway !== "verified")
           missing.push("Highway verification");
         if (p.role === "customer" && !account)
@@ -396,26 +401,19 @@ export async function POST(request: Request) {
         if (missing.length)
           throw new PortalProblem(`Approval needs: ${missing.join(", ")}.`);
       }
-      const updated = result(
-        await db
-          .from("fn_profiles")
-          .update({
-            status,
-            highway_status: highway,
-            customer_account_id: p.role === "customer" ? account || null : null,
-            review_note: text(body.note || "", 1000),
-            version: p.version + 1,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("user_id", p.user_id)
-          .eq("version", body.version)
-          .select("user_id"),
-      );
-      if (!updated?.length)
-        throw new PortalProblem(
-          "Profile changed. Refresh before reviewing.",
-          409,
-        );
+      // One transaction records the checklist and the approval. Uploads/profile
+      // edits bump this same version, so a stale review cannot grant access.
+      result(await db.rpc("fn_review_profile", {
+        p_actor: user.id,
+        p_staff: staff,
+        p_user: p.user_id,
+        p_version: body.version,
+        p_status: status,
+        p_highway: highway,
+        p_account: p.role === "customer" ? account : "",
+        p_note: text(body.note || "", 1000),
+        p_document_reviews: reviews,
+      }));
     } else if (action === "complete_request") {
       if (!staff) throw new PortalProblem("Agent desk access required.", 403);
       result(

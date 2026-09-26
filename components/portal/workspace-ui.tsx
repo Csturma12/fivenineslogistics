@@ -10,6 +10,16 @@ export const input =
   "mt-1.5 w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:outline-2 focus:outline-blue-500";
 export type Act = (body: Record<string, unknown>) => Promise<boolean>;
 export type Upload = (data: FormData) => Promise<boolean>;
+export const documentKindLabel = (kind: string) =>
+  kind === "packet"
+    ? "Carrier packet"
+    : kind === "coi"
+      ? "Certificate of insurance (COI)"
+      : kind === "w9"
+        ? "W-9"
+        : kind === "noa"
+          ? "Notice of assignment (NOA)"
+          : kind.toUpperCase();
 export function Panel({
   title,
   eyebrow,
@@ -81,22 +91,36 @@ export function Field({
 export function DocumentList({
   docs,
   company = false,
+  readOnlySamples = false,
 }: {
   docs: PortalDoc[];
   company?: boolean;
+  readOnlySamples?: boolean;
 }) {
   return docs.length ? (
     <ul className="divide-y divide-slate-100">
       {docs.map((doc) => (
         <li key={doc.id} className="py-3">
-          <a
+          {readOnlySamples ? (
+            <span className="text-sm font-medium text-slate-600">
+              {doc.title || `${doc.kind === "combined" ? "MASTER PACKET" : doc.kind?.toUpperCase()} · ${doc.name}`} · Sample only
+            </span>
+          ) : <a
             className="text-sm font-medium text-blue-700 underline underline-offset-4"
             href={`/api/portal/documents?id=${doc.id}${company ? "&company=1" : ""}`}
             target="_blank"
             rel="noreferrer"
           >
-            {doc.title || `${doc.kind?.toUpperCase()} · ${doc.name}`}
-          </a>
+            {doc.title ||
+              `${doc.kind === "combined" ? "MASTER PACKET" : doc.kind?.toUpperCase()} · ${doc.name}`}
+          </a>}
+          {!company && doc.kind === "combined" ? (
+            <p className="mt-2 text-xs leading-5 text-slate-600">
+              {doc.reviewed_at
+                ? `Staff reviewed ${new Date(doc.reviewed_at).toLocaleDateString("en-US")} · Confirmed contents: ${doc.included_kinds?.length ? doc.included_kinds.map(documentKindLabel).join(", ") : "none confirmed"}.`
+                : "Received — awaiting staff review of the documents inside."}
+            </p>
+          ) : null}
         </li>
       ))}
     </ul>

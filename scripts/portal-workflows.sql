@@ -1,6 +1,16 @@
 -- Five Nines WEBSITE database only. Never apply this to the freight dashboard.
 -- All access passes through verified server routes; no direct browser grants.
 begin;
+-- Bootstrap only: rerunning this script after the master-packet upgrade would
+-- replace its carrier-readiness function with the historical definition.
+do $$ begin
+  if to_regprocedure('public.fn_review_profile(uuid,boolean,uuid,integer,text,text,text,text,jsonb)') is not null
+    or exists (select 1 from pg_attribute
+      where attrelid=to_regclass('public.fn_documents')
+        and attname='included_kinds' and not attisdropped) then
+    raise exception 'Master-packet upgrade is installed. Do not rerun baseline SQL.';
+  end if;
+end $$;
 create table if not exists public.fn_profiles (
   user_id uuid primary key references auth.users(id),
   email text not null,
@@ -247,6 +257,6 @@ do $$ declare t text; f record; begin
   end loop;
 end $$;
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
-values('fn-private-documents','fn-private-documents',false,3145728,array['application/pdf','image/jpeg','image/png'])
+values('fn-private-documents','fn-private-documents',false,15728640,array['application/pdf','image/jpeg','image/png'])
 on conflict(id) do update set public=false,file_size_limit=excluded.file_size_limit,allowed_mime_types=excluded.allowed_mime_types;
 commit;
