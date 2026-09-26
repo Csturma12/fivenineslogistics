@@ -37,7 +37,7 @@ export default function CarriersPage() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
-                render={<Link href={`mailto:${site.carriersEmail}`} />}
+                render={<Link href={`mailto:${site.onboardingEmail}`} />}
                 nativeButton={false}
                 size="lg"
                 className="font-medium"
@@ -111,7 +111,7 @@ export default function CarriersPage() {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button
-                  render={<Link href={`mailto:${site.carriersEmail}`} />}
+                  render={<Link href={`mailto:${site.onboardingEmail}`} />}
                   nativeButton={false}
                   className="font-medium"
                 >

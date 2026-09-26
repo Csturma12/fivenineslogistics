@@ -35,7 +35,8 @@ export function PortalWorkspace({
   const inFlight = useRef(false);
   const refresh = useCallback(async () => {
     if (previewData) return;
-    const res = await fetch(`/api/portal/workspace${desk ? "?desk=1" : ""}`, {
+    const query = desk ? "?desk=1" : initialRole ? `?role=${initialRole}` : "";
+    const res = await fetch(`/api/portal/workspace${query}`, {
       cache: "no-store",
     });
     const body = await readPortalBody(res);
@@ -47,7 +48,7 @@ export function PortalWorkspace({
       throw new Error(String(body.error || "Unable to load your portal."));
     }
     setData(body as unknown as Workspace);
-  }, [desk, previewData]);
+  }, [desk, previewData, initialRole]);
   useEffect(() => {
     let active = true;
     refresh().catch((e) => {
@@ -103,6 +104,11 @@ export function PortalWorkspace({
     }
   };
   const p = data?.profile;
+  const staff = !!data?.staff;
+  // Staff-domain users can view either portal (URL-driven) and are treated as
+  // approved, so the paperwork gate never pins them to the setup tab.
+  const viewRole = staff ? (initialRole ?? p?.role) : p?.role;
+  const approved = staff || p?.status === "approved";
   const tabs = desk
     ? [
         "Setup reviews",
@@ -110,7 +116,7 @@ export function PortalWorkspace({
         "Customer requests",
         "Documents & email",
       ]
-    : p?.role === "carrier"
+    : viewRole === "carrier"
       ? ["Load board", "Setup & profile"]
       : [
           "Your load board",
@@ -121,8 +127,8 @@ export function PortalWorkspace({
         ];
   const selected = tabs.includes(tab)
     ? tab
-    : !desk && p && p.status !== "approved"
-      ? p.role === "carrier"
+    : !desk && p && !approved
+      ? viewRole === "carrier"
         ? "Setup & profile"
         : "Company profile"
       : tabs[0];
@@ -143,9 +149,9 @@ export function PortalWorkspace({
             <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
               {desk
                 ? "Portal review desk"
-                : p?.role === "carrier"
+                : viewRole === "carrier"
                   ? "Carrier portal"
-                  : p?.role === "customer"
+                  : viewRole === "customer"
                     ? "Customer portal"
                     : "Welcome to your portal"}
             </h1>
@@ -276,7 +282,7 @@ export function PortalWorkspace({
                 upload={send}
                 busy={busy}
               />
-            ) : p?.role === "carrier" ? (
+            ) : viewRole === "carrier" ? (
               <CarrierBoard data={data} act={send} busy={busy} />
             ) : selected === "Enter a load" ? (
               <LoadRequestForm act={send} busy={busy} />
@@ -378,7 +384,7 @@ export function PortalWorkspace({
                     </div>
                   ) : (
                     <Empty>
-                      {p?.status === "approved"
+                      {approved
                         ? "No shipments have been synced to your account yet."
                         : "Your shipments will appear after dispatch verifies and links your company account. You can enter a load request now."}
                     </Empty>
@@ -411,7 +417,7 @@ export function PortalWorkspace({
         ) : null}
         <p className="mt-8 text-xs leading-6 text-slate-500">
           Need help?{" "}
-          <a className="underline" href="mailto:sturma@blbxcritical.com">
+          <a className="underline" href="mailto:info@shipfivenines.com">
             Contact your Five Nines coordinator
           </a>
           .

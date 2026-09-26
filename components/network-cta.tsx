@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { RequestCapacityButton } from "@/components/request-capacity-trigger"
 import { CoverageMap } from "@/components/coverage-map"
-import { hubs } from "@/lib/site"
+import { hubs, site } from "@/lib/site"
 
 export function NetworkCta() {
   return (
@@ -41,7 +41,7 @@ export function NetworkCta() {
                 <ArrowRight className="size-4" data-icon="inline-end" />
               </RequestCapacityButton>
               <Button
-                render={<Link href="mailto:dispatch@fivenineslogistics.com" />}
+                render={<Link href={`mailto:${site.dispatchEmail}`} />}
                 nativeButton={false}
                 size="lg"
                 variant="outline"

@@ -12,8 +12,11 @@ export const site = {
   insurance: "$1M auto liability · $1M/$2M general liability · $4M umbrella · $150K contingent cargo",
   location: "Houston, TX",
   quotesEmail: "quotes@fivenineslogistics.com",
-  dispatchEmail: "dispatch@fivenineslogistics.com",
-  carriersEmail: "chris@shipfivenines.com",
+  // Role addresses on shipfivenines.com. These are mailto: contacts (visitors write TO them),
+  // so they do not need Resend domain verification — only inbound receiving/forwarding at the mail host.
+  dispatchEmail: "dispatch@shipfivenines.com", // capacity requests
+  onboardingEmail: "onboarding@shipfivenines.com", // carrier onboarding
+  infoEmail: "info@shipfivenines.com", // general questions
 }
 
 export type Mode = {

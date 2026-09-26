@@ -7,6 +7,25 @@ import { DOCUMENT_BUCKET, PortalProblem, type Profile } from "@/lib/portal-contr
 import { verifiedPortalIdentity } from "@/lib/portal-access-policy";
 
 export const BUCKET = DOCUMENT_BUCKET;
+const STAFF_EMAILS = (process.env.PORTAL_STAFF_EMAILS || "sturma@blbxcritical.com")
+  .split(",")
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean);
+// Verified users on these domains get staff-level access: either portal, no
+// approval/paperwork gate. Temporary bridge while carrier onboarding paperwork
+// is finalized. Override with PORTAL_STAFF_DOMAINS (comma-separated).
+const STAFF_DOMAINS = (
+  process.env.PORTAL_STAFF_DOMAINS || "shipfivenines.com,primarycompanies.com"
+)
+  .split(",")
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean);
+export function isPortalStaff(email?: string | null): boolean {
+  if (!email) return false;
+  const e = email.toLowerCase();
+  if (STAFF_EMAILS.includes(e)) return true;
+  return STAFF_DOMAINS.includes(e.split("@")[1] || "");
+}
 export async function portalIdentity() {
   const {
     data: { user },
