@@ -138,6 +138,13 @@ export async function GET(request: Request) {
           .order("created_at", { ascending: false })
           .limit(200),
       ) || [];
+    // Staff may view either portal via ?role=; everyone else is pinned to their
+    // own profile role so a carrier can't fetch customer data (or vice versa).
+    const requestedRole = new URL(request.url).searchParams.get("role");
+    const viewRole =
+      staff && (requestedRole === "carrier" || requestedRole === "customer")
+        ? requestedRole
+        : profile.role;
     if (viewRole === "carrier") {
       const bids =
         result(
