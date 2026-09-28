@@ -1,3 +1,4 @@
+import { createAdminClient } from "@/lib/supabase/admin"
 import { createLoadsAdminClient } from "@/lib/supabase/loads-admin"
 
 export type ShipmentStage = "uncovered" | "covered" | "in_transit" | "delivered" | "cancelled"
@@ -16,7 +17,12 @@ export type PortalShipment = {
   destination: string
   weight: number | null
   po: string | null
+  /** A POD exists in TAI or was uploaded by the carrier through the portal. */
+  podOnFile: boolean
+  uploads: { pod: number; invoice: number }
 }
+
+export type LoadDocumentKind = "pod" | "invoice"
 
 export type ShipmentScope =
   | { kind: "all"; customer?: string }
@@ -45,11 +51,12 @@ type Row = {
   to_state: string | null
   total_weight: number | string | null
   customer_po: string | null
+  pod_document_count: number | string | null
 }
 
 // Never select buy/sell/margin — this feeds customer- and carrier-facing views.
 const BASE_COLUMNS =
-  "id, shipment_id, status, carrier_name, current_location, ship_date, delivery_date, from_city, from_state, to_city, to_state, total_weight, customer_po"
+  "id, shipment_id, status, carrier_name, current_location, ship_date, delivery_date, from_city, from_state, to_city, to_state, total_weight, customer_po, pod_document_count"
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
 
@@ -93,7 +100,49 @@ function toShipment(row: Row, includeCustomer: boolean): PortalShipment {
     destination: place(row.to_city, row.to_state),
     weight: Number.isFinite(weight) && weight > 0 ? weight : null,
     po: row.customer_po || null,
+    podOnFile: Number(row.pod_document_count) > 0,
+    uploads: { pod: 0, invoice: 0 },
   }
+}
+
+/** Merges carrier-uploaded POD/invoice counts from the portal database. */
+export async function attachLoadDocuments(shipments: PortalShipment[]) {
+  const numbers = [...new Set(shipments.map((s) => s.loadNumber).filter((n) => n !== "—"))]
+  if (!numbers.length) return shipments
+  const counts = new Map<string, { pod: number; invoice: number }>()
+  const db = createAdminClient()
+  for (let i = 0; i < numbers.length; i += 200) {
+    const { data, error } = await db
+      .from("fn_load_documents")
+      .select("load_number, kind")
+      .in("load_number", numbers.slice(i, i + 200))
+    if (error) throw new Error(error.message)
+    for (const row of (data ?? []) as { load_number: string; kind: LoadDocumentKind }[]) {
+      const entry = counts.get(row.load_number) ?? { pod: 0, invoice: 0 }
+      entry[row.kind] += 1
+      counts.set(row.load_number, entry)
+    }
+  }
+  for (const s of shipments) {
+    const entry = counts.get(s.loadNumber)
+    if (!entry) continue
+    s.uploads = entry
+    if (entry.pod > 0) s.podOnFile = true
+  }
+  return shipments
+}
+
+/** True only when the load is assigned to a carrier record matching this login email. */
+export async function carrierOwnsLoad(email: string, loadNumber: string) {
+  const carriers = await carrierNamesForEmail(email)
+  if (!carriers.length) return false
+  const { count, error } = await createLoadsAdminClient()
+    .from("shipments")
+    .select("id", { count: "exact", head: true })
+    .eq("shipment_id", loadNumber)
+    .in("carrier_name", carriers)
+  if (error) throw new Error(error.message)
+  return (count ?? 0) > 0
 }
 
 export async function queryShipments(scope: ShipmentScope, query: ShipmentQuery) {

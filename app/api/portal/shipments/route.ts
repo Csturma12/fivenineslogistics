@@ -1,6 +1,7 @@
 import { PortalProblem } from "@/lib/portal-contract";
 import { failure, portalIdentity, profileFor } from "@/lib/portal-service";
 import {
+  attachLoadDocuments,
   carrierNamesForEmail,
   listCustomerNames,
   queryShipments,
@@ -56,7 +57,7 @@ export async function GET(request: Request) {
             to: params.get("to") || undefined,
             refType,
             ref: params.get("ref") || undefined,
-          })
+          }).then(attachLoadDocuments)
         : Promise.resolve([]),
       staff && role !== "carrier" ? listCustomerNames() : Promise.resolve(undefined),
     ]);

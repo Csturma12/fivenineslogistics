@@ -1,9 +1,84 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import useSWR from "swr";
-import { ArrowDown, ArrowUp, ArrowUpDown, Search, X } from "lucide-react";
-import type { PortalShipment, ReferenceType, ShipmentStage } from "@/lib/portal-shipments";
+import { ArrowDown, ArrowUp, ArrowUpDown, Check, Loader2, Plus, Search, X } from "lucide-react";
+import type { LoadDocumentKind, PortalShipment, ReferenceType, ShipmentStage } from "@/lib/portal-shipments";
+import { uploadDocument } from "@/lib/portal-upload-client";
 import { Empty, Panel } from "./workspace-ui";
+
+function LoadDocButton({
+  kind,
+  loadNumber,
+  count,
+  disabled,
+  onDone,
+}: {
+  kind: LoadDocumentKind;
+  loadNumber: string;
+  count: number;
+  disabled?: boolean;
+  onDone: (message: string, ok: boolean) => void;
+}) {
+  const input = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const name = kind === "pod" ? "POD" : "Invoice";
+  const added = count > 0;
+
+  const upload = async (file: File) => {
+    setBusy(true);
+    try {
+      const form = new FormData();
+      form.set("file", file);
+      form.set("kind", kind);
+      form.set("load", loadNumber);
+      await uploadDocument(form);
+      onDone(`${name} added to load ${loadNumber}.`, true);
+    } catch (e) {
+      onDone(e instanceof Error ? e.message : `${name} upload failed.`, false);
+    } finally {
+      setBusy(false);
+      if (input.current) input.current.value = "";
+    }
+  };
+
+  return (
+    <>
+      <input
+        ref={input}
+        type="file"
+        accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden="true"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void upload(file);
+        }}
+      />
+      <button
+        type="button"
+        disabled={disabled || busy}
+        onClick={() => input.current?.click()}
+        title={added ? `${count} ${name} file${count === 1 ? "" : "s"} on file. Click to add another.` : `Add ${name} for load ${loadNumber}`}
+        aria-label={`${added ? "Add another" : "Add"} ${name} for load ${loadNumber}`}
+        className={`inline-flex items-center gap-1 rounded px-2 py-0.5 font-mono text-[10.5px] font-semibold uppercase tracking-wide ring-1 ring-inset transition disabled:cursor-not-allowed disabled:opacity-50 ${
+          added
+            ? "bg-emerald-50 text-emerald-700 ring-emerald-200 hover:bg-emerald-100"
+            : "bg-[#14365b] text-white ring-[#14365b] hover:bg-[#24568a]"
+        }`}
+      >
+        {busy ? (
+          <Loader2 className="size-3 animate-spin" aria-hidden="true" />
+        ) : added ? (
+          <Check className="size-3" aria-hidden="true" />
+        ) : (
+          <Plus className="size-3" aria-hidden="true" />
+        )}
+        {added ? `${name} added` : `Add ${name}`}
+      </button>
+    </>
+  );
+}
 
 type Response = {
   shipments: PortalShipment[];
@@ -97,7 +172,9 @@ export function ShipmentBoard({
   if (applied.to) params.set("to", applied.to);
   if (applied.ref) params.set("ref", applied.ref);
   if (applied.customer) params.set("customer", applied.customer);
-  const { data, error, isLoading } = useSWR(
+  const [notice, setNotice] = useState<{ text: string; ok: boolean } | null>(null);
+  const carrierView = role === "carrier";
+  const { data, error, isLoading, mutate } = useSWR(
     preview ? null : `/api/portal/shipments?${params}`,
     fetcher,
     { revalidateOnFocus: false, keepPreviousData: true },
@@ -152,8 +229,13 @@ export function ShipmentBoard({
   const toggleSort = (key: SortKey) =>
     setSort((s) => (s.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }));
 
+  const docsDone = (text: string, ok: boolean) => {
+    setNotice({ text, ok });
+    if (ok) void mutate();
+  };
+
   const columns: { key: SortKey; label: string; align?: "right" }[] = [
-    { key: "stage", label: "Status" },
+    ...(carrierView ? [] : [{ key: "stage" as const, label: "Status" }]),
     { key: "loadNumber", label: "Load #" },
     ...(showCustomer ? [{ key: "customer" as const, label: "Customer" }] : []),
     { key: "carrier", label: "Carrier" },
@@ -311,6 +393,22 @@ export function ShipmentBoard({
           </div>
         </form>
 
+        {carrierView && notice ? (
+          <p
+            role={notice.ok ? "status" : "alert"}
+            className={`flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm ${notice.ok ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-red-200 bg-red-50 text-red-800"}`}
+          >
+            {notice.text}
+            <button type="button" onClick={() => setNotice(null)} aria-label="Dismiss message" className="opacity-70 hover:opacity-100">
+              <X className="size-3.5" aria-hidden="true" />
+            </button>
+          </p>
+        ) : null}
+
+        {carrierView && staff ? (
+          <p className="text-xs text-slate-500">Staff preview: carriers use these buttons to attach PODs and invoices to their loads.</p>
+        ) : null}
+
         {preview ? (
           <Empty>Test mode: live shipments load here for signed-in accounts.</Empty>
         ) : error ? (
@@ -325,6 +423,11 @@ export function ShipmentBoard({
               <table className="w-full min-w-[960px] border-collapse text-left text-[13px]">
                 <thead className="sticky top-0 z-10 bg-slate-100 text-slate-600">
                   <tr>
+                    {carrierView ? (
+                      <th scope="col" className="whitespace-nowrap px-3 py-2.5 font-medium">
+                        Documents
+                      </th>
+                    ) : null}
                     {columns.map((c) => {
                       const active = sort.key === c.key;
                       const Icon = !active ? ArrowUpDown : sort.dir === "asc" ? ArrowUp : ArrowDown;
@@ -353,11 +456,35 @@ export function ShipmentBoard({
                     const st = STAGES[STAGE_ORDER[s.stage]];
                     return (
                       <tr key={s.id} className="hover:bg-blue-50/40">
-                        <td className="whitespace-nowrap px-3 py-2">
-                          <span className={`inline-block rounded px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${st.pill}`}>
-                            {st.label}
-                          </span>
-                        </td>
+                        {carrierView ? (
+                          <td className="whitespace-nowrap px-3 py-2">
+                            <div className="flex items-center gap-1.5">
+                              {(["pod", "invoice"] as const).map((kind) => (
+                                <LoadDocButton
+                                  key={kind}
+                                  kind={kind}
+                                  loadNumber={s.loadNumber}
+                                  count={s.uploads[kind]}
+                                  disabled={staff || s.loadNumber === "—"}
+                                  onDone={docsDone}
+                                />
+                              ))}
+                            </div>
+                          </td>
+                        ) : (
+                          <td className="whitespace-nowrap px-3 py-2">
+                            <div className="flex items-center gap-1.5">
+                              <span className={`inline-block rounded px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${st.pill}`}>
+                                {st.label}
+                              </span>
+                              {s.stage === "delivered" && !s.podOnFile ? (
+                                <span className="inline-block rounded bg-amber-50 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-amber-800 ring-1 ring-inset ring-amber-300">
+                                  POD missing
+                                </span>
+                              ) : null}
+                            </div>
+                          </td>
+                        )}
                         <td className="whitespace-nowrap px-3 py-2 font-mono text-blue-700">{s.loadNumber}</td>
                         {showCustomer ? (
                           <td className="max-w-52 truncate px-3 py-2 font-medium text-slate-900" title={s.customer || ""}>
