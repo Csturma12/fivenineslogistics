@@ -7,14 +7,12 @@ import { SignOutButton } from "./sign-out-button";
 import { ProfileForm, LoadRequestForm, UploadForm } from "./workspace-forms";
 import { CarrierBoard } from "./carrier-board";
 import { WorkspaceDesk } from "./workspace-desk";
+import { ShipmentBoard } from "./shipment-board";
 import {
   Badge,
-  button,
   secondary,
   Empty,
   DocumentList,
-  lane,
-  LoadFacts,
   Panel,
 } from "./workspace-ui";
 
@@ -117,7 +115,7 @@ export function PortalWorkspace({
         "Documents & email",
       ]
     : viewRole === "carrier"
-      ? ["Load board", "Setup & profile"]
+      ? ["Load board", "My loads", "Setup & profile"]
       : [
           "Your load board",
           "Enter a load",
@@ -282,6 +280,8 @@ export function PortalWorkspace({
                 upload={send}
                 busy={busy}
               />
+            ) : viewRole === "carrier" && selected === "My loads" ? (
+              <ShipmentBoard role="carrier" staff={staff} preview={!!previewData} />
             ) : viewRole === "carrier" ? (
               <CarrierBoard data={data} act={send} busy={busy} />
             ) : selected === "Enter a load" ? (
@@ -323,73 +323,7 @@ export function PortalWorkspace({
                     Enter a load →
                   </button>
                 </div>
-                <Panel title="Your load board">
-                  <p className="mb-6 text-sm leading-6 text-slate-600">
-                    Only shipments linked to your verified customer account are
-                    shown. Tracking is the latest location reported by your
-                    coordinator or TAI feed, not a live GPS map.
-                  </p>
-                  {data.loads.length ? (
-                    <div className="space-y-4">
-                      {data.loads.map((load) => (
-                        <article
-                          key={load.id}
-                          className="rounded-lg border p-5"
-                        >
-                          <div className="flex flex-wrap items-start justify-between gap-3">
-                            <div>
-                              {load.external_id ? (
-                                <p className="font-mono text-[11px] uppercase tracking-[.2em] text-blue-600">
-                                  Ref {load.external_id}
-                                </p>
-                              ) : null}
-                              <h3 className="font-semibold">{lane(load)}</h3>
-                            </div>
-                            <Badge value={load.status} />
-                          </div>
-                          <LoadFacts load={load} />
-                          <p className="my-4 rounded-lg bg-slate-50 p-3 text-sm">
-                            {load.tracking_location
-                              ? `Last reported: ${load.tracking_location}${load.tracking_at ? ` · ${new Date(load.tracking_at).toLocaleString()}` : ""}`
-                              : "No tracking update available yet. Contact your coordinator."}
-                          </p>
-                          <div className="flex flex-wrap gap-3">
-                            {(["pod", "invoice"] as const).map((kind) => (
-                              <button
-                                key={kind}
-                                className={secondary}
-                                disabled={
-                                  busy ||
-                                  data.requests.some(
-                                    (r) =>
-                                      r.kind === kind &&
-                                      r.load_id === load.id &&
-                                      r.status !== "completed",
-                                  )
-                                }
-                                onClick={() =>
-                                  void send({
-                                    action: "customer_request",
-                                    kind,
-                                    loadId: load.id,
-                                  })
-                                }
-                              >
-                                Request {kind === "pod" ? "POD" : "invoice"}
-                              </button>
-                            ))}
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  ) : (
-                    <Empty>
-                      {approved
-                        ? "No shipments have been synced to your account yet."
-                        : "Your shipments will appear after dispatch verifies and links your company account. You can enter a load request now."}
-                    </Empty>
-                  )}
-                </Panel>
+                <ShipmentBoard role="customer" staff={staff} preview={!!previewData} />
                 <Panel title="Your requests">
                   {data.requests.length ? (
                     <ul className="divide-y">
