@@ -30,12 +30,19 @@ const DOCUMENT_FIELDS = "id,user_id,kind,name,created_at,included_kinds,reviewed
 const DOCUMENT_CHECK_FIELDS = "id,kind,included_kinds,reviewed_at";
 export async function GET(request: Request) {
   try {
-    const { user, staff } = await portalIdentity()
-    const desk = new URL(request.url).searchParams.get("desk") === "1";
+    const { user, staff } = await portalIdentity();
+    const params = new URL(request.url).searchParams;
+    const desk = params.get("desk") === "1";
     if (desk && !staff)
       throw new PortalProblem("Agent desk access required.", 403);
     const db = createAdminClient();
     const profile = await profileFor(user.id);
+    // Only verified staff may choose a view; other users keep their saved role.
+    const requestedRole = params.get("role");
+    const viewRole =
+      staff && (requestedRole === "carrier" || requestedRole === "customer")
+        ? requestedRole
+        : profile?.role;
     const companyDocuments =
       result(
         await db.from("fn_company_documents").select("id,title").order("title"),

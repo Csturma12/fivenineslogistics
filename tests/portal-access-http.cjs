@@ -7,11 +7,13 @@ const cwd = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 assert.ok(args.every(arg => arg === '--webpack'), 'Only the optional --webpack build flag is supported.');
 const calls = [];
+let profileFixture = null;
 const user = { id: '11111111-1111-4111-8111-111111111111', aud: 'authenticated', role: 'authenticated', created_at: '2026-01-01T00:00:00Z', email_confirmed_at: '2026-01-01T00:00:00Z', app_metadata: {}, user_metadata: {}, is_anonymous: false };
 const users = {
     company: { ...user, email: 'Chris@ShipFiveNines.COM' },
     colleague: { ...user, email: 'dispatch@shipfivenines.com', app_metadata: { owner: true, email: 'chris@shipfivenines.com' } },
     external: { ...user, email: 'outsider@example.test', app_metadata: { staff: true, role: 'staff' }, user_metadata: { staff: true, email: 'chris@shipfivenines.com' } },
+    legacyDomain: { ...user, email: 'staff@primarycompanies.com' },
     unconfirmed: { ...user, email: 'chris@shipfivenines.com', email_confirmed_at: null },
     anonymous: { ...user, email: 'chris@shipfivenines.com', is_anonymous: true }
 };
@@ -46,6 +48,11 @@ const stub = http.createServer((req, res) => {
         return res.end('{"message":"Unexpected write"}');
     }
     if (url.pathname.startsWith('/rest/v1/')) {
+        if (url.pathname === '/rest/v1/fn_profiles' && profileFixture) {
+            assert.equal(url.searchParams.get('user_id'), `eq.${user.id}`);
+            res.setHeader('Content-Range', '0-0/1');
+            return res.end(JSON.stringify([profileFixture]));
+        }
         res.setHeader('Content-Range', '*/0');
         return res.end('[]');
     }
@@ -234,6 +241,36 @@ async function stopChild(child) {
             assert.equal(target.origin, origin, 'auth success redirect must stay same-origin');
             console.log(`PASS ${route} success + attacker next => same-origin ${target.pathname}`);
         }
+        // Exercise actual profile-backed branches, not just the empty-profile
+        // response. The fixture is local; the network guard blocks live services.
+        for (const profileRole of ['carrier', 'customer']) {
+            profileFixture = { user_id: user.id, role: profileRole, status: 'pending', highway_status: 'unknown', customer_account_id: null };
+            for (const kind of ['company', 'external', 'legacyDomain']) {
+                for (const requestedRole of ['carrier', 'customer', 'staff', '']) {
+                    const workspace = await request(`/api/portal/workspace?role=${requestedRole}`, kind, undefined, true);
+                    assert.equal(workspace.status, 200, workspace.text);
+                    const body = JSON.parse(workspace.text);
+                    const expectedRole = kind === 'company' && ['carrier', 'customer'].includes(requestedRole) ? requestedRole : profileRole;
+                    assert.equal(body.staff, kind === 'company');
+                    assert.equal(Object.hasOwn(body, 'historyLoads'), expectedRole === 'carrier', `${kind}: ${profileRole} profile, ${requestedRole} query`);
+                }
+                const otherPortal = profileRole === 'carrier' ? '/portal/customer' : '/portal';
+                const entry = await request(otherPortal, kind, undefined, true);
+                if (kind === 'company') {
+                    assert.equal(entry.status, 200, entry.text);
+                } else {
+                    assert.ok([307, 308].includes(entry.status), entry.text);
+                    assert.equal(new URL(entry.location, origin).pathname, profileRole === 'carrier' ? '/portal' : '/portal/customer');
+                }
+            }
+            console.log(`PASS ${profileRole} profile: only verified company staff may switch view; external and legacy domains retain persisted role`);
+        }
+        profileFixture = { ...profileFixture, status: 'suspended' };
+        for (const kind of ['company', 'external', 'legacyDomain']) {
+            assert.equal((await request('/api/portal/workspace?role=carrier', kind)).status, 403);
+        }
+        profileFixture = null;
+        console.log('PASS suspended profiles stay denied for staff and external users');
         assert.equal(calls.filter(x => x.type === 'data' && !['GET', 'HEAD'].includes(x.method)).length, 0);
         console.log(`SUCCESS final build: auth requests=${calls.filter(x => x.type === 'auth').length}; data reads=${calls.filter(x => x.type === 'data').length}; data writes=0; synthetic storage signatures=1; no real signup/email/upload attempts`);
     }
