@@ -286,14 +286,17 @@ async function stopChild(child) {
         }
         const loadReads = () => calls.filter(x => x.path === '/rest/v1/fn_loads');
         profileFixture = { ...profileFixture, role: 'carrier', status: 'approved', highway_status: 'awaiting_invitation' };
+        profileFixture.details = { contact: 'Fixture contact', phone: '555-0100', dot: '0000000', equipment: 'Flatbed', lanes: 'Texas', insurance_company: 'Fixture insurance', insurance_expiry: '2099-12-31', factoring: 'no', contract_ack: 'yes' };
+        const completeDocuments = ['packet', 'coi', 'w9'].map(kind => ({ id: kind, kind, user_id: user.id }));
+        documentFixtures = completeDocuments;
         let reads = loadReads().length;
         assert.equal((await request('/api/portal/workspace?role=customer', 'external')).status, 200);
         assert.equal(loadReads().length, reads, 'unverified carrier cannot read available loads');
         profileFixture.highway_status = 'verified';
+        documentFixtures = [];
         assert.equal((await request('/api/portal/workspace', 'external')).status, 200);
         assert.equal(loadReads().length, reads, 'missing carrier paperwork still blocks available loads');
-        profileFixture.details = { contact: 'Fixture contact', phone: '555-0100', dot: '0000000', equipment: 'Flatbed', lanes: 'Texas', insurance_company: 'Fixture insurance', insurance_expiry: '2099-12-31', factoring: 'no', contract_ack: 'yes' };
-        documentFixtures = ['packet', 'coi', 'w9'].map(kind => ({ id: kind, kind, user_id: user.id }));
+        documentFixtures = completeDocuments;
         assert.equal((await request('/api/portal/workspace?role=customer', 'external')).status, 200);
         assert.equal(loadReads().length, reads + 1, 'complete approved carrier reaches available-load gate');
         assert.equal(new URLSearchParams(loadReads().at(-1).query).get('status'), 'eq.available');
