@@ -7,11 +7,14 @@ const cwd = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 assert.ok(args.every(arg => arg === '--webpack'), 'Only the optional --webpack build flag is supported.');
 const calls = [];
+let profileFixture = null;
+let documentFixtures = [];
 const user = { id: '11111111-1111-4111-8111-111111111111', aud: 'authenticated', role: 'authenticated', created_at: '2026-01-01T00:00:00Z', email_confirmed_at: '2026-01-01T00:00:00Z', app_metadata: {}, user_metadata: {}, is_anonymous: false };
 const users = {
     company: { ...user, email: 'Chris@ShipFiveNines.COM' },
     colleague: { ...user, email: 'dispatch@shipfivenines.com', app_metadata: { owner: true, email: 'chris@shipfivenines.com' } },
     external: { ...user, email: 'outsider@example.test', app_metadata: { staff: true, role: 'staff' }, user_metadata: { staff: true, email: 'chris@shipfivenines.com' } },
+    legacyDomain: { ...user, email: 'staff@primarycompanies.com' },
     unconfirmed: { ...user, email: 'chris@shipfivenines.com', email_confirmed_at: null },
     anonymous: { ...user, email: 'chris@shipfivenines.com', is_anonymous: true }
 };
@@ -40,12 +43,20 @@ const stub = http.createServer((req, res) => {
         // This fake response only issues a token. No document bytes or rows are created.
         return res.end(JSON.stringify({ url: `${url.pathname.replace('/storage/v1', '')}?token=synthetic-upload-only` }));
     }
-    calls.push({ type: 'data', method: req.method, path: url.pathname });
+    calls.push({ type: 'data', method: req.method, path: url.pathname, query: url.search });
     if (req.method !== 'GET' && req.method !== 'HEAD') {
         res.statusCode = 500;
         return res.end('{"message":"Unexpected write"}');
     }
     if (url.pathname.startsWith('/rest/v1/')) {
+        if (url.pathname === '/rest/v1/fn_profiles' && profileFixture) {
+            assert.equal(url.searchParams.get('user_id'), `eq.${user.id}`);
+            res.setHeader('Content-Range', '0-0/1');
+            return res.end(JSON.stringify([profileFixture]));
+        }
+        if (url.pathname === '/rest/v1/fn_documents' && documentFixtures.length) {
+            return res.end(JSON.stringify(documentFixtures));
+        }
         res.setHeader('Content-Range', '*/0');
         return res.end('[]');
     }
@@ -122,6 +133,21 @@ async function stopChild(child) {
         }
         assert.ok(ready, 'server ready');
         async function request(url, kind, body, spoof = false) { const r = await fetch(origin + url, { method: body ? 'POST' : 'GET', redirect: 'manual', headers: { ...(kind ? { Cookie: cookie(kind, spoof) + '; sb-127-auth-token-code-verifier=base64-' + encode('synthetic-pkce-verifier-for-local-only-smoke') } : {}), ...(body ? { Origin: origin, 'Content-Type': 'application/json' } : {}) }, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(10000) }); return { status: r.status, text: await r.text(), location: r.headers.get('location') }; }
+        for (const [file, heading] of [['privacy.html', 'Privacy Policy'], ['terms.html', 'Terms of Service'], ['support.html', 'Support']]) {
+            const policy = await request(`/toolkit/${file}`);
+            assert.equal(policy.status, 200, file);
+            assert.ok(policy.text.includes(`<h1>${heading}</h1>`), file);
+            assert.match(policy.text, /Five Nines Logistics LLC/);
+            assert.match(policy.text, /chris@shipfivenines\.com/);
+            assert.doesNotMatch(policy.text, /<script\b|<form\b|DRAFT FOR REVIEW|Unpublished review|Review packet|href="index\.html"/i);
+            for (const [, href] of policy.text.matchAll(/href="([^"]+)"/g)) {
+                if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('https:')) continue;
+                assert.ok(['privacy.html', 'terms.html', 'support.html', 'styles.css'].includes(href), `${file}: unexpected relative link ${href}`);
+                assert.equal((await request(`/toolkit/${href}`)).status, 200, `${file}: ${href}`);
+            }
+        }
+        assert.equal(calls.filter(x => x.type === 'data').length, 0, 'public policy pages must not query portal data');
+        console.log('PASS three public Toolkit pages => 200 without login; navigation/CSS links resolve; no scripts/forms or portal data reads');
         for (const kind of [null, 'unconfirmed', 'anonymous']) {
             const r = await request('/agent-desk', kind);
             assert.equal(r.status, 200);
@@ -234,6 +260,64 @@ async function stopChild(child) {
             assert.equal(target.origin, origin, 'auth success redirect must stay same-origin');
             console.log(`PASS ${route} success + attacker next => same-origin ${target.pathname}`);
         }
+        // Exercise actual profile-backed branches, not just the empty-profile
+        // response. The fixture is local; the network guard blocks live services.
+        for (const profileRole of ['carrier', 'customer']) {
+            profileFixture = { user_id: user.id, email: 'fixture@example.test', company: 'Fictional fixture', role: profileRole, status: 'draft', highway_status: 'awaiting_invitation', customer_account_id: null, details: {}, review_note: '', version: 1 };
+            for (const kind of ['company', 'external', 'legacyDomain']) {
+                for (const requestedRole of ['carrier', 'customer', 'staff', '']) {
+                    const workspace = await request(`/api/portal/workspace?role=${requestedRole}`, kind, undefined, true);
+                    assert.equal(workspace.status, 200, workspace.text);
+                    const body = JSON.parse(workspace.text);
+                    const expectedRole = kind === 'company' && ['carrier', 'customer'].includes(requestedRole) ? requestedRole : profileRole;
+                    assert.equal(body.staff, kind === 'company');
+                    assert.equal(Object.hasOwn(body, 'historyLoads'), expectedRole === 'carrier', `${kind}: ${profileRole} profile, ${requestedRole} query`);
+                }
+                const otherPortal = profileRole === 'carrier' ? '/portal/customer' : '/portal';
+                const entry = await request(otherPortal, kind, undefined, true);
+                if (kind === 'company') {
+                    assert.equal(entry.status, 200, entry.text);
+                } else {
+                    assert.ok([307, 308].includes(entry.status), entry.text);
+                    assert.equal(new URL(entry.location, origin).pathname, profileRole === 'carrier' ? '/portal' : '/portal/customer');
+                }
+            }
+            console.log(`PASS ${profileRole} profile: only verified company staff may switch view; external and legacy domains retain persisted role`);
+        }
+        const loadReads = () => calls.filter(x => x.path === '/rest/v1/fn_loads');
+        profileFixture = { ...profileFixture, role: 'carrier', status: 'approved', highway_status: 'awaiting_invitation' };
+        profileFixture.details = { contact: 'Fixture contact', phone: '555-0100', dot: '0000000', equipment: 'Flatbed', lanes: 'Texas', insurance_company: 'Fixture insurance', insurance_expiry: '2099-12-31', factoring: 'no', contract_ack: 'yes' };
+        const completeDocuments = ['packet', 'coi', 'w9'].map(kind => ({ id: kind, kind, user_id: user.id }));
+        documentFixtures = completeDocuments;
+        let reads = loadReads().length;
+        assert.equal((await request('/api/portal/workspace?role=customer', 'external')).status, 200);
+        assert.equal(loadReads().length, reads, 'unverified carrier cannot read available loads');
+        profileFixture.highway_status = 'verified';
+        documentFixtures = [];
+        assert.equal((await request('/api/portal/workspace', 'external')).status, 200);
+        assert.equal(loadReads().length, reads, 'missing carrier paperwork still blocks available loads');
+        documentFixtures = completeDocuments;
+        assert.equal((await request('/api/portal/workspace?role=customer', 'external')).status, 200);
+        assert.equal(loadReads().length, reads + 1, 'complete approved carrier reaches available-load gate');
+        assert.equal(new URLSearchParams(loadReads().at(-1).query).get('status'), 'eq.available');
+        // A staff view switch must never change the POST's persisted-role gate.
+        assert.equal((await request('/api/portal/workspace?role=customer', 'company', { action: 'customer_request', kind: 'load' })).status, 403);
+        profileFixture = { ...profileFixture, role: 'customer', customer_account_id: 'fictional-customer-account' };
+        reads = loadReads().length;
+        assert.equal((await request('/api/portal/workspace?role=carrier', 'external')).status, 200);
+        assert.equal(loadReads().length, reads + 1);
+        assert.equal(new URLSearchParams(loadReads().at(-1).query).get('customer_account_id'), 'eq.fictional-customer-account');
+        for (const action of ['submit', 'accept_counter']) {
+            assert.equal((await request('/api/portal/workspace?role=carrier', 'company', { action })).status, 403);
+        }
+        documentFixtures = [];
+        console.log('PASS valid approved-profile load gates and customer scoping; switched-view POSTs stay 403');
+        profileFixture = { ...profileFixture, status: 'suspended' };
+        for (const kind of ['company', 'external', 'legacyDomain']) {
+            assert.equal((await request('/api/portal/workspace?role=carrier', kind)).status, 403);
+        }
+        profileFixture = null;
+        console.log('PASS suspended profiles stay denied for staff and external users');
         assert.equal(calls.filter(x => x.type === 'data' && !['GET', 'HEAD'].includes(x.method)).length, 0);
         console.log(`SUCCESS final build: auth requests=${calls.filter(x => x.type === 'auth').length}; data reads=${calls.filter(x => x.type === 'data').length}; data writes=0; synthetic storage signatures=1; no real signup/email/upload attempts`);
     }

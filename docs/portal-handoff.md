@@ -97,7 +97,7 @@ The development preview returns 404 outside development and never bypasses API a
    Agent-desk access requires a signed-in, email-confirmed, non-anonymous Supabase user
    whose actual email has the exact `shipfivenines.com` domain. The server checks this
    before rendering `/agent-desk`, and the same policy protects staff data/actions.
-   `PORTAL_STAFF_EMAILS` is no longer used; profile roles and editable metadata do not
+   `PORTAL_STAFF_EMAILS` and `PORTAL_STAFF_DOMAINS` are no longer used; profile roles and editable metadata do not
    grant staff access. Staff create an account or sign in at `/agent-desk`; staff signup
    accepts only the company domain and emails a confirmation link before access opens.
    Other portal users retain their customer/carrier access and ownership restrictions.

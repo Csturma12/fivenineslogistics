@@ -22,9 +22,9 @@ export async function PortalEntry({ role }: { role: PortalRole }) {
   // Persisted onboarding role wins over a URL or a legacy account-view hint.
   const profile = user ? await profileFor(user.id) : null;
   const accountRole = profile?.role || user?.app_metadata?.role;
-  // Staff-domain users may open either portal, so skip the single-role redirect
+  // Verified staff may open either portal, so skip the single-role redirect
   // for them while carrier onboarding paperwork is being finalized.
-  const staff = isPortalStaff(user?.email);
+  const staff = identity?.staff ?? false;
   if (user && !staff && accountRole === "customer" && role === "carrier") redirect("/portal/customer");
   if (user && !staff && accountRole === "carrier" && role === "customer") redirect("/portal");
 
