@@ -129,6 +129,21 @@ async function stopChild(child) {
         }
         assert.ok(ready, 'server ready');
         async function request(url, kind, body, spoof = false) { const r = await fetch(origin + url, { method: body ? 'POST' : 'GET', redirect: 'manual', headers: { ...(kind ? { Cookie: cookie(kind, spoof) + '; sb-127-auth-token-code-verifier=base64-' + encode('synthetic-pkce-verifier-for-local-only-smoke') } : {}), ...(body ? { Origin: origin, 'Content-Type': 'application/json' } : {}) }, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(10000) }); return { status: r.status, text: await r.text(), location: r.headers.get('location') }; }
+        for (const [file, heading] of [['privacy.html', 'Privacy Policy'], ['terms.html', 'Terms of Service'], ['support.html', 'Support']]) {
+            const policy = await request(`/toolkit/${file}`);
+            assert.equal(policy.status, 200, file);
+            assert.ok(policy.text.includes(`<h1>${heading}</h1>`), file);
+            assert.match(policy.text, /Five Nines Logistics LLC/);
+            assert.match(policy.text, /chris@shipfivenines\.com/);
+            assert.doesNotMatch(policy.text, /<script\b|<form\b|DRAFT FOR REVIEW|Unpublished review|Review packet|href="index\.html"/i);
+            for (const [, href] of policy.text.matchAll(/href="([^"]+)"/g)) {
+                if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('https:')) continue;
+                assert.ok(['privacy.html', 'terms.html', 'support.html', 'styles.css'].includes(href), `${file}: unexpected relative link ${href}`);
+                assert.equal((await request(`/toolkit/${href}`)).status, 200, `${file}: ${href}`);
+            }
+        }
+        assert.equal(calls.filter(x => x.type === 'data').length, 0, 'public policy pages must not query portal data');
+        console.log('PASS three public Toolkit pages => 200 without login; navigation/CSS links resolve; no scripts/forms or portal data reads');
         for (const kind of [null, 'unconfirmed', 'anonymous']) {
             const r = await request('/agent-desk', kind);
             assert.equal(r.status, 200);
