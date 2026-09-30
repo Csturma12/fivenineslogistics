@@ -8,6 +8,7 @@ const args = process.argv.slice(2);
 assert.ok(args.every(arg => arg === '--webpack'), 'Only the optional --webpack build flag is supported.');
 const calls = [];
 let profileFixture = null;
+let documentFixtures = [];
 const user = { id: '11111111-1111-4111-8111-111111111111', aud: 'authenticated', role: 'authenticated', created_at: '2026-01-01T00:00:00Z', email_confirmed_at: '2026-01-01T00:00:00Z', app_metadata: {}, user_metadata: {}, is_anonymous: false };
 const users = {
     company: { ...user, email: 'Chris@ShipFiveNines.COM' },
@@ -42,7 +43,7 @@ const stub = http.createServer((req, res) => {
         // This fake response only issues a token. No document bytes or rows are created.
         return res.end(JSON.stringify({ url: `${url.pathname.replace('/storage/v1', '')}?token=synthetic-upload-only` }));
     }
-    calls.push({ type: 'data', method: req.method, path: url.pathname });
+    calls.push({ type: 'data', method: req.method, path: url.pathname, query: url.search });
     if (req.method !== 'GET' && req.method !== 'HEAD') {
         res.statusCode = 500;
         return res.end('{"message":"Unexpected write"}');
@@ -52,6 +53,9 @@ const stub = http.createServer((req, res) => {
             assert.equal(url.searchParams.get('user_id'), `eq.${user.id}`);
             res.setHeader('Content-Range', '0-0/1');
             return res.end(JSON.stringify([profileFixture]));
+        }
+        if (url.pathname === '/rest/v1/fn_documents' && documentFixtures.length) {
+            return res.end(JSON.stringify(documentFixtures));
         }
         res.setHeader('Content-Range', '*/0');
         return res.end('[]');
@@ -259,7 +263,7 @@ async function stopChild(child) {
         // Exercise actual profile-backed branches, not just the empty-profile
         // response. The fixture is local; the network guard blocks live services.
         for (const profileRole of ['carrier', 'customer']) {
-            profileFixture = { user_id: user.id, role: profileRole, status: 'pending', highway_status: 'unknown', customer_account_id: null };
+            profileFixture = { user_id: user.id, email: 'fixture@example.test', company: 'Fictional fixture', role: profileRole, status: 'draft', highway_status: 'awaiting_invitation', customer_account_id: null, details: {}, review_note: '', version: 1 };
             for (const kind of ['company', 'external', 'legacyDomain']) {
                 for (const requestedRole of ['carrier', 'customer', 'staff', '']) {
                     const workspace = await request(`/api/portal/workspace?role=${requestedRole}`, kind, undefined, true);
@@ -280,6 +284,31 @@ async function stopChild(child) {
             }
             console.log(`PASS ${profileRole} profile: only verified company staff may switch view; external and legacy domains retain persisted role`);
         }
+        const loadReads = () => calls.filter(x => x.path === '/rest/v1/fn_loads');
+        profileFixture = { ...profileFixture, role: 'carrier', status: 'approved', highway_status: 'awaiting_invitation' };
+        let reads = loadReads().length;
+        assert.equal((await request('/api/portal/workspace?role=customer', 'external')).status, 200);
+        assert.equal(loadReads().length, reads, 'unverified carrier cannot read available loads');
+        profileFixture.highway_status = 'verified';
+        assert.equal((await request('/api/portal/workspace', 'external')).status, 200);
+        assert.equal(loadReads().length, reads, 'missing carrier paperwork still blocks available loads');
+        profileFixture.details = { contact: 'Fixture contact', phone: '555-0100', dot: '0000000', equipment: 'Flatbed', lanes: 'Texas', insurance_company: 'Fixture insurance', insurance_expiry: '2099-12-31', factoring: 'no', contract_ack: 'yes' };
+        documentFixtures = ['packet', 'coi', 'w9'].map(kind => ({ id: kind, kind, user_id: user.id }));
+        assert.equal((await request('/api/portal/workspace?role=customer', 'external')).status, 200);
+        assert.equal(loadReads().length, reads + 1, 'complete approved carrier reaches available-load gate');
+        assert.equal(new URLSearchParams(loadReads().at(-1).query).get('status'), 'eq.available');
+        // A staff view switch must never change the POST's persisted-role gate.
+        assert.equal((await request('/api/portal/workspace?role=customer', 'company', { action: 'customer_request', kind: 'load' })).status, 403);
+        profileFixture = { ...profileFixture, role: 'customer', customer_account_id: 'fictional-customer-account' };
+        reads = loadReads().length;
+        assert.equal((await request('/api/portal/workspace?role=carrier', 'external')).status, 200);
+        assert.equal(loadReads().length, reads + 1);
+        assert.equal(new URLSearchParams(loadReads().at(-1).query).get('customer_account_id'), 'eq.fictional-customer-account');
+        for (const action of ['submit', 'accept_counter']) {
+            assert.equal((await request('/api/portal/workspace?role=carrier', 'company', { action })).status, 403);
+        }
+        documentFixtures = [];
+        console.log('PASS valid approved-profile load gates and customer scoping; switched-view POSTs stay 403');
         profileFixture = { ...profileFixture, status: 'suspended' };
         for (const kind of ['company', 'external', 'legacyDomain']) {
             assert.equal((await request('/api/portal/workspace?role=carrier', kind)).status, 403);

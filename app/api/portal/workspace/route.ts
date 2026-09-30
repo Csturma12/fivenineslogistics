@@ -1,5 +1,6 @@
 import { after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { portalView } from "@/lib/portal-view";
 import {
   carrierLoad,
   centralToday,
@@ -38,11 +39,9 @@ export async function GET(request: Request) {
     const db = createAdminClient();
     const profile = await profileFor(user.id);
     // Only verified staff may choose a view; other users keep their saved role.
-    const requestedRole = params.get("role");
-    const viewRole =
-      staff && (requestedRole === "carrier" || requestedRole === "customer")
-        ? requestedRole
-        : profile?.role;
+    const { role: viewRole } = portalView({
+      staff, profileRole: profile?.role, requestedRole: params.get("role"),
+    });
     const companyDocuments =
       result(
         await db.from("fn_company_documents").select("id,title").order("title"),

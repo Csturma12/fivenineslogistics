@@ -3,10 +3,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Workspace } from "@/lib/portal-contract";
 import { readPortalBody, uploadDocument } from "@/lib/portal-upload-client";
+import { portalView } from "@/lib/portal-view";
 import { SignOutButton } from "./sign-out-button";
 import { ProfileForm, LoadRequestForm, UploadForm } from "./workspace-forms";
 import { CarrierBoard } from "./carrier-board";
 import { WorkspaceDesk } from "./workspace-desk";
+import { ReadOnlyPortalView } from "./read-only-portal-view";
 import {
   Badge,
   button,
@@ -33,6 +35,12 @@ export function PortalWorkspace({
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState("");
   const inFlight = useRef(false);
+  const p = data?.profile;
+  const staff = !!data?.staff;
+  const { role: viewRole, readOnly: alternateView } = portalView({
+    staff, profileRole: p?.role, requestedRole: initialRole,
+  });
+  const readOnly = !desk && alternateView;
   const refresh = useCallback(async () => {
     if (previewData) return;
     const query = desk ? "?desk=1" : initialRole ? `?role=${initialRole}` : "";
@@ -59,6 +67,10 @@ export function PortalWorkspace({
     };
   }, [refresh]);
   const send = async (body: Record<string, unknown> | FormData) => {
+    if (readOnly) {
+      setNotice("Read-only staff view. Return to your account portal to use its approved actions.");
+      return false;
+    }
     if (previewData) {
       setNotice("Test mode: this workspace action does not save, upload, book or send email.");
       return false;
@@ -103,11 +115,7 @@ export function PortalWorkspace({
       setBusy(false);
     }
   };
-  const p = data?.profile;
-  const staff = !!data?.staff;
-  // Staff-domain users can view either portal (URL-driven) and are treated as
-  // approved, so the paperwork gate never pins them to the setup tab.
-  const viewRole = staff ? (initialRole ?? p?.role) : p?.role;
+  // Staff may inspect either portal, but a different saved role stays read-only.
   const approved = staff || p?.status === "approved";
   const tabs = desk
     ? [
@@ -116,6 +124,7 @@ export function PortalWorkspace({
         "Customer requests",
         "Documents & email",
       ]
+    : readOnly ? ["Read-only view"]
     : viewRole === "carrier"
       ? ["Load board", "Setup & profile"]
       : [
@@ -271,6 +280,8 @@ export function PortalWorkspace({
                 upload={send}
                 busy={busy}
               />
+            ) : readOnly ? (
+              <ReadOnlyPortalView data={data} readOnlySamples={!!previewData} />
             ) : selected === "Setup & profile" ||
               selected === "Company profile" ? (
               <ProfileForm
