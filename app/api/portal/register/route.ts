@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Choose a valid portal." }, { status: 400 })
   }
   if (requestedRole === "staff" && !isAgentDeskEmail(email)) {
-    return NextResponse.json({ error: "Use your @shipfivenines.com work email for the agent desk." }, { status: 400 })
+    return NextResponse.json({ error: "Use an approved team email for the agent desk." }, { status: 400 })
   }
 
   const role: Role = requestedRole

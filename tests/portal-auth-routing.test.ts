@@ -42,6 +42,11 @@ test("verified company accounts return to the desk after recovery without requir
     assert.equal(portalHomeDestination(identity, profileRole), "/agent-desk");
 });
 
+test("verified testing email returns to the desk after recovery", () => {
+  const identity = verifiedPortalIdentity(user({ email: "sturma@blbxcritical.com" }));
+  assert.equal(portalHomeDestination(identity), "/agent-desk");
+});
+
 test("other verified users keep persisted customer/carrier routing ahead of metadata hints", () => {
   const carrier = verifiedPortalIdentity(user({
     email: "carrier@example.test", app_metadata: { role: "customer" },

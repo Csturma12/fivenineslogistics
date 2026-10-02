@@ -22,10 +22,21 @@ test("agent desk permits the exact company domain, including mixed case and alia
     assert.equal(isAgentDeskEmail(email), true, email);
 });
 
+test("the owner's exact testing email gets verified staff access", () => {
+  for (const email of ["sturma@blbxcritical.com", "Sturma@BLBXCRITICAL.COM"])
+    assert.equal(isAgentDeskEmail(email), true, email);
+  const tester = confirmedUser({ email: "sturma@blbxcritical.com" });
+  assert.deepEqual(verifiedPortalIdentity(tester), { user: tester, staff: true });
+  assert.throws(() => verifiedPortalIdentity({ ...tester, email_confirmed_at: undefined }),
+    (problem: unknown) => problem instanceof PortalProblem && problem.status === 401);
+});
+
 test("agent desk rejects other domains, lookalikes, subdomains, malformed emails, and whitespace", () => {
   for (const email of [
     undefined, "", "@shipfivenines.com", "chris", "chris@primarycompanies.com",
-    "sturma@blbxcritical.com", "chris@sub.shipfivenines.com", "chris@shipfivenines.com.evil.test",
+    "other@blbxcritical.com", "sturma+test@blbxcritical.com", "sturma@blbxcritical.com.evil.test",
+    " sturma@blbxcritical.com", "sturma@blbxcritical.com ",
+    "chris@sub.shipfivenines.com", "chris@shipfivenines.com.evil.test",
     "chris@evilshipfivenines.com", "chris@shipfiveninesXcom", "chris@shipfivenines.co",
     "chris@@shipfivenines.com", "chris@evil.test@shipfivenines.com",
     " chris@shipfivenines.com", "chris@shipfivenines.com ", "ch ris@shipfivenines.com",
