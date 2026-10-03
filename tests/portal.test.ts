@@ -13,7 +13,9 @@ import {
   setupMissing,
 } from "../lib/portal-contract";
 import { ingestRows } from "../lib/portal-ingest";
-import { notificationHtml } from "../lib/portal-notification";
+import { notificationHtml, notificationRecipient, PORTAL_DISPATCH_EMAIL } from "../lib/portal-notification";
+import { filterCarrierLoads } from "../lib/portal-board";
+import { allPortalRows } from "../lib/portal-pages";
 import { requireBridgeToken } from "../lib/portal-bridge-auth";
 
 test("bridge requires a configured strong token and an exact bearer credential", () => {
@@ -32,6 +34,39 @@ test("release switch hides auto-book and offer amounts even when feed provides t
   assert.equal(row.carrier_offer_usd, null);
 });
 
+test("all open loads are read across page boundaries and can be filtered by pickup and lane", async () => {
+  const all = Array.from({ length: 1201 }, (_, n) => ({
+    id: String(n), origin_city: n % 2 ? "Houston" : "Austin", origin_state: "TX",
+    dest_city: "Dallas", dest_state: "TX", pickup_date: n % 2 ? "2026-10-05" : "2026-10-07",
+    equipment: "Flatbed", status: "available", auto_book: false, carrier_offer_usd: null,
+    delivery_date: null, weight_lbs: null, dimensions: null,
+  }));
+  const pages: Array<string | null> = [];
+  const loaded = await allPortalRows(async (afterId) => {
+    pages.push(afterId);
+    // The first page's load 100 is reserved before page two is read.
+    const remaining = pages.length === 1 ? all : all.filter(row => row.id !== "100");
+    const candidates = remaining.filter(row => afterId === null || Number(row.id) > Number(afterId));
+    return { data: candidates.slice(0, 500), count: candidates.length, error: null };
+  });
+  assert.equal(loaded.length, 1201);
+  assert.deepEqual(pages, [null, "499", "999"]);
+  assert.ok(loaded.some(row => row.id === "500"));
+  assert.equal(filterCarrierLoads(loaded, {
+    search: "flatbed", pickupFrom: "2026-10-05", pickupThrough: "2026-10-05",
+    origin: "houston", destination: "TX",
+  }).length, 600);
+  assert.equal(filterCarrierLoads(loaded, {
+    search: "", pickupFrom: "", pickupThrough: "", origin: "", destination: "",
+  }).length, 1201);
+  // A lower PostgREST max-rows setting must not silently cut the board short.
+  const smallPages = await allPortalRows(async (afterId) => {
+    const remaining = all.filter(row => afterId === null || Number(row.id) > Number(afterId));
+    return { data: remaining.slice(0, 100), count: remaining.length, error: null };
+  });
+  assert.equal(smallPages.length, 1201);
+});
+
 const db = new PGlite();
 before(async () => {
   await db.exec(`create schema auth; create table auth.users(id uuid primary key);
@@ -46,6 +81,7 @@ before(async () => {
   );
   // Existing installations receive just the replacement procedure, not a schema reset.
   await db.exec(await readFile(new URL("../scripts/portal-email-upgrade.sql", import.meta.url), "utf8"));
+  await db.exec(await readFile(new URL("../scripts/portal-load-scope-upgrade.sql", import.meta.url), "utf8"));
 });
 after(async () => {
   await db.close();
@@ -120,6 +156,9 @@ test("internal email escapes input, excludes unknown fields and protects its rec
   assert.match(html, /Not provided/);
   assert.doesNotMatch(html, /<img|PRIVATE_CUSTOMER|PRIVATE_SELL|PRIVATE_BANK/);
   assert.throws(() => notificationHtml({ ...event, recipient: "carrier@example.test" }), /recipient/);
+  assert.equal(notificationRecipient({ recipient: "sturma@blbxcritical.com", subject: "New carrier bid" }), PORTAL_DISPATCH_EMAIL);
+  assert.equal(notificationRecipient({ recipient: "sturma@blbxcritical.com", subject: "Carrier reservation - dispatch action required" }), PORTAL_DISPATCH_EMAIL);
+  assert.equal(notificationRecipient({ recipient: "carrier@example.test", subject: "Your load bid has an update" }), "carrier@example.test");
   assert.throws(() => notificationHtml({ ...event, detail: JSON.stringify({ ...payload, amount: null }) }), /Invalid/);
   assert.throws(() => notificationHtml({ ...event, detail: '{"template":"future"}' }), /Unsupported/);
   assert.match(notificationHtml({ recipient: "carrier@example.test", detail: "Old <alert>" }), /Old &lt;alert&gt;/);
@@ -136,6 +175,10 @@ test("bid and booking emails retain submission snapshots and use the correct car
   assert.equal(first.rows.length, 1);
   const snapshot = JSON.parse(first.rows[0].detail);
   assert.equal(snapshot.company, "Test carrier");
+  assert.equal(snapshot.contact, "Test");
+  assert.equal(snapshot.phone, "555");
+  assert.equal(snapshot.email, "carrier@example.test");
+  assert.equal(first.rows[0].recipient, PORTAL_DISPATCH_EMAIL);
   assert.equal(snapshot.amount, 1400);
   assert.equal(snapshot.dimensions, "48 x 8 x 8 ft");
   assert.equal(snapshot.weight_lbs, 42000);
@@ -149,6 +192,7 @@ test("bid and booking emails retain submission snapshots and use the correct car
   const booked = await db.query<{ detail: string; recipient: string }>(
     "select detail,recipient from fn_notifications where subject='Carrier reservation - dispatch action required' and detail like $1", [`%${accepted.rows[0].id}%`]);
   assert.equal(booked.rows.length, 1);
+  assert.equal(booked.rows[0].recipient, PORTAL_DISPATCH_EMAIL);
   assert.equal(JSON.parse(booked.rows[0].detail).company, "Updated carrier");
   assert.equal(JSON.parse(booked.rows[0].detail).amount, 1400);
   assert.match(notificationHtml(booked.rows[0]), /Draft booking summary/);
@@ -190,6 +234,7 @@ test("carrier projection strips customer information, sell rate, notes and ident
     rate_usd: 5000,
     customer: "Secret",
     customer_account_id: "secret",
+    tracking_location: "PRIVATE_LOCATION",
     notes: "Secret",
     external_id: "private",
   });
@@ -198,6 +243,7 @@ test("carrier projection strips customer information, sell rate, notes and ident
     "rate_usd",
     "customer",
     "customer_account_id",
+    "tracking_location",
     "notes",
     "external_id",
   ])
@@ -439,10 +485,14 @@ test("feed preserves reservations and ignores older snapshots", async () => {
   const newer = {
     ...original,
     origin_city: "New origin",
+    customer_account_id: "101",
     reserved_by: null,
     updated_at: new Date(Date.now() + 1000).toISOString(),
   };
   await db.query("select fn_ingest_loads($1)", [JSON.stringify([newer])]);
+  // The TAI clock does not advance when a local name correction withdraws an
+  // old customer ID. A same-clock snapshot must immediately revoke access.
+  await db.query("select fn_ingest_loads($1)", [JSON.stringify([{ ...newer, customer_account_id: null }])]);
   await db.query("select fn_ingest_loads($1)", [
     JSON.stringify([
       {
@@ -460,4 +510,5 @@ test("feed preserves reservations and ignores older snapshots", async () => {
   ).rows[0];
   assert.equal(row.reserved_by, a);
   assert.equal(row.origin_city, "New origin");
+  assert.equal(row.customer_account_id, null);
 });
