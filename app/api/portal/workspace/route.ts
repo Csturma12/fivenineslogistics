@@ -1,6 +1,7 @@
 import { after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { portalView } from "@/lib/portal-view";
+import { allPortalRows } from "@/lib/portal-pages";
 import {
   carrierLoad,
   centralToday,
@@ -181,9 +182,8 @@ export async function GET(request: Request) {
           profile.highway_status === "verified" &&
           setupMissing(profile, documents, centralToday()).length === 0)
       ) {
-        const rows =
-          result(
-            await db
+        const rows = await allPortalRows((from, to) =>
+            db
               .from("fn_loads")
               .select(LOAD_FIELDS)
               .eq("status", "available")
@@ -191,8 +191,9 @@ export async function GET(request: Request) {
               .gte("updated_at", new Date(Date.now() - 86400000).toISOString())
               .or(`pickup_date.is.null,pickup_date.gte.${centralToday()}`)
               .order("pickup_date", { ascending: true })
-              .limit(200),
-          ) || [];
+              .order("id", { ascending: true })
+              .range(from, to),
+          );
         loads = rows.map((row) => carrierLoad(row, process.env.PORTAL_AUTO_BOOK_ENABLED === "true"));
       }
       return Response.json(
@@ -202,14 +203,15 @@ export async function GET(request: Request) {
     }
     const rows =
       (staff || profile.status === "approved") && profile.customer_account_id
-        ? result(
-            await db
+        ? await allPortalRows((from, to) =>
+            db
               .from("fn_loads")
               .select(`${LOAD_FIELDS},external_id,tracking_location,tracking_at`)
               .eq("customer_account_id", profile.customer_account_id)
               .order("pickup_date", { ascending: false })
-              .limit(200),
-          ) || []
+              .order("id", { ascending: true })
+              .range(from, to),
+          )
         : [];
     const loads = rows.map((row) => ({
       ...carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),

@@ -35,7 +35,7 @@ begin
     insert into fn_bids(load_id,user_id,amount,note) values(p_load,p_actor,p_amount,p_note)
     on conflict(load_id,user_id) do update set amount=excluded.amount,note=excluded.note,status='submitted',counter_amount=null,version=fn_bids.version+1,updated_at=now()
     returning id into result;
-    insert into fn_notifications(recipient,subject,detail) values('sturma@blbxcritical.com','New carrier bid',
+    insert into fn_notifications(recipient,subject,detail) values('dispatch@shipfivenines.com','New carrier bid',
       (snapshot||jsonb_build_object('reference',result,'amount',p_amount,'source','bid','state','bid_submitted','note',p_note))::text);
     return result;
   end if;
@@ -72,7 +72,7 @@ begin
   update fn_bids set status='accepted',version=version+1,updated_at=now()
     where load_id=p_load and user_id=winner and status in ('submitted','countered');
   insert into fn_bookings(load_id,user_id,amount,source) values(p_load,winner,price,origin) returning id into result;
-  insert into fn_notifications(recipient,subject,detail) values('sturma@blbxcritical.com','Carrier reservation - dispatch action required',
+  insert into fn_notifications(recipient,subject,detail) values('dispatch@shipfivenines.com','Carrier reservation - dispatch action required',
     (snapshot||jsonb_build_object('reference',result,'amount',price,'source',origin,'state','awaiting_dispatch','note',case when origin='auto_book' then p_note else b.note end))::text);
   insert into fn_notifications(recipient,subject,detail) values(p.email,'Load reserved - awaiting dispatch','Your load reservation was received. Dispatch will confirm assignment and send the rate confirmation.');
   return result;

@@ -10,7 +10,7 @@ export function GET(request: Request) {
   const type = requested === "bid" || requested === "counter" ? requested : "auto_book";
   const title = type === "bid" ? "New carrier bid" : "Carrier reservation — dispatch action required";
   const email = notificationHtml({
-    recipient: "sturma@blbxcritical.com",
+    recipient: "dispatch@shipfivenines.com",
     detail: JSON.stringify({
       template: "fn_carrier_summary_v1",
       reference: "SAMPLE-REQUEST-1042",
@@ -37,7 +37,7 @@ export function GET(request: Request) {
       note: "Sample: truck available for a morning pickup. Straps and tarps available. Driver details to follow after dispatch confirmation.",
     }),
   });
-  return new Response(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Five Nines — team email preview</title><style>body{margin:0;background:#f1f5f9;font-family:Arial,sans-serif;color:#133457}header{max-width:688px;margin:24px auto 0;padding:0 24px}nav{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}nav a{padding:10px 14px;border:1px solid #133457;border-radius:6px;color:#133457;text-decoration:none}nav a[aria-current=page]{background:#133457;color:white}h1{margin:10px 0}header p{line-height:1.5}</style></head><body><header><p style="font-size:12px;letter-spacing:2px">LOCAL PREVIEW · FICTIONAL DATA · NO EMAIL SENT</p><h1>Your team's notification</h1><nav aria-label="Email examples">${[["bid", "New bid"], ["auto_book", "Auto-book request"], ["counter", "Accepted counteroffer"]].map(([value, label]) => `<a href="?type=${value}"${type === value ? ' aria-current="page"' : ""}>${label}</a>`).join("")}</nav><p><strong>To:</strong> sturma@blbxcritical.com<br><strong>Subject:</strong> ${title}</p></header>${email}</body></html>`, {
+  return new Response(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Five Nines — team email preview</title><style>body{margin:0;background:#f1f5f9;font-family:Arial,sans-serif;color:#133457}header{max-width:688px;margin:24px auto 0;padding:0 24px}nav{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}nav a{padding:10px 14px;border:1px solid #133457;border-radius:6px;color:#133457;text-decoration:none}nav a[aria-current=page]{background:#133457;color:white}h1{margin:10px 0}header p{line-height:1.5}</style></head><body><header><p style="font-size:12px;letter-spacing:2px">LOCAL PREVIEW · FICTIONAL DATA · NO EMAIL SENT</p><h1>Your team's notification</h1><nav aria-label="Email examples">${[["bid", "New bid"], ["auto_book", "Auto-book request"], ["counter", "Accepted counteroffer"]].map(([value, label]) => `<a href="?type=${value}"${type === value ? ' aria-current="page"' : ""}>${label}</a>`).join("")}</nav><p><strong>To:</strong> dispatch@shipfivenines.com<br><strong>Subject:</strong> ${title}</p></header>${email}</body></html>`, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "no-store",

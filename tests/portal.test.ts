@@ -13,7 +13,9 @@ import {
   setupMissing,
 } from "../lib/portal-contract";
 import { ingestRows } from "../lib/portal-ingest";
-import { notificationHtml } from "../lib/portal-notification";
+import { notificationHtml, notificationRecipient, PORTAL_DISPATCH_EMAIL } from "../lib/portal-notification";
+import { filterCarrierLoads } from "../lib/portal-board";
+import { allPortalRows } from "../lib/portal-pages";
 import { requireBridgeToken } from "../lib/portal-bridge-auth";
 
 test("bridge requires a configured strong token and an exact bearer credential", () => {
@@ -30,6 +32,29 @@ test("release switch hides auto-book and offer amounts even when feed provides t
   const row = carrierLoad({ id: "example", auto_book: true, carrier_offer_usd: 1500 }, false);
   assert.equal(row.auto_book, false);
   assert.equal(row.carrier_offer_usd, null);
+});
+
+test("all open loads are read across page boundaries and can be filtered by pickup and lane", async () => {
+  const all = Array.from({ length: 1201 }, (_, n) => ({
+    id: String(n), origin_city: n % 2 ? "Houston" : "Austin", origin_state: "TX",
+    dest_city: "Dallas", dest_state: "TX", pickup_date: n % 2 ? "2026-10-05" : "2026-10-07",
+    equipment: "Flatbed", status: "available", auto_book: false, carrier_offer_usd: null,
+    delivery_date: null, weight_lbs: null, dimensions: null,
+  }));
+  const pages: number[] = [];
+  const loaded = await allPortalRows(async (from, to) => {
+    pages.push(from);
+    return { data: all.slice(from, to + 1), error: null };
+  });
+  assert.equal(loaded.length, 1201);
+  assert.deepEqual(pages, [0, 500, 1000]);
+  assert.equal(filterCarrierLoads(loaded, {
+    search: "flatbed", pickupFrom: "2026-10-05", pickupThrough: "2026-10-05",
+    origin: "houston", destination: "TX",
+  }).length, 600);
+  assert.equal(filterCarrierLoads(loaded, {
+    search: "", pickupFrom: "", pickupThrough: "", origin: "", destination: "",
+  }).length, 1201);
 });
 
 const db = new PGlite();
@@ -120,6 +145,9 @@ test("internal email escapes input, excludes unknown fields and protects its rec
   assert.match(html, /Not provided/);
   assert.doesNotMatch(html, /<img|PRIVATE_CUSTOMER|PRIVATE_SELL|PRIVATE_BANK/);
   assert.throws(() => notificationHtml({ ...event, recipient: "carrier@example.test" }), /recipient/);
+  assert.equal(notificationRecipient({ recipient: "sturma@blbxcritical.com", subject: "New carrier bid" }), PORTAL_DISPATCH_EMAIL);
+  assert.equal(notificationRecipient({ recipient: "sturma@blbxcritical.com", subject: "Carrier reservation - dispatch action required" }), PORTAL_DISPATCH_EMAIL);
+  assert.equal(notificationRecipient({ recipient: "carrier@example.test", subject: "Your load bid has an update" }), "carrier@example.test");
   assert.throws(() => notificationHtml({ ...event, detail: JSON.stringify({ ...payload, amount: null }) }), /Invalid/);
   assert.throws(() => notificationHtml({ ...event, detail: '{"template":"future"}' }), /Unsupported/);
   assert.match(notificationHtml({ recipient: "carrier@example.test", detail: "Old <alert>" }), /Old &lt;alert&gt;/);
@@ -136,6 +164,10 @@ test("bid and booking emails retain submission snapshots and use the correct car
   assert.equal(first.rows.length, 1);
   const snapshot = JSON.parse(first.rows[0].detail);
   assert.equal(snapshot.company, "Test carrier");
+  assert.equal(snapshot.contact, "Test");
+  assert.equal(snapshot.phone, "555");
+  assert.equal(snapshot.email, "carrier@example.test");
+  assert.equal(first.rows[0].recipient, PORTAL_DISPATCH_EMAIL);
   assert.equal(snapshot.amount, 1400);
   assert.equal(snapshot.dimensions, "48 x 8 x 8 ft");
   assert.equal(snapshot.weight_lbs, 42000);
@@ -149,6 +181,7 @@ test("bid and booking emails retain submission snapshots and use the correct car
   const booked = await db.query<{ detail: string; recipient: string }>(
     "select detail,recipient from fn_notifications where subject='Carrier reservation - dispatch action required' and detail like $1", [`%${accepted.rows[0].id}%`]);
   assert.equal(booked.rows.length, 1);
+  assert.equal(booked.rows[0].recipient, PORTAL_DISPATCH_EMAIL);
   assert.equal(JSON.parse(booked.rows[0].detail).company, "Updated carrier");
   assert.equal(JSON.parse(booked.rows[0].detail).amount, 1400);
   assert.match(notificationHtml(booked.rows[0]), /Draft booking summary/);
@@ -190,6 +223,7 @@ test("carrier projection strips customer information, sell rate, notes and ident
     rate_usd: 5000,
     customer: "Secret",
     customer_account_id: "secret",
+    tracking_location: "PRIVATE_LOCATION",
     notes: "Secret",
     external_id: "private",
   });
@@ -198,6 +232,7 @@ test("carrier projection strips customer information, sell rate, notes and ident
     "rate_usd",
     "customer",
     "customer_account_id",
+    "tracking_location",
     "notes",
     "external_id",
   ])

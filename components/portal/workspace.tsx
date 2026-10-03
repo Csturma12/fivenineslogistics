@@ -62,8 +62,14 @@ export function PortalWorkspace({
     refresh().catch((e) => {
       if (active) setError(e.message);
     });
+    const timer = previewData ? null : window.setInterval(() => {
+      if (!inFlight.current) void refresh().catch((e) => {
+        if (active) setError(e.message);
+      });
+    }, 60_000);
     return () => {
       active = false;
+      if (timer !== null) window.clearInterval(timer);
     };
   }, [refresh]);
   const send = async (body: Record<string, unknown> | FormData) => {
