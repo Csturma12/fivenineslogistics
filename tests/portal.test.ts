@@ -41,13 +41,17 @@ test("all open loads are read across page boundaries and can be filtered by pick
     equipment: "Flatbed", status: "available", auto_book: false, carrier_offer_usd: null,
     delivery_date: null, weight_lbs: null, dimensions: null,
   }));
-  const pages: number[] = [];
-  const loaded = await allPortalRows(async (from, to) => {
-    pages.push(from);
-    return { data: all.slice(from, to + 1), error: null };
+  const pages: Array<string | null> = [];
+  const loaded = await allPortalRows(async (afterId) => {
+    pages.push(afterId);
+    // The first page's load 100 is reserved before page two is read.
+    const remaining = pages.length === 1 ? all : all.filter(row => row.id !== "100");
+    const candidates = remaining.filter(row => afterId === null || Number(row.id) > Number(afterId));
+    return { data: candidates.slice(0, 500), count: candidates.length, error: null };
   });
   assert.equal(loaded.length, 1201);
-  assert.deepEqual(pages, [0, 500, 1000]);
+  assert.deepEqual(pages, [null, "499", "999"]);
+  assert.ok(loaded.some(row => row.id === "500"));
   assert.equal(filterCarrierLoads(loaded, {
     search: "flatbed", pickupFrom: "2026-10-05", pickupThrough: "2026-10-05",
     origin: "houston", destination: "TX",
@@ -55,6 +59,12 @@ test("all open loads are read across page boundaries and can be filtered by pick
   assert.equal(filterCarrierLoads(loaded, {
     search: "", pickupFrom: "", pickupThrough: "", origin: "", destination: "",
   }).length, 1201);
+  // A lower PostgREST max-rows setting must not silently cut the board short.
+  const smallPages = await allPortalRows(async (afterId) => {
+    const remaining = all.filter(row => afterId === null || Number(row.id) > Number(afterId));
+    return { data: remaining.slice(0, 100), count: remaining.length, error: null };
+  });
+  assert.equal(smallPages.length, 1201);
 });
 
 const db = new PGlite();
@@ -71,6 +81,7 @@ before(async () => {
   );
   // Existing installations receive just the replacement procedure, not a schema reset.
   await db.exec(await readFile(new URL("../scripts/portal-email-upgrade.sql", import.meta.url), "utf8"));
+  await db.exec(await readFile(new URL("../scripts/portal-load-scope-upgrade.sql", import.meta.url), "utf8"));
 });
 after(async () => {
   await db.close();
@@ -474,10 +485,14 @@ test("feed preserves reservations and ignores older snapshots", async () => {
   const newer = {
     ...original,
     origin_city: "New origin",
+    customer_account_id: "101",
     reserved_by: null,
     updated_at: new Date(Date.now() + 1000).toISOString(),
   };
   await db.query("select fn_ingest_loads($1)", [JSON.stringify([newer])]);
+  // The TAI clock does not advance when a local name correction withdraws an
+  // old customer ID. A same-clock snapshot must immediately revoke access.
+  await db.query("select fn_ingest_loads($1)", [JSON.stringify([{ ...newer, customer_account_id: null }])]);
   await db.query("select fn_ingest_loads($1)", [
     JSON.stringify([
       {
@@ -495,4 +510,5 @@ test("feed preserves reservations and ignores older snapshots", async () => {
   ).rows[0];
   assert.equal(row.reserved_by, a);
   assert.equal(row.origin_city, "New origin");
+  assert.equal(row.customer_account_id, null);
 });

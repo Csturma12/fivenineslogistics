@@ -1,6 +1,6 @@
 # Portal load board review — October 3, 2026
 
-The carrier portal shows all eligible available loads for approved and Highway-verified carriers. It reads the full result in ordered 500-row pages, refreshes the workspace once per minute, and offers pickup-date range, origin, destination, lane/equipment search, and Show all loads. The source bridge publishes every eligible uncovered Committed load from operations every five minutes when configured. Quotes, loads with a carrier, expired pickup dates, and loads without recent TAI operations activity are not bid-ready.
+The carrier portal shows all eligible available loads for approved and Highway-verified carriers. It reads the full result in ID-cursor pages using an exact count to handle database response caps, refreshes the workspace once per minute, and offers pickup-date range, origin, destination, lane/equipment search, and Show all loads. The source bridge publishes every eligible uncovered Committed load from operations every five minutes when configured. Quotes, loads with a carrier, expired pickup dates, and loads without recent TAI operations activity are not bid-ready.
 
 The customer portal reads every shipment whose stored `customer_account_id` exactly equals the approved user's staff-linked TAI bill-to ID. The Fly relay and bridge carry a bill-to ID obtained from that shipment's TAI webhook; missing IDs stay unscoped. Customer history, status and last reported tracking are private to the matching account. Customer name/email matching does not grant access.
 
@@ -8,7 +8,7 @@ Carrier bids require an approved profile with contact name, phone and account em
 
 ## Release checks
 
-1. Deploy the website route and renderer; apply only `scripts/portal-email-upgrade.sql` to the website Supabase project `pzupanvsfrgudoghpjpq`. Do not rerun the historical baseline schema.
+1. Deploy the website route and renderer; apply `scripts/portal-email-upgrade.sql` and `scripts/portal-load-scope-upgrade.sql` to the website Supabase project `pzupanvsfrgudoghpjpq`. The latter accepts equal-time bridge snapshots so a corrected customer scope is withdrawn at the next successful bridge sync; it still rejects older TAI snapshots and preserves reservations. Do not rerun the historical baseline schema.
 2. Deploy the companion operations migration, relay and bridge in the order in its `docs/website-portal.md`; verify the existing bridge token is configured at both ends without displaying its value.
 3. With owner-controlled carrier and two separate customer accounts, compare all eligible Uncovered loads in operations with carrier board count. Check >200 loads if available, each search, an exact customer ID match and a cross-account denial.
 4. Submit a disposable test bid using approved owner-controlled accounts; verify the dispatch inbox received the contact name, phone, account email, amount and load reference. Inspect outbox errors if mail fails. Do not book or dispatch actual freight as a test.

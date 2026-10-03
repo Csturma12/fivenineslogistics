@@ -1,7 +1,7 @@
 import { after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { portalView } from "@/lib/portal-view";
-import { allPortalRows } from "@/lib/portal-pages";
+import { allPortalRows, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
 import {
   carrierLoad,
   centralToday,
@@ -182,18 +182,19 @@ export async function GET(request: Request) {
           profile.highway_status === "verified" &&
           setupMissing(profile, documents, centralToday()).length === 0)
       ) {
-        const rows = await allPortalRows((from, to) =>
-            db
+        const rows = await allPortalRows((afterId) => {
+          const query = db
               .from("fn_loads")
-              .select(LOAD_FIELDS)
+              .select(LOAD_FIELDS, { count: "exact" })
               .eq("status", "available")
               .is("reserved_by", null)
               .gte("updated_at", new Date(Date.now() - 86400000).toISOString())
               .or(`pickup_date.is.null,pickup_date.gte.${centralToday()}`)
-              .order("pickup_date", { ascending: true })
               .order("id", { ascending: true })
-              .range(from, to),
-          );
+              .limit(PORTAL_PAGE_SIZE);
+          return afterId ? query.gt("id", afterId) : query;
+        });
+        rows.sort((a, b) => (a.pickup_date || "").localeCompare(b.pickup_date || "") || a.id.localeCompare(b.id));
         loads = rows.map((row) => carrierLoad(row, process.env.PORTAL_AUTO_BOOK_ENABLED === "true"));
       }
       return Response.json(
@@ -203,16 +204,17 @@ export async function GET(request: Request) {
     }
     const rows =
       (staff || profile.status === "approved") && profile.customer_account_id
-        ? await allPortalRows((from, to) =>
-            db
+        ? await allPortalRows((afterId) => {
+            const query = db
               .from("fn_loads")
-              .select(`${LOAD_FIELDS},external_id,tracking_location,tracking_at`)
+              .select(`${LOAD_FIELDS},external_id,tracking_location,tracking_at`, { count: "exact" })
               .eq("customer_account_id", profile.customer_account_id)
-              .order("pickup_date", { ascending: false })
               .order("id", { ascending: true })
-              .range(from, to),
-          )
+              .limit(PORTAL_PAGE_SIZE);
+            return afterId ? query.gt("id", afterId) : query;
+          })
         : [];
+    rows.sort((a, b) => (b.pickup_date || "").localeCompare(a.pickup_date || "") || a.id.localeCompare(b.id));
     const loads = rows.map((row) => ({
       ...carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
       external_id: (row.external_id as string) || undefined,
