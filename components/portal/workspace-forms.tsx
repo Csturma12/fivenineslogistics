@@ -14,6 +14,8 @@ import {
   type Act,
   type Upload,
 } from "./workspace-ui";
+import { CityField } from "./city-field";
+import { EquipmentMultiSelect, EquipmentSelect } from "./equipment-field";
 
 export function ProfileForm({
   profile,
@@ -119,7 +121,7 @@ export function ProfileForm({
                     name="mc"
                     value={d.mc}
                   />
-                  <Field
+                  <EquipmentMultiSelect
                     label="Equipment types"
                     name="equipment"
                     value={d.equipment}
@@ -408,6 +410,7 @@ export function UploadForm({
 }
 export function LoadRequestForm({ act, busy }: { act: Act; busy: boolean }) {
   const [sent, setSent] = useState(false);
+  const [formKey, setFormKey] = useState(0);
   return (
     <Panel eyebrow="Start a project" title="Enter a load in our system">
       <p className="mb-6 text-sm leading-6 text-slate-600">
@@ -424,6 +427,7 @@ export function LoadRequestForm({ act, busy }: { act: Act; busy: boolean }) {
         </p>
       ) : null}
       <form
+        key={formKey}
         onSubmit={async (e) => {
           e.preventDefault();
           const form = e.currentTarget;
@@ -434,21 +438,21 @@ export function LoadRequestForm({ act, busy }: { act: Act; busy: boolean }) {
               details: Object.fromEntries(new FormData(form).entries()),
             })
           ) {
-            form.reset();
+            setFormKey((k) => k + 1);
             setSent(true);
           }
         }}
       >
         <fieldset disabled={busy} className="grid gap-4 sm:grid-cols-2">
-          <Field label="Origin city, state" name="origin" required />
-          <Field label="Destination city, state" name="destination" required />
+          <CityField label="Origin city, state" name="origin" required />
+          <CityField label="Destination city, state" name="destination" required />
           <Field label="Pickup date" name="pickup_date" type="date" required />
           <Field
             label="Delivery date, if known"
             name="delivery_date"
             type="date"
           />
-          <Field label="Equipment / freight mode" name="equipment" required />
+          <EquipmentSelect label="Equipment (TAI trailer type)" name="equipment" required />
           <Field label="Weight (lb)" name="weight" />
           <Field label="Dimensions, if known" name="dimensions" />
           <Field label="Instructions / project details" name="notes" />

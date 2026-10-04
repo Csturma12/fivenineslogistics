@@ -22,6 +22,8 @@ import {
   result,
   sameOrigin,
 } from "@/lib/portal-service";
+import { syncOpenLoads } from "@/lib/portal-load-sync";
+import { isTaiTrailerType } from "@/lib/tai-equipment";
 
 export const dynamic = "force-dynamic";
 const LOAD_FIELDS =
@@ -182,6 +184,9 @@ export async function GET(request: Request) {
           profile.highway_status === "verified" &&
           setupMissing(profile, documents, centralToday()).length === 0)
       ) {
+        await syncOpenLoads().catch((e) =>
+          console.error("Open load sync failed", e instanceof Error ? e.message : e),
+        );
         const rows =
           result(
             await db
@@ -260,6 +265,13 @@ export async function POST(request: Request) {
             { onConflict: "user_id", ignoreDuplicates: true },
           ),
       );
+    } else if (action === "refresh_loads") {
+      if (!staff) {
+        const p = await requireProfile(user.id, "carrier");
+        if (p.status !== "approved" || p.highway_status !== "verified")
+          throw new PortalProblem("Complete approved carrier setup to view the load board.", 403);
+      }
+      await syncOpenLoads({ force: true });
     } else if (action === "save_profile") {
       const profile = await requireProfile(user.id);
       const company = text(body.company);
@@ -354,6 +366,8 @@ export async function POST(request: Request) {
         details.delivery_date = calendarDate(body.details?.delivery_date);
         if (!details.origin || !details.destination || !details.equipment)
           throw new PortalProblem("Enter origin, destination and equipment.");
+        if (!isTaiTrailerType(details.equipment))
+          throw new PortalProblem("Choose equipment from the TAI trailer type list.");
         if (
           details.delivery_date &&
           details.delivery_date < details.pickup_date

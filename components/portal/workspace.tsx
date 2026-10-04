@@ -79,7 +79,11 @@ export function PortalWorkspace({
         const result = await readPortalBody(res);
         if (!res.ok)
           throw new Error(String(result.error || "Unable to save. Please retry."));
-        setNotice("Saved. Any required notifications are queued for delivery.");
+        setNotice(
+          body.action === "refresh_loads"
+            ? "Load board updated with the latest open freight."
+            : "Saved. Any required notifications are queued for delivery.",
+        );
       }
       try {
         await refresh();

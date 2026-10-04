@@ -6,6 +6,7 @@ import {
   setupMissing,
   type Workspace,
 } from "@/lib/portal-contract";
+import { groupOf, TAI_EQUIPMENT_GROUPS } from "@/lib/tai-equipment";
 import {
   Badge,
   button,
@@ -35,10 +36,13 @@ export function CarrierBoard({
     p.status === "approved" &&
     p.highway_status === "verified" &&
     !setupMissing(p, data.documents, centralToday()).length;
-  const loads = data.loads.filter((l) =>
-    `${lane(l)} ${l.equipment || ""}`
-      .toLowerCase()
-      .includes(search.toLowerCase()),
+  const [group, setGroup] = useState("");
+  const loads = data.loads.filter(
+    (l) =>
+      (!group || groupOf(l.equipment || "") === group) &&
+      `${lane(l)} ${l.equipment || ""} ${groupOf(l.equipment || "")}`
+        .toLowerCase()
+        .includes(search.trim().toLowerCase()),
   );
   const allLoads = [...data.loads, ...(data.historyLoads || [])];
   return (
@@ -64,15 +68,42 @@ export function CarrierBoard({
           </Empty>
         ) : (
           <>
-            <label className="mb-6 block max-w-md text-sm font-medium">
-              Find a lane or equipment
-              <input
-                className={input}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search city, state, flatbed…"
-              />
-            </label>
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end">
+              <label className="block flex-1 text-sm font-medium">
+                Find a lane
+                <input
+                  className={input}
+                  type="search"
+                  enterKeyHint="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="City, state or trailer type"
+                />
+              </label>
+              <label className="block text-sm font-medium sm:w-56">
+                Equipment
+                <select
+                  className={input}
+                  value={group}
+                  onChange={(e) => setGroup(e.target.value)}
+                >
+                  <option value="">All equipment</option>
+                  {TAI_EQUIPMENT_GROUPS.map((g) => (
+                    <option key={g.label} value={g.label}>
+                      {g.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="button"
+                className={`${secondary} min-h-11`}
+                disabled={busy}
+                onClick={() => act({ action: "refresh_loads" })}
+              >
+                {busy ? "Refreshing…" : "Refresh loads"}
+              </button>
+            </div>
             <div className="space-y-4">
               {loads.map((load) => (
                 <article

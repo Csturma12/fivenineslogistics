@@ -65,6 +65,9 @@ importers:
       unpdf:
         specifier: ^1.8.1
         version: 1.8.1
+      zipcodes:
+        specifier: 8.0.0
+        version: 8.0.0
     devDependencies:
       '@electric-sql/pglite':
         specifier: 0.3.14
@@ -81,6 +84,9 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.2.3(@types/react@19.2.14)
+      '@types/zipcodes':
+        specifier: 8.0.5
+        version: 8.0.5
       postcss:
         specifier: ^8.5
         version: 8.5.6
@@ -903,6 +909,9 @@ packages:
 
   '@types/validate-npm-package-name@4.0.2':
     resolution: {integrity: sha512-lrpDziQipxCEeK5kWxvljWYhUvOiB2A9izZd9B2AFarYAkqZshb4lPbRs7zKEic6eGtH8V/2qJW+dPp9OtF6bw==}
+
+  '@types/zipcodes@8.0.5':
+    resolution: {integrity: sha512-NxtKCnUa/LJ6kIku6Rl8mkXfpGkZ0y6AG7rh+WHYtaxfhVgi1bDOZDfGVZiY+JxW+GPdvYXmyERB9rd/xa/pEg==}
 
   '@vercel/analytics@1.6.1':
     resolution: {integrity: sha512-oH9He/bEM+6oKlv3chWuOOcp8Y6fo6/PSro8hEkgCW3pu9/OiCXiUpRUogDh3Fs3LH2sosDrx8CxeOLBEE+afg==}
@@ -2213,6 +2222,9 @@ packages:
     resolution: {integrity: sha512-CzhO+pFNo8ajLM2d2IW/R93ipy99LWjtwblvC1RsoSUMZgyLbYFr221TnSNT7GjGdYui6P459mw9JH/g/zW2ug==}
     engines: {node: '>=18'}
 
+  zipcodes@8.0.0:
+    resolution: {integrity: sha512-V8NolFaJhsPamGeCv5lJdk60Q7JBiXI6e+8JDksPC1NJWZ0t7g1OFfqVLZb2Nc2F5jmf9JTdYdWJBnIhGBvtbA==}
+
   zod-to-json-schema@3.25.2:
     resolution: {integrity: sha512-O/PgfnpT1xKSDeQYSCfRI5Gy3hPf91mKVDuYLUHZJMiDFptvP41MSnWofm8dnCm0256ZNfZIM7DSzuSMAFnjHA==}
     peerDependencies:
@@ -2919,6 +2931,8 @@ snapshots:
       csstype: 3.2.3
 
   '@types/validate-npm-package-name@4.0.2': {}
+
+  '@types/zipcodes@8.0.5': {}
 
   '@vercel/analytics@1.6.1(next@16.3.3(@babel/core@7.29.7)(@types/node@24.10.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)':
     optionalDependencies:
@@ -4118,6 +4132,8 @@ snapshots:
       yoctocolors: 2.1.2
 
   yoctocolors@2.1.2: {}
+
+  zipcodes@8.0.0: {}
 
   zod-to-json-schema@3.25.2(zod@3.25.76):
     dependencies:
