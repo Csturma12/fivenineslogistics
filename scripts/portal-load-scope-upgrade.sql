@@ -1,8 +1,39 @@
 -- Website database only: pzupanvsfrgudoghpjpq. Apply after the portal routes deploy.
 -- A local correction can withdraw a customer bill-to ID without changing the
--- upstream TAI activity timestamp. Equal-time bridge snapshots must therefore
--- update customer scope; genuinely older snapshots still cannot roll it back.
+-- upstream TAI activity timestamp. Once scope changes, equal-time snapshots
+-- cannot restore a prior customer link; a strictly newer timestamp can.
 begin;
+alter table fn_loads
+  add column if not exists customer_scope_withdrawn boolean not null default false;
+
+create table if not exists fn_load_sync_state (
+  id text primary key check (id <> ''),
+  version bigint not null default 0
+);
+alter table fn_load_sync_state enable row level security;
+revoke all on fn_load_sync_state from public,anon,authenticated;
+grant select,insert,update,delete on fn_load_sync_state to service_role;
+
+create or replace function public.fn_bump_load_sync_version()
+returns trigger language plpgsql set search_path=public,pg_temp as $$
+begin
+  insert into fn_load_sync_state(id,version) values ('carrier:*',1)
+    on conflict(id) do update set version=fn_load_sync_state.version+1;
+  if new.customer_account_id is not null then
+    insert into fn_load_sync_state(id,version) values ('customer:'||new.customer_account_id,1)
+      on conflict(id) do update set version=fn_load_sync_state.version+1;
+  end if;
+  if tg_op='UPDATE' and old.customer_account_id is not null
+     and old.customer_account_id is distinct from new.customer_account_id then
+    insert into fn_load_sync_state(id,version) values ('customer:'||old.customer_account_id,1)
+      on conflict(id) do update set version=fn_load_sync_state.version+1;
+  end if;
+  return null;
+end $$;
+drop trigger if exists fn_load_sync_version on fn_loads;
+create trigger fn_load_sync_version after insert or update on fn_loads
+  for each row execute function public.fn_bump_load_sync_version();
+
 create or replace function public.fn_ingest_loads(p_rows jsonb)
 returns integer language plpgsql security invoker set search_path=public,pg_temp as $$
 declare total integer;
@@ -13,8 +44,15 @@ begin
   on conflict(external_id) do update set customer_account_id=excluded.customer_account_id,status=excluded.status,
     origin_city=excluded.origin_city,origin_state=excluded.origin_state,dest_city=excluded.dest_city,dest_state=excluded.dest_state,
     pickup_date=excluded.pickup_date,delivery_date=excluded.delivery_date,equipment=excluded.equipment,weight_lbs=excluded.weight_lbs,dimensions=excluded.dimensions,
-    carrier_offer_usd=excluded.carrier_offer_usd,auto_book=excluded.auto_book,tracking_location=excluded.tracking_location,tracking_at=excluded.tracking_at,updated_at=excluded.updated_at
-  where excluded.updated_at>=fn_loads.updated_at;
+    carrier_offer_usd=excluded.carrier_offer_usd,auto_book=excluded.auto_book,tracking_location=excluded.tracking_location,tracking_at=excluded.tracking_at,updated_at=excluded.updated_at,
+    customer_scope_withdrawn=fn_loads.customer_scope_withdrawn
+      or (fn_loads.customer_account_id is not null
+        and fn_loads.customer_account_id is distinct from excluded.customer_account_id)
+  where excluded.updated_at>fn_loads.updated_at
+     or (excluded.updated_at=fn_loads.updated_at
+       and not (fn_loads.customer_scope_withdrawn
+         and excluded.customer_account_id is not null
+         and excluded.customer_account_id is distinct from fn_loads.customer_account_id));
   get diagnostics total=row_count;
   return total;
 end $$;

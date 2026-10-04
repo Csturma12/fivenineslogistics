@@ -36,6 +36,8 @@ export function PortalWorkspace({
   const [tab, setTab] = useState("");
   const inFlight = useRef(false);
   const refreshVersion = useRef(0);
+  const dataRef = useRef(data);
+  dataRef.current = data;
   const p = data?.profile;
   const staff = !!data?.staff;
   const { role: viewRole, readOnly: alternateView } = portalView({
@@ -46,7 +48,12 @@ export function PortalWorkspace({
     if (previewData || (inFlight.current && !afterSave)) return;
     const version = ++refreshVersion.current;
     try {
-      const query = desk ? "?desk=1" : initialRole ? `?role=${initialRole}` : "";
+      const params = new URLSearchParams();
+      if (desk) params.set("desk", "1");
+      else if (initialRole) params.set("role", initialRole);
+      if (!afterSave && dataRef.current?.loadVersion)
+        params.set("loadsVersion", dataRef.current.loadVersion);
+      const query = params.size ? `?${params}` : "";
       const res = await fetch(`/api/portal/workspace${query}`, {
         cache: "no-store",
       });
@@ -61,7 +68,12 @@ export function PortalWorkspace({
         }
         throw new Error(String(body.error || "Unable to load your portal."));
       }
-      setData(body as unknown as Workspace);
+      const nextData = body as unknown as Workspace;
+      if (nextData.loadsUnchanged && dataRef.current) {
+        nextData.loads = dataRef.current.loads;
+        nextData.historyLoads = dataRef.current.historyLoads;
+      }
+      setData(nextData);
     } catch (e) {
       if (version === refreshVersion.current) throw e;
     }

@@ -15,7 +15,7 @@ import {
 import { ingestRows } from "../lib/portal-ingest";
 import { notificationHtml, notificationRecipient, PORTAL_DISPATCH_EMAIL } from "../lib/portal-notification";
 import { filterCarrierLoads } from "../lib/portal-board";
-import { allPortalRows } from "../lib/portal-pages";
+import { allPortalRows, allPortalRowsAtVersion, comparePickupDate } from "../lib/portal-pages";
 import { requireBridgeToken } from "../lib/portal-bridge-auth";
 
 test("bridge requires a configured strong token and an exact bearer credential", () => {
@@ -65,6 +65,38 @@ test("all open loads are read across page boundaries and can be filtered by pick
     return { data: remaining.slice(0, 100), count: remaining.length, error: null };
   });
   assert.equal(smallPages.length, 1201);
+});
+
+test("a load made eligible behind the cursor is found after the feed revision changes", async () => {
+  let version = "1";
+  let inserted = false;
+  const ids = ["b", "c", "d", "e"];
+  const result = await allPortalRowsAtVersion(
+    async (afterId) => {
+      if (afterId === "c" && !inserted) {
+        ids.unshift("a");
+        inserted = true;
+        version = "2";
+      }
+      const remaining = ids.filter((id) => afterId === null || id > afterId);
+      const data = remaining.slice(0, 2).map((id) => ({ id }));
+      return { data, count: remaining.length, error: null };
+    },
+    version,
+    async () => version,
+  );
+  assert.deepEqual(result.rows.map((row) => row.id), ["a", "b", "c", "d", "e"]);
+  assert.equal(result.version, "2");
+});
+
+test("pickup-date sorting keeps undated loads last in either direction", () => {
+  const rows = [
+    { id: "b", pickup_date: null },
+    { id: "c", pickup_date: "2026-10-06" },
+    { id: "a", pickup_date: "2026-10-05" },
+  ];
+  assert.deepEqual([...rows].sort((a, b) => comparePickupDate(a, b, "asc")).map((row) => row.id), ["a", "c", "b"]);
+  assert.deepEqual([...rows].sort((a, b) => comparePickupDate(a, b, "desc")).map((row) => row.id), ["c", "a", "b"]);
 });
 
 const db = new PGlite();
@@ -472,7 +504,7 @@ test("stale loads and changed offers cannot be booked", async () => {
   );
   await assert.rejects(() => bid(a, "auto_book", l, 1500));
 });
-test("feed preserves reservations and ignores older snapshots", async () => {
+test("feed preserves reservations and blocks stale equal-time scope replays", async () => {
   const a = await carrier(),
     l = await load();
   await bid(a, "auto_book", l, 1500);
@@ -493,6 +525,7 @@ test("feed preserves reservations and ignores older snapshots", async () => {
   // The TAI clock does not advance when a local name correction withdraws an
   // old customer ID. A same-clock snapshot must immediately revoke access.
   await db.query("select fn_ingest_loads($1)", [JSON.stringify([{ ...newer, customer_account_id: null }])]);
+  await db.query("select fn_ingest_loads($1)", [JSON.stringify([newer])]);
   await db.query("select fn_ingest_loads($1)", [
     JSON.stringify([
       {
@@ -511,4 +544,38 @@ test("feed preserves reservations and ignores older snapshots", async () => {
   assert.equal(row.reserved_by, a);
   assert.equal(row.origin_city, "New origin");
   assert.equal(row.customer_account_id, null);
+});
+
+test("load-feed revisions change only for affected customer scopes", async () => {
+  const l = await load("revision-account-a");
+  const original = (
+    await db.query<Record<string, unknown>>("select * from fn_loads where id=$1", [l])
+  ).rows[0];
+  const version = async (scope: string) => {
+    const rows = await db.query<{ version: number }>(
+      "select version from fn_load_sync_state where id=$1",
+      [scope],
+    );
+    return rows.rows[0]?.version || 0;
+  };
+  const accountA = "customer:revision-account-a";
+  const accountB = "customer:revision-account-b";
+  const beforeA = await version(accountA);
+  const beforeB = await version(accountB);
+  const updated = {
+    ...original,
+    updated_at: new Date(Date.parse(String(original.updated_at)) + 1000).toISOString(),
+  };
+  await db.query("select fn_ingest_loads($1)", [JSON.stringify([updated])]);
+  assert.ok((await version(accountA)) > beforeA);
+  assert.equal(await version(accountB), beforeB);
+  await db.query("select fn_ingest_loads($1)", [
+    JSON.stringify([{
+      ...updated,
+      customer_account_id: "revision-account-b",
+      updated_at: new Date(Date.parse(updated.updated_at) + 1000).toISOString(),
+    }]),
+  ]);
+  assert.ok((await version(accountA)) > beforeA);
+  assert.ok((await version(accountB)) > beforeB);
 });

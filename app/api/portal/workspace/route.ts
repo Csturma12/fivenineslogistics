@@ -1,7 +1,7 @@
 import { after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { portalView } from "@/lib/portal-view";
-import { allPortalRows, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
+import { allPortalRowsAtVersion, comparePickupDate, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
 import {
   carrierLoad,
   centralToday,
@@ -30,11 +30,20 @@ const LOAD_FIELDS =
   "id,status,origin_city,origin_state,dest_city,dest_state,pickup_date,delivery_date,equipment,weight_lbs,dimensions,auto_book,carrier_offer_usd";
 const DOCUMENT_FIELDS = "id,user_id,kind,name,created_at,included_kinds,reviewed_at";
 const DOCUMENT_CHECK_FIELDS = "id,kind,included_kinds,reviewed_at";
+const loadVersionToken = (scope: string, version: string) =>
+  JSON.stringify([scope, version]);
+async function readLoadVersion(db: ReturnType<typeof createAdminClient>, scope: string) {
+  const state = result(
+    await db.from("fn_load_sync_state").select("version").eq("id", scope).maybeSingle(),
+  ) as { version: string | number } | null;
+  return state ? String(state.version) : "0";
+}
 export async function GET(request: Request) {
   try {
     const { user, staff } = await portalIdentity();
     const params = new URL(request.url).searchParams;
     const desk = params.get("desk") === "1";
+    const requestedLoadVersion = params.get("loadsVersion");
     if (desk && !staff)
       throw new PortalProblem("Agent desk access required.", 403);
     const db = createAdminClient();
@@ -167,44 +176,72 @@ export async function GET(request: Request) {
       const historyIds = [
         ...new Set([...bids, ...bookings].map((row) => row.load_id)),
       ];
-      const historyRows = historyIds.length
-        ? result(
-            await db.from("fn_loads").select(LOAD_FIELDS).in("id", historyIds),
-          ) || []
-        : [];
-      const historyLoads = historyRows.map((row) =>
-        carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
-      );
       let loads: ReturnType<typeof carrierLoad>[] = [];
+      let historyLoads: ReturnType<typeof carrierLoad>[] = [];
+      let loadVersion: string | undefined;
+      let loadsUnchanged = false;
       if (
         staff ||
         (profile.status === "approved" &&
           profile.highway_status === "verified" &&
           setupMissing(profile, documents, centralToday()).length === 0)
       ) {
-        const rows = await allPortalRows((afterId) => {
-          const query = db
-              .from("fn_loads")
-              .select(LOAD_FIELDS, { count: "exact" })
-              .eq("status", "available")
-              .is("reserved_by", null)
-              .gte("updated_at", new Date(Date.now() - 86400000).toISOString())
-              .or(`pickup_date.is.null,pickup_date.gte.${centralToday()}`)
-              .order("id", { ascending: true })
-              .limit(PORTAL_PAGE_SIZE);
-          return afterId ? query.gt("id", afterId) : query;
-        });
-        rows.sort((a, b) => (a.pickup_date || "").localeCompare(b.pickup_date || "") || a.id.localeCompare(b.id));
-        loads = rows.map((row) => carrierLoad(row, process.env.PORTAL_AUTO_BOOK_ENABLED === "true"));
+        const version = await readLoadVersion(db, "carrier:*");
+        loadVersion = loadVersionToken("carrier", version);
+        if (requestedLoadVersion === loadVersion) {
+          loadsUnchanged = true;
+        } else {
+          const snapshot = await allPortalRowsAtVersion<Record<string, unknown> & { id: string; pickup_date: string | null }>(
+            (afterId) => {
+              const query = db
+                .from("fn_loads")
+                .select(LOAD_FIELDS, { count: "exact" })
+                .eq("status", "available")
+                .is("reserved_by", null)
+                .gte("updated_at", new Date(Date.now() - 86400000).toISOString())
+                .or(`pickup_date.is.null,pickup_date.gte.${centralToday()}`)
+                .order("id", { ascending: true })
+                .limit(PORTAL_PAGE_SIZE);
+              return afterId ? query.gt("id", afterId) : query;
+            },
+            version,
+            () => readLoadVersion(db, "carrier:*"),
+          );
+          loadVersion = loadVersionToken("carrier", snapshot.version);
+          snapshot.rows.sort((a, b) => comparePickupDate(a, b, "asc"));
+          loads = snapshot.rows.map((row) => carrierLoad(row, process.env.PORTAL_AUTO_BOOK_ENABLED === "true"));
+        }
+      }
+      if (!loadsUnchanged) {
+        const historyRows = historyIds.length
+          ? result(
+              await db.from("fn_loads").select(LOAD_FIELDS).in("id", historyIds),
+            ) || []
+          : [];
+        historyLoads = historyRows.map((row) =>
+          carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
+        );
       }
       return Response.json(
-        { ...base, documents, requests, bids, bookings, loads, historyLoads },
+        {
+          ...base, documents, requests, bids, bookings, loads, historyLoads,
+          ...(loadVersion ? { loadVersion, loadsUnchanged } : {}),
+        },
         { headers: { "Cache-Control": "private, no-store" } },
       );
     }
-    const rows =
-      (staff || profile.status === "approved") && profile.customer_account_id
-        ? await allPortalRows((afterId) => {
+    let loads: ReturnType<typeof carrierLoad>[] = [];
+    let loadVersion: string | undefined;
+    let loadsUnchanged = false;
+    if ((staff || profile.status === "approved") && profile.customer_account_id) {
+      const scope = `customer:${profile.customer_account_id}`;
+      const version = await readLoadVersion(db, scope);
+      loadVersion = loadVersionToken(scope, version);
+      if (requestedLoadVersion === loadVersion) {
+        loadsUnchanged = true;
+      } else {
+        const snapshot = await allPortalRowsAtVersion<Record<string, unknown> & { id: string; pickup_date: string | null }>(
+          (afterId) => {
             const query = db
               .from("fn_loads")
               .select(`${LOAD_FIELDS},external_id,tracking_location,tracking_at`, { count: "exact" })
@@ -212,17 +249,25 @@ export async function GET(request: Request) {
               .order("id", { ascending: true })
               .limit(PORTAL_PAGE_SIZE);
             return afterId ? query.gt("id", afterId) : query;
-          })
-        : [];
-    rows.sort((a, b) => (b.pickup_date || "").localeCompare(a.pickup_date || "") || a.id.localeCompare(b.id));
-    const loads = rows.map((row) => ({
-      ...carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
-      external_id: (row.external_id as string) || undefined,
-      tracking_location: row.tracking_location,
-      tracking_at: row.tracking_at,
-    }));
+          },
+          version,
+          () => readLoadVersion(db, scope),
+        );
+        snapshot.rows.sort((a, b) => comparePickupDate(a, b, "desc"));
+        loadVersion = loadVersionToken(scope, snapshot.version);
+        loads = snapshot.rows.map((row) => ({
+          ...carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
+          external_id: (row.external_id as string) || undefined,
+          tracking_location: row.tracking_location as string | null,
+          tracking_at: row.tracking_at as string | null,
+        }));
+      }
+    }
     return Response.json(
-      { ...base, documents, requests, loads },
+      {
+        ...base, documents, requests, loads,
+        ...(loadVersion ? { loadVersion, loadsUnchanged } : {}),
+      },
       { headers: { "Cache-Control": "private, no-store" } },
     );
   } catch (e) {
