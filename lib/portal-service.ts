@@ -2,7 +2,7 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPortalEmail } from "@/lib/portal-mail";
-import { notificationHtml } from "@/lib/portal-notification";
+import { notificationHtml, notificationRecipient } from "@/lib/portal-notification";
 import { DOCUMENT_BUCKET, PortalProblem, type Profile } from "@/lib/portal-contract";
 import { verifiedPortalIdentity } from "@/lib/portal-access-policy";
 
@@ -129,7 +129,7 @@ export async function flushNotifications() {
     }
     try {
       const response = await sendPortalEmail({
-        to: [event.recipient],
+        to: [notificationRecipient(event)],
         subject: event.subject,
         html: notificationHtml(event),
         idempotencyKey: `portal-event/${event.id}`,

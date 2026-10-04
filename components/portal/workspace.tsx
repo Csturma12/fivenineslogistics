@@ -35,35 +35,61 @@ export function PortalWorkspace({
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState("");
   const inFlight = useRef(false);
+  const refreshVersion = useRef(0);
+  const dataRef = useRef(data);
+  dataRef.current = data;
   const p = data?.profile;
   const staff = !!data?.staff;
   const { role: viewRole, readOnly: alternateView } = portalView({
     staff, profileRole: p?.role, requestedRole: initialRole,
   });
   const readOnly = !desk && alternateView;
-  const refresh = useCallback(async () => {
-    if (previewData) return;
-    const query = desk ? "?desk=1" : initialRole ? `?role=${initialRole}` : "";
-    const res = await fetch(`/api/portal/workspace${query}`, {
-      cache: "no-store",
-    });
-    const body = await readPortalBody(res);
-    if (!res.ok) {
-      if (res.status === 401 || (desk && res.status === 403)) {
-        setData(null);
-        window.location.assign(desk ? "/agent-desk" : "/portal");
+  const refresh = useCallback(async (afterSave = false) => {
+    if (previewData || (inFlight.current && !afterSave)) return;
+    const version = ++refreshVersion.current;
+    try {
+      const params = new URLSearchParams();
+      if (desk) params.set("desk", "1");
+      else if (initialRole) params.set("role", initialRole);
+      if (!afterSave && dataRef.current?.loadVersion)
+        params.set("loadsVersion", dataRef.current.loadVersion);
+      const query = params.size ? `?${params}` : "";
+      const res = await fetch(`/api/portal/workspace${query}`, {
+        cache: "no-store",
+      });
+      const body = await readPortalBody(res);
+      // A pending poll can finish after a bid or reservation is saved. It must
+      // not overwrite the newer workspace response or trigger an old redirect.
+      if (version !== refreshVersion.current) return;
+      if (!res.ok) {
+        if (res.status === 401 || (desk && res.status === 403)) {
+          setData(null);
+          window.location.assign(desk ? "/agent-desk" : "/portal");
+        }
+        throw new Error(String(body.error || "Unable to load your portal."));
       }
-      throw new Error(String(body.error || "Unable to load your portal."));
+      const nextData = body as unknown as Workspace;
+      if (nextData.loadsUnchanged && dataRef.current) {
+        nextData.loads = dataRef.current.loads;
+      }
+      setData(nextData);
+    } catch (e) {
+      if (version === refreshVersion.current) throw e;
     }
-    setData(body as unknown as Workspace);
   }, [desk, previewData, initialRole]);
   useEffect(() => {
     let active = true;
     refresh().catch((e) => {
       if (active) setError(e.message);
     });
+    const timer = previewData ? null : window.setInterval(() => {
+      if (!inFlight.current) void refresh().catch((e) => {
+        if (active) setError(e.message);
+      });
+    }, 60_000);
     return () => {
       active = false;
+      if (timer !== null) window.clearInterval(timer);
     };
   }, [refresh]);
   const send = async (body: Record<string, unknown> | FormData) => {
@@ -77,6 +103,7 @@ export function PortalWorkspace({
     }
     if (inFlight.current) return false;
     inFlight.current = true;
+    ++refreshVersion.current;
     setBusy(true);
     setError("");
     setNotice("");
@@ -96,7 +123,7 @@ export function PortalWorkspace({
         setNotice("Saved. Any required notifications are queued for delivery.");
       }
       try {
-        await refresh();
+        await refresh(true);
       } catch {
         setError(
           "Saved successfully, but the view could not refresh. Refresh before making another change.",

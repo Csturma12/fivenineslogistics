@@ -380,9 +380,9 @@ export function WorkspaceDesk({
       </Panel>
       <Panel title="Email delivery queue">
         <p className="mb-4 text-sm text-slate-600">
-          Dispatch inbox: sturma@blbxcritical.com. A saved request is retained
-          even if email delivery fails. Items older than 23 hours require manual
-          follow-up.
+          Carrier bids and reservations go to dispatch@shipfivenines.com. Saved
+          alerts remain in the queue if email delivery fails. Items older than
+          23 hours require manual follow-up.
         </p>
         <button
           className={secondary}

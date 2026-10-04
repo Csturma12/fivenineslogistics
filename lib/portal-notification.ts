@@ -1,4 +1,16 @@
 /** Pure renderer: only explicitly selected operational fields enter internal emails. */
+import { site } from "./site";
+
+const LEGACY_INBOX = "sturma@blbxcritical.com";
+export const PORTAL_DISPATCH_EMAIL = site.dispatchEmail;
+
+// In-flight carrier summaries created by the old procedure still have the
+// legacy recipient. Deliver them to dispatch without rewriting the outbox row.
+export function notificationRecipient(event: { recipient: string; subject: string }): string {
+  return event.recipient.toLowerCase() === LEGACY_INBOX &&
+    ["New carrier bid", "Carrier reservation - dispatch action required"].includes(event.subject)
+    ? PORTAL_DISPATCH_EMAIL : event.recipient;
+}
 const escape = (value: unknown): string =>
   String(value ?? "Not provided").replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
@@ -20,7 +32,7 @@ const fields = [
 ] as const;
 
 export function notificationHtml(event: { recipient: string; detail: string }): string {
-  const internal = event.recipient.toLowerCase() === "sturma@blbxcritical.com";
+  const internal = [PORTAL_DISPATCH_EMAIL, LEGACY_INBOX].includes(event.recipient.toLowerCase());
   const link = `<p><a href="https://fivenineslogistics.com/${internal ? "agent-desk" : "portal/home"}">Open Five Nines to review</a></p>`;
   let data: Record<string, unknown> | undefined;
   try { data = JSON.parse(event.detail); } catch { /* Existing plain-text queue entries. */ }
@@ -37,7 +49,7 @@ export function notificationHtml(event: { recipient: string; detail: string }): 
     return `<div style="background:#f1f5f9;padding:24px;font-family:Arial,sans-serif;color:#133457"><div style="max-width:640px;margin:auto;background:white;padding:24px">
       <p style="font-size:12px;letter-spacing:2px">FIVE NINES LOGISTICS · INTERNAL</p>
       <h1 style="font-size:24px">${pendingBid ? "Carrier bid summary" : "Draft booking summary"}</h1>
-      <p style="background:#fff7ed;padding:14px"><strong>${pendingBid ? "BID RECEIVED — REVIEW REQUIRED" : "PENDING DISPATCH CONFIRMATION"}</strong><br>This is a mock operational summary, not a rate confirmation or authorization to dispatch a truck.</p>
+      <p style="background:#fff7ed;padding:14px"><strong>${pendingBid ? "BID RECEIVED — REVIEW REQUIRED" : "PENDING DISPATCH CONFIRMATION"}</strong><br>This summary is not a rate confirmation or authorization to dispatch a truck.</p>
       <table style="border-collapse:collapse;width:100%;font-size:14px">${row(pendingBid ? "Carrier bid (USD)" : "Carrier offer accepted (USD)", amount)}${row("Source", data.source === "auto_book" ? "Auto-book request" : data.source === "counter" ? "Carrier accepted counteroffer" : "Carrier bid")}${fields.map(([key, label]) => row(label, data[key])).join("")}</table>
       <p>${pendingBid ? "Accept, deny, or counter in the authenticated desk." : "Verify availability and complete the existing TAI assignment/write-back process before sending a final rate confirmation."}</p>
       <p>Customer pricing, tax documents, banking details, and private document links are intentionally excluded. Review protected documents in the portal.</p>${link}</div></div>`;

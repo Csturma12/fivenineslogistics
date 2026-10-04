@@ -103,6 +103,8 @@ export type Workspace = {
   profile: Profile | null;
   hint: string;
   company: string;
+  loadVersion?: string;
+  loadsUnchanged?: boolean;
   documents: PortalDoc[];
   companyDocuments: PortalDoc[];
   loads: PortalLoad[];
