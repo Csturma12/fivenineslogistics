@@ -1,7 +1,7 @@
 import { after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { portalView } from "@/lib/portal-view";
-import { allPortalRowsAtVersion, comparePickupDate, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
+import { allPortalRowsAtVersion, carrierEligibilityKey, comparePickupDate, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
 import {
   carrierLoad,
   centralToday,
@@ -30,8 +30,8 @@ const LOAD_FIELDS =
   "id,status,origin_city,origin_state,dest_city,dest_state,pickup_date,delivery_date,equipment,weight_lbs,dimensions,auto_book,carrier_offer_usd";
 const DOCUMENT_FIELDS = "id,user_id,kind,name,created_at,included_kinds,reviewed_at";
 const DOCUMENT_CHECK_FIELDS = "id,kind,included_kinds,reviewed_at";
-const loadVersionToken = (scope: string, version: string) =>
-  JSON.stringify([scope, version]);
+const loadVersionToken = (scope: string, version: string, eligibility?: string) =>
+  JSON.stringify([scope, version, eligibility]);
 async function readLoadVersion(db: ReturnType<typeof createAdminClient>, scope: string) {
   const state = result(
     await db.from("fn_load_sync_state").select("version").eq("id", scope).maybeSingle(),
@@ -186,8 +186,11 @@ export async function GET(request: Request) {
           profile.highway_status === "verified" &&
           setupMissing(profile, documents, centralToday()).length === 0)
       ) {
+        const now = Date.now();
+        const today = centralToday();
+        const eligibility = carrierEligibilityKey(now, today);
         const version = await readLoadVersion(db, "carrier:*");
-        loadVersion = loadVersionToken("carrier", version);
+        loadVersion = loadVersionToken("carrier", version, eligibility);
         if (requestedLoadVersion === loadVersion) {
           loadsUnchanged = true;
         } else {
@@ -198,8 +201,8 @@ export async function GET(request: Request) {
                 .select(LOAD_FIELDS, { count: "exact" })
                 .eq("status", "available")
                 .is("reserved_by", null)
-                .gte("updated_at", new Date(Date.now() - 86400000).toISOString())
-                .or(`pickup_date.is.null,pickup_date.gte.${centralToday()}`)
+                .gte("updated_at", new Date(now - 86400000).toISOString())
+                .or(`pickup_date.is.null,pickup_date.gte.${today}`)
                 .order("id", { ascending: true })
                 .limit(PORTAL_PAGE_SIZE);
               return afterId ? query.gt("id", afterId) : query;
@@ -207,21 +210,19 @@ export async function GET(request: Request) {
             version,
             () => readLoadVersion(db, "carrier:*"),
           );
-          loadVersion = loadVersionToken("carrier", snapshot.version);
+          loadVersion = loadVersionToken("carrier", snapshot.version, eligibility);
           snapshot.rows.sort((a, b) => comparePickupDate(a, b, "asc"));
           loads = snapshot.rows.map((row) => carrierLoad(row, process.env.PORTAL_AUTO_BOOK_ENABLED === "true"));
         }
       }
-      if (!loadsUnchanged) {
-        const historyRows = historyIds.length
-          ? result(
-              await db.from("fn_loads").select(LOAD_FIELDS).in("id", historyIds),
-            ) || []
-          : [];
-        historyLoads = historyRows.map((row) =>
-          carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
-        );
-      }
+      const historyRows = historyIds.length
+        ? result(
+            await db.from("fn_loads").select(LOAD_FIELDS).in("id", historyIds),
+          ) || []
+        : [];
+      historyLoads = historyRows.map((row) =>
+        carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
+      );
       return Response.json(
         {
           ...base, documents, requests, bids, bookings, loads, historyLoads,

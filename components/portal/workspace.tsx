@@ -71,7 +71,6 @@ export function PortalWorkspace({
       const nextData = body as unknown as Workspace;
       if (nextData.loadsUnchanged && dataRef.current) {
         nextData.loads = dataRef.current.loads;
-        nextData.historyLoads = dataRef.current.historyLoads;
       }
       setData(nextData);
     } catch (e) {

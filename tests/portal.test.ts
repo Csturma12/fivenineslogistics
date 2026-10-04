@@ -15,7 +15,7 @@ import {
 import { ingestRows } from "../lib/portal-ingest";
 import { notificationHtml, notificationRecipient, PORTAL_DISPATCH_EMAIL } from "../lib/portal-notification";
 import { filterCarrierLoads } from "../lib/portal-board";
-import { allPortalRows, allPortalRowsAtVersion, comparePickupDate } from "../lib/portal-pages";
+import { allPortalRows, allPortalRowsAtVersion, carrierEligibilityKey, comparePickupDate } from "../lib/portal-pages";
 import { requireBridgeToken } from "../lib/portal-bridge-auth";
 
 test("bridge requires a configured strong token and an exact bearer credential", () => {
@@ -97,6 +97,17 @@ test("pickup-date sorting keeps undated loads last in either direction", () => {
   ];
   assert.deepEqual([...rows].sort((a, b) => comparePickupDate(a, b, "asc")).map((row) => row.id), ["a", "c", "b"]);
   assert.deepEqual([...rows].sort((a, b) => comparePickupDate(a, b, "desc")).map((row) => row.id), ["c", "a", "b"]);
+});
+
+test("carrier board cache expires with each eligibility minute and Chicago pickup date", () => {
+  assert.notEqual(
+    carrierEligibilityKey(60_000, "2026-10-04"),
+    carrierEligibilityKey(120_000, "2026-10-04"),
+  );
+  assert.notEqual(
+    carrierEligibilityKey(120_000, "2026-10-04"),
+    carrierEligibilityKey(120_000, "2026-10-05"),
+  );
 });
 
 const db = new PGlite();
@@ -527,6 +538,13 @@ test("feed preserves reservations and blocks stale equal-time scope replays", as
   await db.query("select fn_ingest_loads($1)", [JSON.stringify([{ ...newer, customer_account_id: null }])]);
   await db.query("select fn_ingest_loads($1)", [JSON.stringify([newer])]);
   await db.query("select fn_ingest_loads($1)", [
+    JSON.stringify([{ ...newer, customer_account_id: "102" }]),
+  ]);
+  await db.query("select fn_ingest_loads($1)", [
+    JSON.stringify([{ ...newer, customer_account_id: "103" }]),
+  ]);
+  await db.query("select fn_ingest_loads($1)", [JSON.stringify([newer])]);
+  await db.query("select fn_ingest_loads($1)", [
     JSON.stringify([
       {
         ...newer,
@@ -543,7 +561,7 @@ test("feed preserves reservations and blocks stale equal-time scope replays", as
   ).rows[0];
   assert.equal(row.reserved_by, a);
   assert.equal(row.origin_city, "New origin");
-  assert.equal(row.customer_account_id, null);
+  assert.equal(row.customer_account_id, "103");
 });
 
 test("load-feed revisions change only for affected customer scopes", async () => {
@@ -578,4 +596,26 @@ test("load-feed revisions change only for affected customer scopes", async () =>
   ]);
   assert.ok((await version(accountA)) > beforeA);
   assert.ok((await version(accountB)) > beforeB);
+});
+
+test("load sync revisions advance once per multirow statement", async () => {
+  const before = await db.query<{ version: number }>(
+    "select version from fn_load_sync_state where id='carrier:*'",
+  );
+  await db.query(`insert into fn_loads(external_id,customer_account_id,status,origin_city,origin_state,dest_city,dest_state)
+    values ('batch-revision-a','batch-account','available','Houston','TX','Dallas','TX'),
+           ('batch-revision-b','batch-account','available','Austin','TX','Dallas','TX')`);
+  const inserted = await db.query<{ version: number }>(
+    "select version from fn_load_sync_state where id='carrier:*'",
+  );
+  const customerInserted = await db.query<{ version: number }>(
+    "select version from fn_load_sync_state where id='customer:batch-account'",
+  );
+  assert.equal(inserted.rows[0].version, before.rows[0].version + 1);
+  assert.equal(customerInserted.rows[0].version, 1);
+  await db.query("update fn_loads set origin_city='Updated' where external_id like 'batch-revision-%'");
+  const updated = await db.query<{ version: number }>(
+    "select version from fn_load_sync_state where id='carrier:*'",
+  );
+  assert.equal(updated.rows[0].version, inserted.rows[0].version + 1);
 });

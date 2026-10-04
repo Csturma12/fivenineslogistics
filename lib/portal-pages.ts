@@ -3,6 +3,9 @@ import { PortalProblem } from "./portal-contract";
 // Traverse stable IDs so a reservation/removal in an earlier page cannot
 // shift a later offset and silently skip another available load.
 export const PORTAL_PAGE_SIZE = 500;
+export function carrierEligibilityKey(now: number, chicagoDate: string): string {
+  return `${Math.floor(now / 60_000)}:${chicagoDate}`;
+}
 export async function allPortalRows<T extends { id: string }>(
   page: (afterId: string | null) => PromiseLike<{ data: T[] | null; count: number | null; error: { message: string } | null }>,
 ): Promise<T[]> {
