@@ -37,13 +37,16 @@ Do not run the same successful verification more than once unless code changed a
 
 ## Stop conditions
 Stop and report instead of expanding scope if:
-- a production configuration or deployment change is required;
+- a production configuration or deployment change outside the authorized task scope is required;
 - an unexpected database/schema migration is required;
-- authentication/authorization architecture must change;
+- authentication/authorization architecture must change outside the authorized task scope;
 - completing the task requires a substantial unrelated refactor;
 - an existing active branch or PR appears to already implement the same change;
 - a blocker cannot be resolved within the files directly related to the task.
 
+Explicitly authorized work within the task scope should proceed under the existing safety and verification requirements.
+
 ## Git and deployment safety
-Do not merge, deploy, or change production configuration unless the current task explicitly authorizes it.
+The owner authorizes Vercel/v0 to create and update pull requests for requested work in this repository and merge them when required checks and reviews pass, review comments are resolved, and there are no merge conflicts. No additional confirmation is required once these conditions are verified. This includes any automatic deployment triggered by the authorized merge.
+Do not otherwise merge, deploy, or change production configuration unless the current task explicitly authorizes it.
 Keep unrelated changes out of the working branch.
