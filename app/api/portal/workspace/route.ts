@@ -23,6 +23,8 @@ import {
   sameOrigin,
 } from "@/lib/portal-service";
 import { syncOpenLoads } from "@/lib/portal-load-sync";
+import { pickupWindow } from "@/lib/portal-load-window";
+import { allPortalRows, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
 import { isTaiTrailerType } from "@/lib/tai-equipment";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +35,8 @@ const DOCUMENT_CHECK_FIELDS = "id,kind,included_kinds,reviewed_at";
 export async function GET(request: Request) {
   try {
     const { user, staff } = await portalIdentity()
-    const desk = new URL(request.url).searchParams.get("desk") === "1";
+    const params = new URL(request.url).searchParams;
+    const desk = params.get("desk") === "1";
     if (desk && !staff)
       throw new PortalProblem("Agent desk access required.", 403);
     const db = createAdminClient();
@@ -142,12 +145,13 @@ export async function GET(request: Request) {
       ) || [];
     // Staff may view either portal via ?role=; everyone else is pinned to their
     // own profile role so a carrier can't fetch customer data (or vice versa).
-    const requestedRole = new URL(request.url).searchParams.get("role");
+    const requestedRole = params.get("role");
     const viewRole =
       staff && (requestedRole === "carrier" || requestedRole === "customer")
         ? requestedRole
         : profile.role;
     if (viewRole === "carrier") {
+      const loadWindow = pickupWindow(params.get("pickupFrom"));
       const bids =
         result(
           await db
@@ -184,25 +188,29 @@ export async function GET(request: Request) {
           profile.highway_status === "verified" &&
           setupMissing(profile, documents, centralToday()).length === 0)
       ) {
-        await syncOpenLoads().catch((e) =>
-          console.error("Open load sync failed", e instanceof Error ? e.message : e),
-        );
-        const rows =
-          result(
-            await db
+        await syncOpenLoads({ window: loadWindow });
+        const rows = await allPortalRows<Record<string, unknown> & { id: string; pickup_date: string | null }>(
+          (afterId) => {
+            const query = db
               .from("fn_loads")
-              .select(LOAD_FIELDS)
+              .select(LOAD_FIELDS, { count: "exact" })
               .eq("status", "available")
               .is("reserved_by", null)
               .gte("updated_at", new Date(Date.now() - 86400000).toISOString())
-              .or(`pickup_date.is.null,pickup_date.gte.${centralToday()}`)
-              .order("pickup_date", { ascending: true })
-              .limit(200),
-          ) || [];
+              .gte("pickup_date", loadWindow.from)
+              .lte("pickup_date", loadWindow.through)
+              .order("id", { ascending: true })
+              .limit(PORTAL_PAGE_SIZE);
+            return afterId == null ? query : query.gt("id", afterId);
+          },
+        );
+        rows.sort((a, b) =>
+          a.pickup_date!.localeCompare(b.pickup_date!) || a.id.localeCompare(b.id),
+        );
         loads = rows.map((row) => carrierLoad(row, process.env.PORTAL_AUTO_BOOK_ENABLED === "true"));
       }
       return Response.json(
-        { ...base, documents, requests, bids, bookings, loads, historyLoads },
+        { ...base, documents, requests, bids, bookings, loads, historyLoads, loadWindow },
         { headers: { "Cache-Control": "private, no-store" } },
       );
     }
@@ -268,10 +276,14 @@ export async function POST(request: Request) {
     } else if (action === "refresh_loads") {
       if (!staff) {
         const p = await requireProfile(user.id, "carrier");
-        if (p.status !== "approved" || p.highway_status !== "verified")
+        const docs = result(
+          await db.from("fn_documents").select(DOCUMENT_CHECK_FIELDS).eq("user_id", user.id),
+        ) || [];
+        if (p.status !== "approved" || p.highway_status !== "verified" ||
+            setupMissing(p, docs, centralToday()).length)
           throw new PortalProblem("Complete approved carrier setup to view the load board.", 403);
       }
-      await syncOpenLoads({ force: true });
+      await syncOpenLoads({ window: pickupWindow(body.pickupFrom), force: true });
     } else if (action === "save_profile") {
       const profile = await requireProfile(user.id);
       const company = text(body.company);

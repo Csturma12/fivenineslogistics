@@ -6,6 +6,7 @@ import {
   setupMissing,
   type Workspace,
 } from "@/lib/portal-contract";
+import { pickupWindow } from "@/lib/portal-load-window";
 import { groupOf, TAI_EQUIPMENT_GROUPS } from "@/lib/tai-equipment";
 import {
   Badge,
@@ -24,22 +25,31 @@ export function CarrierBoard({
   data,
   act,
   busy,
+  pickupFrom = centralToday(),
+  onPickupFromChange = () => {},
 }: {
   data: Workspace;
   act: Act;
   busy: boolean;
+  pickupFrom?: string;
+  onPickupFromChange?: (date: string) => void;
 }) {
   const [search, setSearch] = useState("");
   const [booking, setBooking] = useState<string | null>(null);
   const p = data.profile!;
-  const ready =
+  const ready = data.staff || (
     p.status === "approved" &&
     p.highway_status === "verified" &&
-    !setupMissing(p, data.documents, centralToday()).length;
-  const [group, setGroup] = useState("");
-  const loads = data.loads.filter(
+    !setupMissing(p, data.documents, centralToday()).length);
+  const [equipment, setEquipment] = useState("");
+  const pickupRange = pickupWindow(pickupFrom);
+  const windowReady = !data.loadWindow || data.loadWindow.from === pickupRange.from;
+  const equipmentTypes = [...new Set(data.loads.map((load) => load.equipment).filter(
+    (type): type is string => !!type,
+  ))].sort();
+  const loads = (windowReady ? data.loads : []).filter(
     (l) =>
-      (!group || groupOf(l.equipment || "") === group) &&
+      (!equipment || l.equipment === equipment) &&
       `${lane(l)} ${l.equipment || ""} ${groupOf(l.equipment || "")}`
         .toLowerCase()
         .includes(search.trim().toLowerCase()),
@@ -69,6 +79,16 @@ export function CarrierBoard({
         ) : (
           <>
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end">
+              <label className="block text-sm font-medium sm:w-44">
+                Pickup from
+                <input
+                  className={input}
+                  type="date"
+                  min={centralToday()}
+                  value={pickupFrom}
+                  onChange={(e) => onPickupFromChange(e.target.value || centralToday())}
+                />
+              </label>
               <label className="block flex-1 text-sm font-medium">
                 Find a lane
                 <input
@@ -81,17 +101,22 @@ export function CarrierBoard({
                 />
               </label>
               <label className="block text-sm font-medium sm:w-56">
-                Equipment
+                Equipment type
                 <select
                   className={input}
-                  value={group}
-                  onChange={(e) => setGroup(e.target.value)}
+                  value={equipment}
+                  onChange={(e) => setEquipment(e.target.value)}
                 >
                   <option value="">All equipment</option>
+                  {equipment && !equipmentTypes.includes(equipment) ? (
+                    <option value={equipment}>{equipment}</option>
+                  ) : null}
                   {TAI_EQUIPMENT_GROUPS.map((g) => (
-                    <option key={g.label} value={g.label}>
-                      {g.label}
-                    </option>
+                    <optgroup key={g.label} label={g.label}>
+                      {equipmentTypes.filter((type) => groupOf(type) === g.label).map((type) => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </label>
@@ -99,11 +124,17 @@ export function CarrierBoard({
                 type="button"
                 className={`${secondary} min-h-11`}
                 disabled={busy}
-                onClick={() => act({ action: "refresh_loads" })}
+                onClick={() => act({ action: "refresh_loads", pickupFrom })}
               >
                 {busy ? "Refreshing…" : "Refresh loads"}
               </button>
             </div>
+            <p className="mb-4 text-sm text-slate-600">
+              {windowReady
+                ? `Showing ${loads.length} of ${data.loads.length} available loads`
+                : "Loading available loads"}{" "}
+              for pickup {pickupRange.from} through {pickupRange.through}.
+            </p>
             <div className="space-y-4">
               {loads.map((load) => (
                 <article
@@ -221,8 +252,9 @@ export function CarrierBoard({
             </div>
             {!loads.length ? (
               <Empty>
-                No matching open loads right now. Refresh for the latest
-                available freight.
+                {windowReady
+                  ? "No matching open loads in this two-week window. Change the date or equipment type to see more freight."
+                  : "Loading loads for the selected pickup dates…"}
               </Empty>
             ) : null}
           </>

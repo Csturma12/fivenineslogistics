@@ -1,9 +1,12 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createLoadsAdminClient } from "@/lib/supabase/loads-admin";
-import { centralToday } from "@/lib/portal-contract";
+import { allPortalRows, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
+import type { pickupWindow } from "@/lib/portal-load-window";
+import { PortalProblem } from "@/lib/portal-contract";
 
 type OpenShipment = {
+  id: number | string;
   shipment_id: string | number | null;
   status: string | null;
   carrier_name: string | null;
@@ -19,12 +22,13 @@ type OpenShipment = {
 
 // No buy/sell/customer columns: rates are never posted to carriers.
 const COLUMNS =
-  "shipment_id,status,carrier_name,from_city,from_state,to_city,to_state,ship_date,delivery_date,equipment_type,total_weight";
+  "id,shipment_id,status,carrier_name,from_city,from_state,to_city,to_state,ship_date,delivery_date,equipment_type,total_weight";
 
 const MIN_INTERVAL_MS = 60_000;
 const FORCED_MIN_INTERVAL_MS = 15_000;
-let lastRun = 0;
-let running: Promise<number> | null = null;
+type PickupWindow = ReturnType<typeof pickupWindow>;
+const lastRun = new Map<string, number>();
+const running = new Map<string, Promise<number>>();
 
 function weight(value: number | string | null) {
   const n = value == null || value === "" ? NaN : Number(value);
@@ -32,7 +36,9 @@ function weight(value: number | string | null) {
 }
 
 function closedStatus(row: OpenShipment | undefined) {
-  if (!row) return "cancelled";
+  // Another feed may own a portal load with this external ID; don't cancel it
+  // just because no matching TAI shipment was found.
+  if (!row) return null;
   if (row.status === "Cancelled") return "cancelled";
   if (row.status === "Delivered") return "delivered";
   if (row.status === "Dispatched") return "in_transit";
@@ -40,23 +46,25 @@ function closedStatus(row: OpenShipment | undefined) {
   return null;
 }
 
-async function runSync() {
+async function runSync(window: PickupWindow) {
   const main = createLoadsAdminClient();
   const portal = createAdminClient();
   const now = new Date().toISOString();
 
-  const { data, error } = await main
-    .from("shipments")
-    .select(COLUMNS)
-    .in("status", ["Committed", "Quote"])
-    // TAI writes uncovered shipments with an empty carrier string rather than null.
-    .or("carrier_name.is.null,carrier_name.eq.")
-    .gte("ship_date", centralToday())
-    .order("ship_date", { ascending: true })
-    .limit(500);
-  if (error) throw new Error(`Open shipment read failed: ${error.message}`);
-
-  const open = ((data ?? []) as OpenShipment[]).filter(
+  const shipments = await allPortalRows<OpenShipment>((afterId) => {
+    const query = main
+      .from("shipments")
+      .select(COLUMNS, { count: "exact" })
+      .in("status", ["Committed", "Quote"])
+      // TAI writes uncovered shipments with an empty carrier string rather than null.
+      .or("carrier_name.is.null,carrier_name.eq.")
+      .gte("ship_date", window.from)
+      .lt("ship_date", window.until)
+      .order("id", { ascending: true })
+      .limit(PORTAL_PAGE_SIZE);
+    return afterId == null ? query : query.gt("id", afterId);
+  });
+  const open = shipments.filter(
     (r) => r.shipment_id != null && r.from_city && r.from_state && r.to_city && r.to_state,
   );
   const rows = open.map((r) => ({
@@ -89,48 +97,63 @@ async function runSync() {
     written += Number(count) || 0;
   }
 
-  // Take loads off the board once TAI shows them covered, cancelled or gone.
+  // Take loads off the board once TAI shows them covered or cancelled.
   const openIds = new Set(rows.map((r) => r.external_id));
-  const { data: posted } = await portal
-    .from("fn_loads")
-    .select("external_id")
-    .eq("status", "available")
-    .is("reserved_by", null)
-    .limit(1000);
-  const stale = (posted ?? [])
-    .map((p: { external_id: string }) => p.external_id)
+  const posted = await allPortalRows<{ id: string; external_id: string }>((afterId) => {
+    const query = portal
+      .from("fn_loads")
+      .select("id,external_id", { count: "exact" })
+      .eq("status", "available")
+      .is("reserved_by", null)
+      .gte("pickup_date", window.from)
+      .lte("pickup_date", window.through)
+      .order("id", { ascending: true })
+      .limit(PORTAL_PAGE_SIZE);
+    return afterId == null ? query : query.gt("id", afterId);
+  });
+  const stale = posted
+    .map((p) => p.external_id)
     .filter((id) => !openIds.has(id));
   for (let i = 0; i < stale.length; i += 200) {
     const batch = stale.slice(i, i + 200);
-    const { data: current } = await main.from("shipments").select(COLUMNS).in("shipment_id", batch);
+    const { data: current, error } = await main.from("shipments").select(COLUMNS).in("shipment_id", batch);
+    if (error) throw new Error(`Shipment status read failed: ${error.message}`);
     const byId = new Map(
       ((current ?? []) as OpenShipment[]).map((r) => [String(r.shipment_id), r]),
     );
     for (const id of batch) {
       const status = closedStatus(byId.get(id));
       if (!status) continue;
-      await portal
+      const { error: updateError } = await portal
         .from("fn_loads")
         .update({ status, updated_at: now })
         .eq("external_id", id)
         .eq("status", "available");
+      if (updateError) throw new Error(`Load status update failed: ${updateError.message}`);
     }
   }
   return written;
 }
 
 /** Pulls uncovered TAI shipments (Committed + Quote) onto the carrier board on demand. */
-export async function syncOpenLoads({ force = false } = {}) {
-  if (running) return running;
+export async function syncOpenLoads({ window, force = false }: { window: PickupWindow; force?: boolean }) {
+  const key = `${window.from}:${window.through}`;
+  const active = running.get(key);
+  if (active) return active;
   const wait = force ? FORCED_MIN_INTERVAL_MS : MIN_INTERVAL_MS;
-  if (Date.now() - lastRun < wait) return 0;
-  running = runSync()
+  if (Date.now() - (lastRun.get(key) || 0) < wait) return 0;
+  const task = runSync(window)
+    .catch((error) => {
+      console.error("Open load sync failed", error instanceof Error ? error.message : error);
+      throw new PortalProblem("The load board could not be refreshed. Please try again.", 503);
+    })
     .then((count) => {
-      lastRun = Date.now();
+      lastRun.set(key, Date.now());
       return count;
     })
     .finally(() => {
-      running = null;
+      running.delete(key);
     });
-  return running;
+  running.set(key, task);
+  return task;
 }

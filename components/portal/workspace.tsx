@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import type { Workspace } from "@/lib/portal-contract";
+import { centralToday, type Workspace } from "@/lib/portal-contract";
 import { readPortalBody, uploadDocument } from "@/lib/portal-upload-client";
 import { SignOutButton } from "./sign-out-button";
 import { ProfileForm, LoadRequestForm, UploadForm } from "./workspace-forms";
@@ -30,14 +30,21 @@ export function PortalWorkspace({
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState("");
+  const [pickupFrom, setPickupFrom] = useState(() => centralToday());
   const inFlight = useRef(false);
+  const latestRefresh = useRef(0);
   const refresh = useCallback(async () => {
     if (previewData) return;
-    const query = desk ? "?desk=1" : initialRole ? `?role=${initialRole}` : "";
-    const res = await fetch(`/api/portal/workspace${query}`, {
+    const refreshId = ++latestRefresh.current;
+    const params = new URLSearchParams();
+    if (desk) params.set("desk", "1");
+    else if (initialRole) params.set("role", initialRole);
+    if (!desk && initialRole === "carrier") params.set("pickupFrom", pickupFrom);
+    const res = await fetch(`/api/portal/workspace?${params}`, {
       cache: "no-store",
     });
     const body = await readPortalBody(res);
+    if (refreshId !== latestRefresh.current) return;
     if (!res.ok) {
       if (res.status === 401 || (desk && res.status === 403)) {
         setData(null);
@@ -46,7 +53,7 @@ export function PortalWorkspace({
       throw new Error(String(body.error || "Unable to load your portal."));
     }
     setData(body as unknown as Workspace);
-  }, [desk, previewData, initialRole]);
+  }, [desk, previewData, initialRole, pickupFrom]);
   useEffect(() => {
     let active = true;
     refresh().catch((e) => {
@@ -287,7 +294,13 @@ export function PortalWorkspace({
             ) : viewRole === "carrier" && selected === "My loads" ? (
               <ShipmentBoard role="carrier" staff={staff} preview={!!previewData} />
             ) : viewRole === "carrier" ? (
-              <CarrierBoard data={data} act={send} busy={busy} />
+              <CarrierBoard
+                data={data}
+                act={send}
+                busy={busy}
+                pickupFrom={pickupFrom}
+                onPickupFromChange={setPickupFrom}
+              />
             ) : selected === "Enter a load" ? (
               <LoadRequestForm act={send} busy={busy} />
             ) : selected === "My documents" ? (

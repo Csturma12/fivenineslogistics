@@ -101,6 +101,7 @@ export type Workspace = {
   email: string;
   staff: boolean;
   profile: Profile | null;
+  loadWindow?: { from: string; through: string };
   hint: string;
   company: string;
   documents: PortalDoc[];
