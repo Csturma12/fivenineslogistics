@@ -58,6 +58,7 @@ export async function uploadDocument(form: FormData, deps: UploadDeps = {}): Pro
   const kind = String(form.get("kind") || "");
   const title = String(form.get("title") || "");
   const split = String(form.get("split") || "") === "yes";
+  const load = String(form.get("load") || "") || undefined;
   if (!(file instanceof File) || file.size === 0)
     throw new Error("Choose a PDF, JPG or PNG to upload.");
   if (file.size > MAX_UPLOAD_BYTES)
@@ -70,7 +71,7 @@ export async function uploadDocument(form: FormData, deps: UploadDeps = {}): Pro
   const signRes = await fetcher("/api/portal/documents", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "sign", kind, name: file.name, title }),
+    body: JSON.stringify({ action: "sign", kind, name: file.name, title, load }),
   });
   const signed = await readPortalBody(signRes);
   if (!signRes.ok || signed.error)
@@ -93,7 +94,7 @@ export async function uploadDocument(form: FormData, deps: UploadDeps = {}): Pro
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(split
       ? { action, path }
-      : { action, kind, path, name: file.name, title }),
+      : { action, kind, path, name: file.name, title, load }),
   };
   let finishRes: Response;
   let finished: Record<string, unknown>;

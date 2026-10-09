@@ -6,11 +6,11 @@ export const PORTAL_PAGE_SIZE = 500;
 export function carrierEligibilityKey(now: number, chicagoDate: string): string {
   return `${Math.floor(now / 60_000)}:${chicagoDate}`;
 }
-export async function allPortalRows<T extends { id: string }>(
-  page: (afterId: string | null) => PromiseLike<{ data: T[] | null; count: number | null; error: { message: string } | null }>,
+export async function allPortalRows<T extends { id: string | number }>(
+  page: (afterId: T["id"] | null) => PromiseLike<{ data: T[] | null; count: number | null; error: { message: string } | null }>,
 ): Promise<T[]> {
   const rows: T[] = [];
-  let afterId: string | null = null;
+  let afterId: T["id"] | null = null;
   for (;;) {
     const response = await page(afterId);
     if (response.error || response.count === null) throw new PortalProblem("The load board could not be refreshed. Please try again.", 503);
@@ -26,8 +26,8 @@ export async function allPortalRows<T extends { id: string }>(
   }
 }
 
-export async function allPortalRowsAtVersion<T extends { id: string }>(
-  page: (afterId: string | null) => PromiseLike<{ data: T[] | null; count: number | null; error: { message: string } | null }>,
+export async function allPortalRowsAtVersion<T extends { id: string | number }>(
+  page: (afterId: T["id"] | null) => PromiseLike<{ data: T[] | null; count: number | null; error: { message: string } | null }>,
   initialVersion: string,
   readVersion: () => Promise<string>,
 ): Promise<{ rows: T[]; version: string }> {

@@ -24,6 +24,9 @@ import {
   result,
   sameOrigin,
 } from "@/lib/portal-service";
+import { syncOpenLoads } from "@/lib/portal-load-sync";
+import { pickupWindow } from "@/lib/portal-load-window";
+import { isTaiTrailerType } from "@/lib/tai-equipment";
 
 export const dynamic = "force-dynamic";
 const LOAD_FIELDS =
@@ -155,6 +158,7 @@ export async function GET(request: Request) {
           .limit(200),
       ) || [];
     if (viewRole === "carrier") {
+      const loadWindow = pickupWindow(params.get("pickupFrom"));
       const bids =
         result(
           await db
@@ -186,9 +190,10 @@ export async function GET(request: Request) {
           profile.highway_status === "verified" &&
           setupMissing(profile, documents, centralToday()).length === 0)
       ) {
+        await syncOpenLoads({ window: loadWindow });
         const now = Date.now();
         const today = centralToday();
-        const eligibility = carrierEligibilityKey(now, today);
+        const eligibility = `${carrierEligibilityKey(now, today)}:${loadWindow.from}:${loadWindow.through}`;
         const version = await readLoadVersion(db, "carrier:*");
         loadVersion = loadVersionToken("carrier", version, eligibility);
         if (requestedLoadVersion === loadVersion) {
@@ -202,7 +207,8 @@ export async function GET(request: Request) {
                 .eq("status", "available")
                 .is("reserved_by", null)
                 .gte("updated_at", new Date(now - 86400000).toISOString())
-                .or(`pickup_date.is.null,pickup_date.gte.${today}`)
+                .gte("pickup_date", loadWindow.from)
+                .lte("pickup_date", loadWindow.through)
                 .order("id", { ascending: true })
                 .limit(PORTAL_PAGE_SIZE);
               return afterId ? query.gt("id", afterId) : query;
@@ -225,7 +231,7 @@ export async function GET(request: Request) {
       );
       return Response.json(
         {
-          ...base, documents, requests, bids, bookings, loads, historyLoads,
+          ...base, documents, requests, bids, bookings, loads, historyLoads, loadWindow,
           ...(loadVersion ? { loadVersion, loadsUnchanged } : {}),
         },
         { headers: { "Cache-Control": "private, no-store" } },
@@ -309,6 +315,17 @@ export async function POST(request: Request) {
             { onConflict: "user_id", ignoreDuplicates: true },
           ),
       );
+    } else if (action === "refresh_loads") {
+      if (!staff) {
+        const p = await requireProfile(user.id, "carrier");
+        const docs = result(
+          await db.from("fn_documents").select(DOCUMENT_CHECK_FIELDS).eq("user_id", user.id),
+        ) || [];
+        if (p.status !== "approved" || p.highway_status !== "verified" ||
+            setupMissing(p, docs, centralToday()).length)
+          throw new PortalProblem("Complete approved carrier setup to view the load board.", 403);
+      }
+      await syncOpenLoads({ window: pickupWindow(body.pickupFrom), force: true });
     } else if (action === "save_profile") {
       const profile = await requireProfile(user.id);
       const company = text(body.company);
@@ -403,6 +420,8 @@ export async function POST(request: Request) {
         details.delivery_date = calendarDate(body.details?.delivery_date);
         if (!details.origin || !details.destination || !details.equipment)
           throw new PortalProblem("Enter origin, destination and equipment.");
+        if (!isTaiTrailerType(details.equipment))
+          throw new PortalProblem("Choose equipment from the TAI trailer type list.");
         if (
           details.delivery_date &&
           details.delivery_date < details.pickup_date

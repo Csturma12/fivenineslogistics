@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { splitCarrierPacket } from "@/lib/portal-doc-split";
+import { carrierOwnsLoad, cleanReference } from "@/lib/portal-shipments";
 import {
   DOCUMENT_BUCKET,
   PortalProblem,
@@ -25,6 +26,7 @@ export const maxDuration = 60;
 
 const CARRIER_KINDS = ["combined", "packet", "coi", "w9", "noa"];
 const CUSTOMER_KINDS = ["bol", "po", "packing_list", "other"];
+const LOAD_KINDS = ["pod", "invoice"];
 const MAX_BYTES = 15_728_640; // 15 MB — covers scanned BOLs and phone photos of PODs/COIs.
 const MIME_BY_EXT: Record<string, string> = {
   pdf: "application/pdf",
@@ -124,6 +126,76 @@ export async function POST(request: Request) {
     }
 
     const kind = text(payload.kind, 30);
+
+    if (LOAD_KINDS.includes(kind)) {
+      const profile = await requireProfile(user.id);
+      if (profile.role !== "carrier" || profile.status !== "approved")
+        throw new PortalProblem("Approved carrier accounts can add PODs and invoices.", 403);
+      const loadNumber = cleanReference(text(payload.load, 40));
+      if (!loadNumber || !(await carrierOwnsLoad(user.email || "", loadNumber)))
+        throw new PortalProblem("That load is not assigned to your carrier account.", 403);
+      const db = createAdminClient();
+
+      if (action === "sign") {
+        const rawName = text(payload.name, 200);
+        const ext = extensionOf(rawName);
+        if (!MIME_BY_EXT[ext]) throw new PortalProblem("Upload a PDF, JPG or PNG.");
+        const counted = await db
+          .from("fn_load_documents")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("load_number", loadNumber);
+        if (counted.error) throw new PortalProblem("Document storage unavailable.", 503);
+        if ((counted.count || 0) >= 20)
+          throw new PortalProblem("Document limit reached for this load. Contact dispatch.");
+        const safeName = rawName.replace(/[^a-zA-Z0-9._ -]/g, "_") || `document.${ext}`;
+        const path = `${user.id}/${randomUUID()}/${kind.toUpperCase()}-${loadNumber}-${safeName}`;
+        const signed = result(await db.storage.from(DOCUMENT_BUCKET).createSignedUploadUrl(path));
+        return Response.json({ path, token: signed!.token });
+      }
+      if (action !== "record") throw new PortalProblem("Unsupported action.");
+
+      const path = text(payload.path, 300);
+      if (!path.startsWith(`${user.id}/`) || path.split("/").length !== 3)
+        throw new PortalProblem("Invalid upload. Please try again.");
+      const fileName = path.slice(path.lastIndexOf("/") + 1);
+      const expectedMime = MIME_BY_EXT[extensionOf(fileName)];
+      if (!expectedMime) throw new PortalProblem("Upload a PDF, JPG or PNG.");
+      const existing = result(
+        await db.from("fn_load_documents").select("load_number, kind").eq("path", path).maybeSingle(),
+      ) as { load_number: string; kind: string } | null;
+      if (existing) {
+        if (existing.load_number === loadNumber && existing.kind === kind)
+          return Response.json({ ok: true, alreadyRecorded: true });
+        throw new PortalProblem("This upload was already saved with different details.", 409);
+      }
+      const dir = path.slice(0, path.lastIndexOf("/"));
+      const listed = result(await db.storage.from(DOCUMENT_BUCKET).list(dir));
+      const object = listed?.find((entry) => entry.name === fileName);
+      if (!object) throw new PortalProblem("Upload did not complete. Try again.");
+      const size = Number(object.metadata?.size ?? 0);
+      if (size <= 0 || size > MAX_BYTES || String(object.metadata?.mimetype ?? "") !== expectedMime) {
+        await db.storage.from(DOCUMENT_BUCKET).remove([path]);
+        throw new PortalProblem(
+          size > MAX_BYTES
+            ? "That file is larger than 15 MB. Please upload a smaller file."
+            : "Upload a valid PDF, JPG or PNG.",
+        );
+      }
+      const saved = await db.from("fn_load_documents").insert({
+        user_id: user.id,
+        load_number: loadNumber,
+        kind,
+        path,
+        name: fileName,
+      });
+      if (saved.error) {
+        await db.storage.from(DOCUMENT_BUCKET).remove([path]);
+        throw new PortalProblem("Document could not be saved. Please try again.", 503);
+      }
+      return Response.json({ ok: true });
+    }
+
     const company = kind === "company";
 
     if (company) {

@@ -12,6 +12,7 @@ let documentFixtures = [];
 const user = { id: '11111111-1111-4111-8111-111111111111', aud: 'authenticated', role: 'authenticated', created_at: '2026-01-01T00:00:00Z', email_confirmed_at: '2026-01-01T00:00:00Z', app_metadata: {}, user_metadata: {}, is_anonymous: false };
 const users = {
     company: { ...user, email: 'Chris@ShipFiveNines.COM' },
+    tester: { ...user, email: 'sturma@blbxcritical.com' },
     colleague: { ...user, email: 'dispatch@shipfivenines.com', app_metadata: { owner: true, email: 'chris@shipfivenines.com' } },
     external: { ...user, email: 'outsider@example.test', app_metadata: { staff: true, role: 'staff' }, user_metadata: { staff: true, email: 'chris@shipfivenines.com' } },
     legacyDomain: { ...user, email: 'staff@primarycompanies.com' },
@@ -83,6 +84,8 @@ async function stopChild(child) {
         // Build and runtime use the same local Auth endpoint because Next inlines
         // NEXT_PUBLIC variables during the build. Do not reuse a hosted build.
         const env = { PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, TEMP: process.env.TEMP, TMP: process.env.TMP, NODE_ENV: 'production', NEXT_TELEMETRY_DISABLED: '1', NEXT_PUBLIC_SUPABASE_URL: `http://127.0.0.1:${supabasePort}`, NEXT_PUBLIC_SUPABASE_ANON_KEY: 'synthetic-anon-key-for-local-smoke', SUPABASE_SERVICE_ROLE_KEY: 'synthetic-service-key-for-local-smoke' };
+        if (process.env.NEXT_FONT_GOOGLE_MOCKED_RESPONSES)
+            env.NEXT_FONT_GOOGLE_MOCKED_RESPONSES = process.env.NEXT_FONT_GOOGLE_MOCKED_RESPONSES;
         console.log(`Building production app with synthetic Auth settings${args.includes('--webpack') ? ' (webpack)' : ''}...`);
         child = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'build', ...args], { cwd, env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
         child.stdout.on('data', x => logs += x);
@@ -213,7 +216,7 @@ async function stopChild(child) {
         const beforeRegistration = calls.length;
         const signup = await request('/api/portal/register', null, { role: 'staff', email: 'outsider@example.test', password: 'SyntheticPasswordOnly123!', fullName: 'Synthetic smoke' });
         assert.equal(signup.status, 400, signup.text);
-        assert.match(signup.text, /@shipfivenines\.com/);
+        assert.match(signup.text, /approved team email/);
         assert.equal(calls.length, beforeRegistration);
         console.log('PASS external-domain staff registration => 400; zero Auth/admin/data calls');
         const company = await request('/agent-desk', 'company');
@@ -229,6 +232,14 @@ async function stopChild(child) {
         assert.equal(desk.status, 200, desk.text);
         assert.equal(JSON.parse(desk.text).staff, true);
         console.log('PASS confirmed mixed-case company desk GET => 200 staff:true');
+        const testerPage = await request('/agent-desk', 'tester');
+        assert.equal(testerPage.status, 200);
+        assert.match(testerPage.text, /Portal review desk/);
+        assert.doesNotMatch(testerPage.text, /href="\/portal\/test"/);
+        const testerDesk = await request('/api/portal/workspace?desk=1', 'tester');
+        assert.equal(testerDesk.status, 200, testerDesk.text);
+        assert.equal(JSON.parse(testerDesk.text).staff, true);
+        console.log('PASS confirmed exact testing email => agent desk page and API staff:true');
         const signed = await request('/api/portal/documents', 'company', { action: 'sign', kind: 'company', name: 'synthetic.pdf', size: 50, title: 'Synthetic only' });
         assert.equal(signed.status, 200, signed.text);
         const signedBody = JSON.parse(signed.text);
@@ -240,12 +251,12 @@ async function stopChild(child) {
         assert.equal(ordinary.status, 200, ordinary.text);
         assert.equal(JSON.parse(ordinary.text).staff, false);
         console.log('PASS external ordinary portal GET => 200 staff:false');
-        for (const kind of ['company', 'external']) {
+        for (const kind of ['company', 'tester', 'external']) {
             const home = await request('/portal/home', kind);
             assert.ok([307, 308].includes(home.status), home.text);
             const target = new URL(home.location, origin);
             assert.equal(target.origin, origin);
-            assert.equal(target.pathname, kind === 'company' ? '/agent-desk' : '/portal');
+            assert.equal(target.pathname, kind === 'external' ? '/portal' : '/agent-desk');
             console.log(`PASS ${kind} /portal/home => ${target.pathname}`);
         }
         for (const route of ['confirm', 'callback']) {

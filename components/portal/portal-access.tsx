@@ -26,7 +26,7 @@ const roleCopy = {
     title: "Your operations desk.",
     description: "Create or sign in to your verified Five Nines work account to review portal submissions and coordinate operations.",
     steps: [
-      "Use your @shipfivenines.com work email.",
+      "Use an approved Five Nines team email.",
       "Your email must be verified before access opens.",
       "Sign in to continue directly to the agent desk.",
     ],
@@ -127,7 +127,7 @@ export function PortalSignIn({ role }: { role: Role }) {
     setError("")
     if (role === "staff" && !isAgentDeskEmail(email.trim())) {
       setStatus("error")
-      setError("Use your @shipfivenines.com work email for the agent desk.")
+      setError("Use an approved team email for the agent desk.")
       return
     }
     try {
@@ -280,8 +280,8 @@ export function PortalSignIn({ role }: { role: Role }) {
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {role === "staff" ? (mode === "signin"
-                ? "Enter your verified @shipfivenines.com email and password."
-                : "Use your @shipfivenines.com email. You must confirm it before the agent desk opens.") : mode === "signin"
+                ? "Enter your verified team email and password."
+                : "Use an approved team email. You must confirm it before the agent desk opens.") : mode === "signin"
                 ? "Enter your email and password to reach your portal."
                 : "Set up your account. We'll email a link to confirm it before your first sign in."}
             </p>

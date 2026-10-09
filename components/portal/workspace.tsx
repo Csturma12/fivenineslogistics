@@ -1,17 +1,17 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import type { Workspace } from "@/lib/portal-contract";
+import { centralToday, type Workspace } from "@/lib/portal-contract";
 import { readPortalBody, uploadDocument } from "@/lib/portal-upload-client";
 import { portalView } from "@/lib/portal-view";
 import { SignOutButton } from "./sign-out-button";
 import { ProfileForm, LoadRequestForm, UploadForm } from "./workspace-forms";
 import { CarrierBoard } from "./carrier-board";
 import { WorkspaceDesk } from "./workspace-desk";
+import { ShipmentBoard } from "./shipment-board";
 import { ReadOnlyPortalView } from "./read-only-portal-view";
 import {
   Badge,
-  button,
   secondary,
   Empty,
   DocumentList,
@@ -34,6 +34,7 @@ export function PortalWorkspace({
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState("");
+  const [pickupFrom, setPickupFrom] = useState(() => centralToday());
   const inFlight = useRef(false);
   const refreshVersion = useRef(0);
   const dataRef = useRef(data);
@@ -53,6 +54,7 @@ export function PortalWorkspace({
       else if (initialRole) params.set("role", initialRole);
       if (!afterSave && dataRef.current?.loadVersion)
         params.set("loadsVersion", dataRef.current.loadVersion);
+      if (!desk && initialRole === "carrier") params.set("pickupFrom", pickupFrom);
       const query = params.size ? `?${params}` : "";
       const res = await fetch(`/api/portal/workspace${query}`, {
         cache: "no-store",
@@ -76,7 +78,7 @@ export function PortalWorkspace({
     } catch (e) {
       if (version === refreshVersion.current) throw e;
     }
-  }, [desk, previewData, initialRole]);
+  }, [desk, previewData, initialRole, pickupFrom]);
   useEffect(() => {
     let active = true;
     refresh().catch((e) => {
@@ -120,7 +122,11 @@ export function PortalWorkspace({
         const result = await readPortalBody(res);
         if (!res.ok)
           throw new Error(String(result.error || "Unable to save. Please retry."));
-        setNotice("Saved. Any required notifications are queued for delivery.");
+        setNotice(
+          body.action === "refresh_loads"
+            ? "Load board updated with the latest open freight."
+            : "Saved. Any required notifications are queued for delivery.",
+        );
       }
       try {
         await refresh(true);
@@ -153,7 +159,7 @@ export function PortalWorkspace({
       ]
     : readOnly ? ["Read-only view"]
     : viewRole === "carrier"
-      ? ["Load board", "Setup & profile"]
+      ? ["Load board", "My loads", "Setup & profile"]
       : [
           "Your load board",
           "Enter a load",
@@ -320,8 +326,16 @@ export function PortalWorkspace({
                 upload={send}
                 busy={busy}
               />
+            ) : viewRole === "carrier" && selected === "My loads" ? (
+              <ShipmentBoard role="carrier" staff={staff} preview={!!previewData} />
             ) : viewRole === "carrier" ? (
-              <CarrierBoard data={data} act={send} busy={busy} />
+              <CarrierBoard
+                data={data}
+                act={send}
+                busy={busy}
+                pickupFrom={pickupFrom}
+                onPickupFromChange={setPickupFrom}
+              />
             ) : selected === "Enter a load" ? (
               <LoadRequestForm act={send} busy={busy} />
             ) : selected === "My documents" ? (
@@ -361,6 +375,7 @@ export function PortalWorkspace({
                     Enter a load →
                   </button>
                 </div>
+                <ShipmentBoard role="customer" staff={staff} preview={!!previewData} />
                 <Panel title="Your load board">
                   <p className="mb-6 text-sm leading-6 text-slate-600">
                     Only shipments linked to your verified customer account are

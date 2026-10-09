@@ -42,7 +42,7 @@ test("all open loads are read across page boundaries and can be filtered by pick
     delivery_date: null, weight_lbs: null, dimensions: null,
   }));
   const pages: Array<string | null> = [];
-  const loaded = await allPortalRows(async (afterId) => {
+  const loaded = await allPortalRows<(typeof all)[number]>(async (afterId) => {
     pages.push(afterId);
     // The first page's load 100 is reserved before page two is read.
     const remaining = pages.length === 1 ? all : all.filter(row => row.id !== "100");

@@ -35,7 +35,7 @@ export default async function AgentDeskPage() {
               {identity ? "Agent desk access restricted" : "Agent desk sign in"}
             </h1>
             <p className="mt-3 mb-8 max-w-2xl text-base leading-7 text-muted-foreground">
-              Only signed-in users with a verified @shipfivenines.com email can access the agent desk.
+              Only signed-in users with a verified, authorized team email can access the agent desk.
             </p>
             {identity ? (
               <div className="rounded-xl border border-border bg-card p-6">

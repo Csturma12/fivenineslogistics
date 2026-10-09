@@ -58,7 +58,7 @@ as already live; this follow-up does not claim a new end-to-end delivery test.
 | --- | --- | --- |
 | Portal screens | Setup/profile, packet uploads, Highway invitation fallback, safe carrier board, bids/counters, customer shipment board, company documents and requests | `components/portal/workspace*.tsx`, `carrier-board.tsx`, `app/portal/home/page.tsx` |
 | Agent desk | Profile/document review, exact customer-account mapping, accept/deny/counter, reservation inbox, customer requests, company uploads, pending-email visibility | `app/agent-desk/page.tsx`, `components/portal/workspace-desk.tsx` |
-| Protected backend | Server-verified identity, verified exact `@shipfivenines.com` staff domain, private files, approved-carrier checks, ownership isolation, validated inputs | `app/api/portal/workspace/route.ts`, `documents/route.ts`, `lib/portal-contract.ts`, `portal-service.ts`, `portal-access-policy.ts` |
+| Protected backend | Server-verified identity, verified company-domain staff or the exact testing email, private files, approved-carrier checks, ownership isolation, validated inputs | `app/api/portal/workspace/route.ts`, `documents/route.ts`, `lib/portal-contract.ts`, `portal-service.ts`, `portal-access-policy.ts` |
 | Database | Approval state, bids, exclusive reservations, requests, durable email outbox, safe feed upsert | `scripts/portal-workflows.sql` (already applied) |
 | TAI feed interface | Explicit status, dimensions, freshness, customer account ID, separate opt-in carrier offer; preserves reservations and rejects older snapshots | `app/api/tms/loads/route.ts`, `lib/portal-ingest.ts` |
 | Close old bypasses | Public load page redirects to carrier login; signup-only legacy booking action cannot book | `app/loads/page.tsx`, `app/actions/book-load.ts` |
@@ -95,11 +95,12 @@ The development preview returns 404 outside development and never bypasses API a
    existing server-only credential. Do not use the Primary Freight project or expose the service credential.
 2. Keep the existing Supabase/Resend configuration in the hosting secret settings.
    Agent-desk access requires a signed-in, email-confirmed, non-anonymous Supabase user
-   whose actual email has the exact `shipfivenines.com` domain. The server checks this
+   whose actual email has the exact `shipfivenines.com` domain or is the designated
+   testing address `sturma@blbxcritical.com`. The server checks this
    before rendering `/agent-desk`, and the same policy protects staff data/actions.
    `PORTAL_STAFF_EMAILS` and `PORTAL_STAFF_DOMAINS` are no longer used; profile roles and editable metadata do not
    grant staff access. Staff create an account or sign in at `/agent-desk`; staff signup
-   accepts only the company domain and emails a confirmation link before access opens.
+   accepts the company domain or the designated testing address and emails a confirmation link before access opens.
    Other portal users retain their customer/carrier access and ownership restrictions.
    Staff password recovery returns to the desk. Auth confirmation/callback redirects
    accept only the app destinations in `lib/portal-auth-routing.ts`.
