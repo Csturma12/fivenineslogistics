@@ -48,11 +48,10 @@ test("carrier board exposes pickup date, exact equipment types and a bid form", 
     data: samplePortalWorkspace("carrier"),
     act: async () => true,
     busy: false,
-    pickupFrom: "2026-10-08",
-    onPickupFromChange: () => {},
+    pickupFrom: "2099-01-04",
   }));
   assert.match(html, /Pickup from/);
-  assert.match(html, /2026-10-08 through 2026-10-21/);
+  assert.match(html, /2099-01-04 through 2099-01-17/);
   assert.match(html, /Flatbed · 48 ft/);
   assert.match(html, /Dry van · 53 ft/);
   assert.match(html, /Submit bid/);

@@ -3,16 +3,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { centralToday, type Workspace } from "@/lib/portal-contract";
 import { readPortalBody, uploadDocument } from "@/lib/portal-upload-client";
+import { portalView } from "@/lib/portal-view";
 import { SignOutButton } from "./sign-out-button";
 import { ProfileForm, LoadRequestForm, UploadForm } from "./workspace-forms";
 import { CarrierBoard } from "./carrier-board";
 import { WorkspaceDesk } from "./workspace-desk";
 import { ShipmentBoard } from "./shipment-board";
+import { ReadOnlyPortalView } from "./read-only-portal-view";
 import {
   Badge,
   secondary,
   Empty,
   DocumentList,
+  lane,
+  LoadFacts,
   Panel,
 } from "./workspace-ui";
 
@@ -32,44 +36,76 @@ export function PortalWorkspace({
   const [tab, setTab] = useState("");
   const [pickupFrom, setPickupFrom] = useState(() => centralToday());
   const inFlight = useRef(false);
-  const latestRefresh = useRef(0);
-  const refresh = useCallback(async () => {
-    if (previewData) return;
-    const refreshId = ++latestRefresh.current;
-    const params = new URLSearchParams();
-    if (desk) params.set("desk", "1");
-    else if (initialRole) params.set("role", initialRole);
-    if (!desk && initialRole === "carrier") params.set("pickupFrom", pickupFrom);
-    const res = await fetch(`/api/portal/workspace?${params}`, {
-      cache: "no-store",
-    });
-    const body = await readPortalBody(res);
-    if (refreshId !== latestRefresh.current) return;
-    if (!res.ok) {
-      if (res.status === 401 || (desk && res.status === 403)) {
-        setData(null);
-        window.location.assign(desk ? "/agent-desk" : "/portal");
+  const refreshVersion = useRef(0);
+  const dataRef = useRef(data);
+  dataRef.current = data;
+  const p = data?.profile;
+  const staff = !!data?.staff;
+  const { role: viewRole, readOnly: alternateView } = portalView({
+    staff, profileRole: p?.role, requestedRole: initialRole,
+  });
+  const readOnly = !desk && alternateView;
+  const refresh = useCallback(async (afterSave = false) => {
+    if (previewData || (inFlight.current && !afterSave)) return;
+    const version = ++refreshVersion.current;
+    try {
+      const params = new URLSearchParams();
+      if (desk) params.set("desk", "1");
+      else if (initialRole) params.set("role", initialRole);
+      if (!afterSave && dataRef.current?.loadVersion)
+        params.set("loadsVersion", dataRef.current.loadVersion);
+      if (!desk && initialRole === "carrier") params.set("pickupFrom", pickupFrom);
+      const query = params.size ? `?${params}` : "";
+      const res = await fetch(`/api/portal/workspace${query}`, {
+        cache: "no-store",
+      });
+      const body = await readPortalBody(res);
+      // A pending poll can finish after a bid or reservation is saved. It must
+      // not overwrite the newer workspace response or trigger an old redirect.
+      if (version !== refreshVersion.current) return;
+      if (!res.ok) {
+        if (res.status === 401 || (desk && res.status === 403)) {
+          setData(null);
+          window.location.assign(desk ? "/agent-desk" : "/portal");
+        }
+        throw new Error(String(body.error || "Unable to load your portal."));
       }
-      throw new Error(String(body.error || "Unable to load your portal."));
+      const nextData = body as unknown as Workspace;
+      if (nextData.loadsUnchanged && dataRef.current) {
+        nextData.loads = dataRef.current.loads;
+      }
+      setData(nextData);
+    } catch (e) {
+      if (version === refreshVersion.current) throw e;
     }
-    setData(body as unknown as Workspace);
   }, [desk, previewData, initialRole, pickupFrom]);
   useEffect(() => {
     let active = true;
     refresh().catch((e) => {
       if (active) setError(e.message);
     });
+    const timer = previewData ? null : window.setInterval(() => {
+      if (!inFlight.current) void refresh().catch((e) => {
+        if (active) setError(e.message);
+      });
+    }, 60_000);
     return () => {
       active = false;
+      if (timer !== null) window.clearInterval(timer);
     };
   }, [refresh]);
   const send = async (body: Record<string, unknown> | FormData) => {
+    if (readOnly) {
+      setNotice("Read-only staff view. Return to your account portal to use its approved actions.");
+      return false;
+    }
     if (previewData) {
       setNotice("Test mode: this workspace action does not save, upload, book or send email.");
       return false;
     }
     if (inFlight.current) return false;
     inFlight.current = true;
+    ++refreshVersion.current;
     setBusy(true);
     setError("");
     setNotice("");
@@ -93,7 +129,7 @@ export function PortalWorkspace({
         );
       }
       try {
-        await refresh();
+        await refresh(true);
       } catch {
         setError(
           "Saved successfully, but the view could not refresh. Refresh before making another change.",
@@ -112,11 +148,7 @@ export function PortalWorkspace({
       setBusy(false);
     }
   };
-  const p = data?.profile;
-  const staff = !!data?.staff;
-  // Staff-domain users can view either portal (URL-driven) and are treated as
-  // approved, so the paperwork gate never pins them to the setup tab.
-  const viewRole = staff ? (initialRole ?? p?.role) : p?.role;
+  // Staff may inspect either portal, but a different saved role stays read-only.
   const approved = staff || p?.status === "approved";
   const tabs = desk
     ? [
@@ -125,6 +157,7 @@ export function PortalWorkspace({
         "Customer requests",
         "Documents & email",
       ]
+    : readOnly ? ["Read-only view"]
     : viewRole === "carrier"
       ? ["Load board", "My loads", "Setup & profile"]
       : [
@@ -280,6 +313,8 @@ export function PortalWorkspace({
                 upload={send}
                 busy={busy}
               />
+            ) : readOnly ? (
+              <ReadOnlyPortalView data={data} readOnlySamples={!!previewData} />
             ) : selected === "Setup & profile" ||
               selected === "Company profile" ? (
               <ProfileForm
@@ -341,6 +376,73 @@ export function PortalWorkspace({
                   </button>
                 </div>
                 <ShipmentBoard role="customer" staff={staff} preview={!!previewData} />
+                <Panel title="Your load board">
+                  <p className="mb-6 text-sm leading-6 text-slate-600">
+                    Only shipments linked to your verified customer account are
+                    shown. Tracking is the latest location reported by your
+                    coordinator or TAI feed, not a live GPS map.
+                  </p>
+                  {data.loads.length ? (
+                    <div className="space-y-4">
+                      {data.loads.map((load) => (
+                        <article
+                          key={load.id}
+                          className="rounded-lg border p-5"
+                        >
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                              {load.external_id ? (
+                                <p className="font-mono text-[11px] uppercase tracking-[.2em] text-blue-600">
+                                  Ref {load.external_id}
+                                </p>
+                              ) : null}
+                              <h3 className="font-semibold">{lane(load)}</h3>
+                            </div>
+                            <Badge value={load.status} />
+                          </div>
+                          <LoadFacts load={load} />
+                          <p className="my-4 rounded-lg bg-slate-50 p-3 text-sm">
+                            {load.tracking_location
+                              ? `Last reported: ${load.tracking_location}${load.tracking_at ? ` · ${new Date(load.tracking_at).toLocaleString()}` : ""}`
+                              : "No tracking update available yet. Contact your coordinator."}
+                          </p>
+                          <div className="flex flex-wrap gap-3">
+                            {(["pod", "invoice"] as const).map((kind) => (
+                              <button
+                                key={kind}
+                                className={secondary}
+                                disabled={
+                                  busy ||
+                                  data.requests.some(
+                                    (r) =>
+                                      r.kind === kind &&
+                                      r.load_id === load.id &&
+                                      r.status !== "completed",
+                                  )
+                                }
+                                onClick={() =>
+                                  void send({
+                                    action: "customer_request",
+                                    kind,
+                                    loadId: load.id,
+                                  })
+                                }
+                              >
+                                Request {kind === "pod" ? "POD" : "invoice"}
+                              </button>
+                            ))}
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <Empty>
+                      {approved
+                        ? "No shipments have been synced to your account yet."
+                        : "Your shipments will appear after dispatch verifies and links your company account. You can enter a load request now."}
+                    </Empty>
+                  )}
+                </Panel>
                 <Panel title="Your requests">
                   {data.requests.length ? (
                     <ul className="divide-y">

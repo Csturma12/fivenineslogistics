@@ -8,6 +8,7 @@ import { canUsePortalSamples, portalSampleView } from "../lib/portal-sample-acce
 import { samplePortalWorkspace } from "../lib/portal-sample-data";
 import { DocumentList } from "../components/portal/workspace-ui";
 import { PortalWorkspace } from "../components/portal/workspace";
+import { portalView } from "../lib/portal-view";
 
 function user(email: string, changes: Partial<User> = {}): User {
   return { id: "sample-auth-user", aud: "authenticated", email,
@@ -75,5 +76,42 @@ test("customer samples render the same tracking text across server and browser t
   } finally {
     if (originalTimezone === undefined) delete process.env.TZ;
     else process.env.TZ = originalTimezone;
+  }
+});
+
+test("staff view selection is read-only across roles and never changes non-staff roles", () => {
+  for (const profileRole of ["carrier", "customer"] as const) {
+    const opposite = profileRole === "carrier" ? "customer" : "carrier";
+    assert.deepEqual(portalView({ staff: true, profileRole, requestedRole: opposite }), { role: opposite, readOnly: true });
+    for (const requestedRole of [undefined, "staff", profileRole])
+      assert.deepEqual(portalView({ staff: true, profileRole, requestedRole }), { role: profileRole, readOnly: false });
+    assert.deepEqual(portalView({ staff: false, profileRole, requestedRole: opposite }), { role: profileRole, readOnly: false });
+  }
+});
+
+test("alternate staff portals show load facts without transactional forms or action controls", () => {
+  for (const profileRole of ["carrier", "customer"] as const) {
+    const data = samplePortalWorkspace(profileRole);
+    data.staff = true;
+    // Even a bookable load must not expose a reservation in an alternate view.
+    data.loads[0].auto_book = true;
+    data.loads[0].carrier_offer_usd = 1000;
+    const html = renderToStaticMarkup(createElement(PortalWorkspace, {
+      previewData: data, initialRole: profileRole === "carrier" ? "customer" : "carrier",
+    }));
+    assert.match(html, /Read-only staff view/);
+    assert.match(html, /Houston/);
+    assert.match(html, /Return to your account portal/);
+    assert.doesNotMatch(html, /<form\b|Submit bid|Accept counteroffer|Auto-book at this offer|Confirm reservation|Enter a load|Request POD|Request invoice|Setup &amp; profile|Company profile/);
+  }
+});
+
+test("matching staff portals retain their existing action controls", () => {
+  for (const profileRole of ["carrier", "customer"] as const) {
+    const data = samplePortalWorkspace(profileRole);
+    data.staff = true;
+    const html = renderToStaticMarkup(createElement(PortalWorkspace, { previewData: data, initialRole: profileRole }));
+    assert.doesNotMatch(html, /Read-only staff view/);
+    assert.match(html, profileRole === "carrier" ? /Submit bid/ : /Enter a load/);
   }
 });

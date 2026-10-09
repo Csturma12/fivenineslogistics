@@ -132,9 +132,53 @@ create table if not exists public.fn_loads (
   reserved_by uuid references public.fn_profiles(user_id),
   tracking_location text,
   tracking_at timestamptz,
+  customer_scope_withdrawn boolean not null default false,
+  customer_scope_blocked_ids text[] not null default '{}',
   updated_at timestamptz not null default now(),
   check (not auto_book or carrier_offer_usd is not null)
 );
+create table if not exists public.fn_load_sync_state (
+  id text primary key check (id <> ''),
+  version bigint not null default 0
+);
+create or replace function public.fn_bump_load_sync_insert()
+returns trigger language plpgsql set search_path=public,pg_temp as $$
+begin
+  insert into fn_load_sync_state(id,version) values ('carrier:*',1)
+    on conflict(id) do update set version=fn_load_sync_state.version+1;
+  insert into fn_load_sync_state(id,version)
+    select 'customer:'||customer_account_id,1
+    from new_rows where customer_account_id is not null
+    group by customer_account_id order by customer_account_id
+      on conflict(id) do update set version=fn_load_sync_state.version+1;
+  return null;
+end $$;
+create or replace function public.fn_bump_load_sync_update()
+returns trigger language plpgsql set search_path=public,pg_temp as $$
+begin
+  insert into fn_load_sync_state(id,version) values ('carrier:*',1)
+    on conflict(id) do update set version=fn_load_sync_state.version+1;
+  insert into fn_load_sync_state(id,version)
+    select 'customer:'||customer_account_id,1
+    from (
+      select customer_account_id from old_rows
+      union
+      select customer_account_id from new_rows
+    ) accounts
+    where customer_account_id is not null
+    order by customer_account_id
+      on conflict(id) do update set version=fn_load_sync_state.version+1;
+  return null;
+end $$;
+drop trigger if exists fn_load_sync_version on public.fn_loads;
+drop trigger if exists fn_load_sync_insert on public.fn_loads;
+drop trigger if exists fn_load_sync_update on public.fn_loads;
+create trigger fn_load_sync_insert after insert on public.fn_loads
+  referencing new table as new_rows
+  for each statement execute function public.fn_bump_load_sync_insert();
+create trigger fn_load_sync_update after update on public.fn_loads
+  referencing old table as old_rows new table as new_rows
+  for each statement execute function public.fn_bump_load_sync_update();
 create index if not exists fn_loads_customer on public.fn_loads(customer_account_id,pickup_date desc);
 create index if not exists fn_loads_open on public.fn_loads(pickup_date,id) where status='available' and reserved_by is null;
 create table if not exists public.fn_bids (
@@ -303,7 +347,7 @@ end $$;
 
 -- Service-only tables and procedures: application routes re-verify identity and role.
 do $$ declare t text; f record; begin
-  foreach t in array array['fn_profiles','fn_documents','fn_company_documents','fn_loads','fn_bids','fn_bookings','fn_requests','fn_notifications'] loop
+  foreach t in array array['fn_profiles','fn_documents','fn_company_documents','fn_loads','fn_load_sync_state','fn_bids','fn_bookings','fn_requests','fn_notifications'] loop
     execute format('alter table public.%I enable row level security',t);
     execute format('revoke all on public.%I from public,anon,authenticated',t);
     execute format('grant select,insert,update,delete on public.%I to service_role',t);
@@ -376,4 +420,3 @@ REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC,anon,authenticated;
 GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO service_role;
 GRANT USAGE,SELECT ON ALL SEQUENCES IN SCHEMA public TO service_role;
 commit;
-

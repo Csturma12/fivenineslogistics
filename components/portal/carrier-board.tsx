@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { filterCarrierLoads } from "@/lib/portal-board";
 import { HIGHWAY_ONBOARDING_EMAIL, highwayOnboardingMailto } from "@/lib/portal-highway-onboarding";
 import {
   centralToday,
@@ -25,8 +26,7 @@ export function CarrierBoard({
   data,
   act,
   busy,
-  pickupFrom = centralToday(),
-  onPickupFromChange = () => {},
+  pickupFrom: windowFrom = centralToday(),
 }: {
   data: Workspace;
   act: Act;
@@ -35,6 +35,10 @@ export function CarrierBoard({
   onPickupFromChange?: (date: string) => void;
 }) {
   const [search, setSearch] = useState("");
+  const [pickupFrom, setPickupFrom] = useState("");
+  const [pickupThrough, setPickupThrough] = useState("");
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
   const [booking, setBooking] = useState<string | null>(null);
   const p = data.profile!;
   const ready = data.staff || (
@@ -42,18 +46,14 @@ export function CarrierBoard({
     p.highway_status === "verified" &&
     !setupMissing(p, data.documents, centralToday()).length);
   const [equipment, setEquipment] = useState("");
-  const pickupRange = pickupWindow(pickupFrom);
+  const pickupRange = pickupWindow(windowFrom);
   const windowReady = !data.loadWindow || data.loadWindow.from === pickupRange.from;
   const equipmentTypes = [...new Set(data.loads.map((load) => load.equipment).filter(
     (type): type is string => !!type,
   ))].sort();
-  const loads = (windowReady ? data.loads : []).filter(
-    (l) =>
-      (!equipment || l.equipment === equipment) &&
-      `${lane(l)} ${l.equipment || ""} ${groupOf(l.equipment || "")}`
-        .toLowerCase()
-        .includes(search.trim().toLowerCase()),
-  );
+  const loads = filterCarrierLoads(windowReady ? data.loads : [], {
+    search, pickupFrom, pickupThrough, origin, destination,
+  }).filter((l) => !equipment || l.equipment === equipment);
   const allLoads = [...data.loads, ...(data.historyLoads || [])];
   return (
     <div className="space-y-6">
@@ -78,29 +78,28 @@ export function CarrierBoard({
           </Empty>
         ) : (
           <>
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end">
-              <label className="block text-sm font-medium sm:w-44">
+            <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <label className="block text-sm font-medium">
+                Search loads
+                <input className={input} type="search" enterKeyHint="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Lane or equipment" />
+              </label>
+              <label className="block text-sm font-medium">
                 Pickup from
-                <input
-                  className={input}
-                  type="date"
-                  min={centralToday()}
-                  value={pickupFrom}
-                  onChange={(e) => onPickupFromChange(e.target.value || centralToday())}
-                />
+                <input className={input} type="date" min={pickupRange.from} max={pickupRange.through} value={pickupFrom} onChange={(e) => setPickupFrom(e.target.value)} />
               </label>
-              <label className="block flex-1 text-sm font-medium">
-                Find a lane
-                <input
-                  className={input}
-                  type="search"
-                  enterKeyHint="search"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="City, state or trailer type"
-                />
+              <label className="block text-sm font-medium">
+                Pickup through
+                <input className={input} type="date" min={pickupRange.from} max={pickupRange.through} value={pickupThrough} onChange={(e) => setPickupThrough(e.target.value)} />
               </label>
-              <label className="block text-sm font-medium sm:w-56">
+              <label className="block text-sm font-medium">
+                Origin
+                <input className={input} value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="City or state" />
+              </label>
+              <label className="block text-sm font-medium">
+                Destination
+                <input className={input} value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="City or state" />
+              </label>
+              <label className="block text-sm font-medium">
                 Equipment type
                 <select
                   className={input}
@@ -120,21 +119,28 @@ export function CarrierBoard({
                   ))}
                 </select>
               </label>
-              <button
-                type="button"
-                className={`${secondary} min-h-11`}
-                disabled={busy}
-                onClick={() => act({ action: "refresh_loads", pickupFrom })}
-              >
-                {busy ? "Refreshing…" : "Refresh loads"}
-              </button>
             </div>
-            <p className="mb-4 text-sm text-slate-600">
-              {windowReady
-                ? `Showing ${loads.length} of ${data.loads.length} available loads`
-                : "Loading available loads"}{" "}
-              for pickup {pickupRange.from} through {pickupRange.through}.
-            </p>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
+              <span>
+                {windowReady
+                  ? `Showing ${loads.length} of ${data.loads.length} available loads`
+                  : "Loading available loads"}{" "}
+                for pickup {pickupRange.from} through {pickupRange.through}.
+              </span>
+              <div className="flex flex-wrap gap-2">
+                <button className={secondary} type="button" onClick={() => {
+                  setSearch(""); setPickupFrom(""); setPickupThrough(""); setOrigin(""); setDestination(""); setEquipment("");
+                }}>Show all loads</button>
+                <button
+                  type="button"
+                  className={secondary}
+                  disabled={busy}
+                  onClick={() => act({ action: "refresh_loads", pickupFrom: windowFrom })}
+                >
+                  {busy ? "Refreshing…" : "Refresh loads"}
+                </button>
+              </div>
+            </div>
             <div className="space-y-4">
               {loads.map((load) => (
                 <article
@@ -191,6 +197,9 @@ export function CarrierBoard({
                         Submit bid
                       </button>
                     </form>
+                    <p className="text-xs leading-5 text-slate-600">
+                      Dispatch receives your bid with {p.details.contact}, {p.details.phone} and {p.email}.
+                    </p>
                     {load.auto_book && load.carrier_offer_usd != null ? (
                       <div className="text-right">
                         <p className="mb-2 text-sm text-slate-600">

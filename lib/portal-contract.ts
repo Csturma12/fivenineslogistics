@@ -104,6 +104,8 @@ export type Workspace = {
   loadWindow?: { from: string; through: string };
   hint: string;
   company: string;
+  loadVersion?: string;
+  loadsUnchanged?: boolean;
   documents: PortalDoc[];
   companyDocuments: PortalDoc[];
   loads: PortalLoad[];

@@ -13,7 +13,9 @@ import {
   setupMissing,
 } from "../lib/portal-contract";
 import { ingestRows } from "../lib/portal-ingest";
-import { notificationHtml } from "../lib/portal-notification";
+import { notificationHtml, notificationRecipient, PORTAL_DISPATCH_EMAIL } from "../lib/portal-notification";
+import { filterCarrierLoads } from "../lib/portal-board";
+import { allPortalRows, allPortalRowsAtVersion, carrierEligibilityKey, comparePickupDate } from "../lib/portal-pages";
 import { requireBridgeToken } from "../lib/portal-bridge-auth";
 
 test("bridge requires a configured strong token and an exact bearer credential", () => {
@@ -32,6 +34,82 @@ test("release switch hides auto-book and offer amounts even when feed provides t
   assert.equal(row.carrier_offer_usd, null);
 });
 
+test("all open loads are read across page boundaries and can be filtered by pickup and lane", async () => {
+  const all = Array.from({ length: 1201 }, (_, n) => ({
+    id: String(n), origin_city: n % 2 ? "Houston" : "Austin", origin_state: "TX",
+    dest_city: "Dallas", dest_state: "TX", pickup_date: n % 2 ? "2026-10-05" : "2026-10-07",
+    equipment: "Flatbed", status: "available", auto_book: false, carrier_offer_usd: null,
+    delivery_date: null, weight_lbs: null, dimensions: null,
+  }));
+  const pages: Array<string | null> = [];
+  const loaded = await allPortalRows<(typeof all)[number]>(async (afterId) => {
+    pages.push(afterId);
+    // The first page's load 100 is reserved before page two is read.
+    const remaining = pages.length === 1 ? all : all.filter(row => row.id !== "100");
+    const candidates = remaining.filter(row => afterId === null || Number(row.id) > Number(afterId));
+    return { data: candidates.slice(0, 500), count: candidates.length, error: null };
+  });
+  assert.equal(loaded.length, 1201);
+  assert.deepEqual(pages, [null, "499", "999"]);
+  assert.ok(loaded.some(row => row.id === "500"));
+  assert.equal(filterCarrierLoads(loaded, {
+    search: "flatbed", pickupFrom: "2026-10-05", pickupThrough: "2026-10-05",
+    origin: "houston", destination: "TX",
+  }).length, 600);
+  assert.equal(filterCarrierLoads(loaded, {
+    search: "", pickupFrom: "", pickupThrough: "", origin: "", destination: "",
+  }).length, 1201);
+  // A lower PostgREST max-rows setting must not silently cut the board short.
+  const smallPages = await allPortalRows(async (afterId) => {
+    const remaining = all.filter(row => afterId === null || Number(row.id) > Number(afterId));
+    return { data: remaining.slice(0, 100), count: remaining.length, error: null };
+  });
+  assert.equal(smallPages.length, 1201);
+});
+
+test("a load made eligible behind the cursor is found after the feed revision changes", async () => {
+  let version = "1";
+  let inserted = false;
+  const ids = ["b", "c", "d", "e"];
+  const result = await allPortalRowsAtVersion(
+    async (afterId) => {
+      if (afterId === "c" && !inserted) {
+        ids.unshift("a");
+        inserted = true;
+        version = "2";
+      }
+      const remaining = ids.filter((id) => afterId === null || id > afterId);
+      const data = remaining.slice(0, 2).map((id) => ({ id }));
+      return { data, count: remaining.length, error: null };
+    },
+    version,
+    async () => version,
+  );
+  assert.deepEqual(result.rows.map((row) => row.id), ["a", "b", "c", "d", "e"]);
+  assert.equal(result.version, "2");
+});
+
+test("pickup-date sorting keeps undated loads last in either direction", () => {
+  const rows = [
+    { id: "b", pickup_date: null },
+    { id: "c", pickup_date: "2026-10-06" },
+    { id: "a", pickup_date: "2026-10-05" },
+  ];
+  assert.deepEqual([...rows].sort((a, b) => comparePickupDate(a, b, "asc")).map((row) => row.id), ["a", "c", "b"]);
+  assert.deepEqual([...rows].sort((a, b) => comparePickupDate(a, b, "desc")).map((row) => row.id), ["c", "a", "b"]);
+});
+
+test("carrier board cache expires with each eligibility minute and Chicago pickup date", () => {
+  assert.notEqual(
+    carrierEligibilityKey(60_000, "2026-10-04"),
+    carrierEligibilityKey(120_000, "2026-10-04"),
+  );
+  assert.notEqual(
+    carrierEligibilityKey(120_000, "2026-10-04"),
+    carrierEligibilityKey(120_000, "2026-10-05"),
+  );
+});
+
 const db = new PGlite();
 before(async () => {
   await db.exec(`create schema auth; create table auth.users(id uuid primary key);
@@ -46,6 +124,7 @@ before(async () => {
   );
   // Existing installations receive just the replacement procedure, not a schema reset.
   await db.exec(await readFile(new URL("../scripts/portal-email-upgrade.sql", import.meta.url), "utf8"));
+  await db.exec(await readFile(new URL("../scripts/portal-load-scope-upgrade.sql", import.meta.url), "utf8"));
 });
 after(async () => {
   await db.close();
@@ -120,6 +199,9 @@ test("internal email escapes input, excludes unknown fields and protects its rec
   assert.match(html, /Not provided/);
   assert.doesNotMatch(html, /<img|PRIVATE_CUSTOMER|PRIVATE_SELL|PRIVATE_BANK/);
   assert.throws(() => notificationHtml({ ...event, recipient: "carrier@example.test" }), /recipient/);
+  assert.equal(notificationRecipient({ recipient: "sturma@blbxcritical.com", subject: "New carrier bid" }), PORTAL_DISPATCH_EMAIL);
+  assert.equal(notificationRecipient({ recipient: "sturma@blbxcritical.com", subject: "Carrier reservation - dispatch action required" }), PORTAL_DISPATCH_EMAIL);
+  assert.equal(notificationRecipient({ recipient: "carrier@example.test", subject: "Your load bid has an update" }), "carrier@example.test");
   assert.throws(() => notificationHtml({ ...event, detail: JSON.stringify({ ...payload, amount: null }) }), /Invalid/);
   assert.throws(() => notificationHtml({ ...event, detail: '{"template":"future"}' }), /Unsupported/);
   assert.match(notificationHtml({ recipient: "carrier@example.test", detail: "Old <alert>" }), /Old &lt;alert&gt;/);
@@ -136,6 +218,10 @@ test("bid and booking emails retain submission snapshots and use the correct car
   assert.equal(first.rows.length, 1);
   const snapshot = JSON.parse(first.rows[0].detail);
   assert.equal(snapshot.company, "Test carrier");
+  assert.equal(snapshot.contact, "Test");
+  assert.equal(snapshot.phone, "555");
+  assert.equal(snapshot.email, "carrier@example.test");
+  assert.equal(first.rows[0].recipient, PORTAL_DISPATCH_EMAIL);
   assert.equal(snapshot.amount, 1400);
   assert.equal(snapshot.dimensions, "48 x 8 x 8 ft");
   assert.equal(snapshot.weight_lbs, 42000);
@@ -149,6 +235,7 @@ test("bid and booking emails retain submission snapshots and use the correct car
   const booked = await db.query<{ detail: string; recipient: string }>(
     "select detail,recipient from fn_notifications where subject='Carrier reservation - dispatch action required' and detail like $1", [`%${accepted.rows[0].id}%`]);
   assert.equal(booked.rows.length, 1);
+  assert.equal(booked.rows[0].recipient, PORTAL_DISPATCH_EMAIL);
   assert.equal(JSON.parse(booked.rows[0].detail).company, "Updated carrier");
   assert.equal(JSON.parse(booked.rows[0].detail).amount, 1400);
   assert.match(notificationHtml(booked.rows[0]), /Draft booking summary/);
@@ -190,6 +277,7 @@ test("carrier projection strips customer information, sell rate, notes and ident
     rate_usd: 5000,
     customer: "Secret",
     customer_account_id: "secret",
+    tracking_location: "PRIVATE_LOCATION",
     notes: "Secret",
     external_id: "private",
   });
@@ -198,6 +286,7 @@ test("carrier projection strips customer information, sell rate, notes and ident
     "rate_usd",
     "customer",
     "customer_account_id",
+    "tracking_location",
     "notes",
     "external_id",
   ])
@@ -426,7 +515,7 @@ test("stale loads and changed offers cannot be booked", async () => {
   );
   await assert.rejects(() => bid(a, "auto_book", l, 1500));
 });
-test("feed preserves reservations and ignores older snapshots", async () => {
+test("feed preserves reservations and blocks stale equal-time scope replays", async () => {
   const a = await carrier(),
     l = await load();
   await bid(a, "auto_book", l, 1500);
@@ -439,9 +528,21 @@ test("feed preserves reservations and ignores older snapshots", async () => {
   const newer = {
     ...original,
     origin_city: "New origin",
+    customer_account_id: "101",
     reserved_by: null,
     updated_at: new Date(Date.now() + 1000).toISOString(),
   };
+  await db.query("select fn_ingest_loads($1)", [JSON.stringify([newer])]);
+  // The TAI clock does not advance when a local name correction withdraws an
+  // old customer ID. A same-clock snapshot must immediately revoke access.
+  await db.query("select fn_ingest_loads($1)", [JSON.stringify([{ ...newer, customer_account_id: null }])]);
+  await db.query("select fn_ingest_loads($1)", [JSON.stringify([newer])]);
+  await db.query("select fn_ingest_loads($1)", [
+    JSON.stringify([{ ...newer, customer_account_id: "102" }]),
+  ]);
+  await db.query("select fn_ingest_loads($1)", [
+    JSON.stringify([{ ...newer, customer_account_id: "103" }]),
+  ]);
   await db.query("select fn_ingest_loads($1)", [JSON.stringify([newer])]);
   await db.query("select fn_ingest_loads($1)", [
     JSON.stringify([
@@ -460,4 +561,61 @@ test("feed preserves reservations and ignores older snapshots", async () => {
   ).rows[0];
   assert.equal(row.reserved_by, a);
   assert.equal(row.origin_city, "New origin");
+  assert.equal(row.customer_account_id, "103");
+});
+
+test("load-feed revisions change only for affected customer scopes", async () => {
+  const l = await load("revision-account-a");
+  const original = (
+    await db.query<Record<string, unknown>>("select * from fn_loads where id=$1", [l])
+  ).rows[0];
+  const version = async (scope: string) => {
+    const rows = await db.query<{ version: number }>(
+      "select version from fn_load_sync_state where id=$1",
+      [scope],
+    );
+    return rows.rows[0]?.version || 0;
+  };
+  const accountA = "customer:revision-account-a";
+  const accountB = "customer:revision-account-b";
+  const beforeA = await version(accountA);
+  const beforeB = await version(accountB);
+  const updated = {
+    ...original,
+    updated_at: new Date(Date.parse(String(original.updated_at)) + 1000).toISOString(),
+  };
+  await db.query("select fn_ingest_loads($1)", [JSON.stringify([updated])]);
+  assert.ok((await version(accountA)) > beforeA);
+  assert.equal(await version(accountB), beforeB);
+  await db.query("select fn_ingest_loads($1)", [
+    JSON.stringify([{
+      ...updated,
+      customer_account_id: "revision-account-b",
+      updated_at: new Date(Date.parse(updated.updated_at) + 1000).toISOString(),
+    }]),
+  ]);
+  assert.ok((await version(accountA)) > beforeA);
+  assert.ok((await version(accountB)) > beforeB);
+});
+
+test("load sync revisions advance once per multirow statement", async () => {
+  const before = await db.query<{ version: number }>(
+    "select version from fn_load_sync_state where id='carrier:*'",
+  );
+  await db.query(`insert into fn_loads(external_id,customer_account_id,status,origin_city,origin_state,dest_city,dest_state)
+    values ('batch-revision-a','batch-account','available','Houston','TX','Dallas','TX'),
+           ('batch-revision-b','batch-account','available','Austin','TX','Dallas','TX')`);
+  const inserted = await db.query<{ version: number }>(
+    "select version from fn_load_sync_state where id='carrier:*'",
+  );
+  const customerInserted = await db.query<{ version: number }>(
+    "select version from fn_load_sync_state where id='customer:batch-account'",
+  );
+  assert.equal(inserted.rows[0].version, before.rows[0].version + 1);
+  assert.equal(customerInserted.rows[0].version, 1);
+  await db.query("update fn_loads set origin_city='Updated' where external_id like 'batch-revision-%'");
+  const updated = await db.query<{ version: number }>(
+    "select version from fn_load_sync_state where id='carrier:*'",
+  );
+  assert.equal(updated.rows[0].version, inserted.rows[0].version + 1);
 });

@@ -1,5 +1,7 @@
 import { after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { portalView } from "@/lib/portal-view";
+import { allPortalRowsAtVersion, carrierEligibilityKey, comparePickupDate, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
 import {
   carrierLoad,
   centralToday,
@@ -24,7 +26,6 @@ import {
 } from "@/lib/portal-service";
 import { syncOpenLoads } from "@/lib/portal-load-sync";
 import { pickupWindow } from "@/lib/portal-load-window";
-import { allPortalRows, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
 import { isTaiTrailerType } from "@/lib/tai-equipment";
 
 export const dynamic = "force-dynamic";
@@ -32,15 +33,28 @@ const LOAD_FIELDS =
   "id,status,origin_city,origin_state,dest_city,dest_state,pickup_date,delivery_date,equipment,weight_lbs,dimensions,auto_book,carrier_offer_usd";
 const DOCUMENT_FIELDS = "id,user_id,kind,name,created_at,included_kinds,reviewed_at";
 const DOCUMENT_CHECK_FIELDS = "id,kind,included_kinds,reviewed_at";
+const loadVersionToken = (scope: string, version: string, eligibility?: string) =>
+  JSON.stringify([scope, version, eligibility]);
+async function readLoadVersion(db: ReturnType<typeof createAdminClient>, scope: string) {
+  const state = result(
+    await db.from("fn_load_sync_state").select("version").eq("id", scope).maybeSingle(),
+  ) as { version: string | number } | null;
+  return state ? String(state.version) : "0";
+}
 export async function GET(request: Request) {
   try {
-    const { user, staff } = await portalIdentity()
+    const { user, staff } = await portalIdentity();
     const params = new URL(request.url).searchParams;
     const desk = params.get("desk") === "1";
+    const requestedLoadVersion = params.get("loadsVersion");
     if (desk && !staff)
       throw new PortalProblem("Agent desk access required.", 403);
     const db = createAdminClient();
     const profile = await profileFor(user.id);
+    // Only verified staff may choose a view; other users keep their saved role.
+    const { role: viewRole } = portalView({
+      staff, profileRole: profile?.role, requestedRole: params.get("role"),
+    });
     const companyDocuments =
       result(
         await db.from("fn_company_documents").select("id,title").order("title"),
@@ -143,13 +157,6 @@ export async function GET(request: Request) {
           .order("created_at", { ascending: false })
           .limit(200),
       ) || [];
-    // Staff may view either portal via ?role=; everyone else is pinned to their
-    // own profile role so a carrier can't fetch customer data (or vice versa).
-    const requestedRole = params.get("role");
-    const viewRole =
-      staff && (requestedRole === "carrier" || requestedRole === "customer")
-        ? requestedRole
-        : profile.role;
     if (viewRole === "carrier") {
       const loadWindow = pickupWindow(params.get("pickupFrom"));
       const bids =
@@ -173,15 +180,10 @@ export async function GET(request: Request) {
       const historyIds = [
         ...new Set([...bids, ...bookings].map((row) => row.load_id)),
       ];
-      const historyRows = historyIds.length
-        ? result(
-            await db.from("fn_loads").select(LOAD_FIELDS).in("id", historyIds),
-          ) || []
-        : [];
-      const historyLoads = historyRows.map((row) =>
-        carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
-      );
       let loads: ReturnType<typeof carrierLoad>[] = [];
+      let historyLoads: ReturnType<typeof carrierLoad>[] = [];
+      let loadVersion: string | undefined;
+      let loadsUnchanged = false;
       if (
         staff ||
         (profile.status === "approved" &&
@@ -189,50 +191,90 @@ export async function GET(request: Request) {
           setupMissing(profile, documents, centralToday()).length === 0)
       ) {
         await syncOpenLoads({ window: loadWindow });
-        const rows = await allPortalRows<Record<string, unknown> & { id: string; pickup_date: string | null }>(
-          (afterId) => {
-            const query = db
-              .from("fn_loads")
-              .select(LOAD_FIELDS, { count: "exact" })
-              .eq("status", "available")
-              .is("reserved_by", null)
-              .gte("updated_at", new Date(Date.now() - 86400000).toISOString())
-              .gte("pickup_date", loadWindow.from)
-              .lte("pickup_date", loadWindow.through)
-              .order("id", { ascending: true })
-              .limit(PORTAL_PAGE_SIZE);
-            return afterId == null ? query : query.gt("id", afterId);
-          },
-        );
-        rows.sort((a, b) =>
-          a.pickup_date!.localeCompare(b.pickup_date!) || a.id.localeCompare(b.id),
-        );
-        loads = rows.map((row) => carrierLoad(row, process.env.PORTAL_AUTO_BOOK_ENABLED === "true"));
+        const now = Date.now();
+        const today = centralToday();
+        const eligibility = `${carrierEligibilityKey(now, today)}:${loadWindow.from}:${loadWindow.through}`;
+        const version = await readLoadVersion(db, "carrier:*");
+        loadVersion = loadVersionToken("carrier", version, eligibility);
+        if (requestedLoadVersion === loadVersion) {
+          loadsUnchanged = true;
+        } else {
+          const snapshot = await allPortalRowsAtVersion<Record<string, unknown> & { id: string; pickup_date: string | null }>(
+            (afterId) => {
+              const query = db
+                .from("fn_loads")
+                .select(LOAD_FIELDS, { count: "exact" })
+                .eq("status", "available")
+                .is("reserved_by", null)
+                .gte("updated_at", new Date(now - 86400000).toISOString())
+                .gte("pickup_date", loadWindow.from)
+                .lte("pickup_date", loadWindow.through)
+                .order("id", { ascending: true })
+                .limit(PORTAL_PAGE_SIZE);
+              return afterId ? query.gt("id", afterId) : query;
+            },
+            version,
+            () => readLoadVersion(db, "carrier:*"),
+          );
+          loadVersion = loadVersionToken("carrier", snapshot.version, eligibility);
+          snapshot.rows.sort((a, b) => comparePickupDate(a, b, "asc"));
+          loads = snapshot.rows.map((row) => carrierLoad(row, process.env.PORTAL_AUTO_BOOK_ENABLED === "true"));
+        }
       }
+      const historyRows = historyIds.length
+        ? result(
+            await db.from("fn_loads").select(LOAD_FIELDS).in("id", historyIds),
+          ) || []
+        : [];
+      historyLoads = historyRows.map((row) =>
+        carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
+      );
       return Response.json(
-        { ...base, documents, requests, bids, bookings, loads, historyLoads, loadWindow },
+        {
+          ...base, documents, requests, bids, bookings, loads, historyLoads, loadWindow,
+          ...(loadVersion ? { loadVersion, loadsUnchanged } : {}),
+        },
         { headers: { "Cache-Control": "private, no-store" } },
       );
     }
-    const rows =
-      (staff || profile.status === "approved") && profile.customer_account_id
-        ? result(
-            await db
+    let loads: ReturnType<typeof carrierLoad>[] = [];
+    let loadVersion: string | undefined;
+    let loadsUnchanged = false;
+    if ((staff || profile.status === "approved") && profile.customer_account_id) {
+      const scope = `customer:${profile.customer_account_id}`;
+      const version = await readLoadVersion(db, scope);
+      loadVersion = loadVersionToken(scope, version);
+      if (requestedLoadVersion === loadVersion) {
+        loadsUnchanged = true;
+      } else {
+        const snapshot = await allPortalRowsAtVersion<Record<string, unknown> & { id: string; pickup_date: string | null }>(
+          (afterId) => {
+            const query = db
               .from("fn_loads")
-              .select(`${LOAD_FIELDS},external_id,tracking_location,tracking_at`)
+              .select(`${LOAD_FIELDS},external_id,tracking_location,tracking_at`, { count: "exact" })
               .eq("customer_account_id", profile.customer_account_id)
-              .order("pickup_date", { ascending: false })
-              .limit(200),
-          ) || []
-        : [];
-    const loads = rows.map((row) => ({
-      ...carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
-      external_id: (row.external_id as string) || undefined,
-      tracking_location: row.tracking_location,
-      tracking_at: row.tracking_at,
-    }));
+              .order("id", { ascending: true })
+              .limit(PORTAL_PAGE_SIZE);
+            return afterId ? query.gt("id", afterId) : query;
+          },
+          version,
+          () => readLoadVersion(db, scope),
+        );
+        snapshot.rows.sort((a, b) => comparePickupDate(a, b, "desc"));
+        loadVersion = loadVersionToken(scope, snapshot.version);
+        loads = snapshot.rows.map((row) => ({
+          ...carrierLoad({ ...row, auto_book: false, carrier_offer_usd: null }),
+          external_id: (row.external_id as string) || undefined,
+          tracking_location: row.tracking_location as string | null,
+          tracking_at: row.tracking_at as string | null,
+        }));
+      }
+    }
     return Response.json(
-      { ...base, documents, requests, loads },
+      {
+        ...base, documents, requests, loads,
+        ...(loadVersion ? { loadVersion, loadsUnchanged } : {}),
+      },
       { headers: { "Cache-Control": "private, no-store" } },
     );
   } catch (e) {
