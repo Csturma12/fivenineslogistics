@@ -23,6 +23,28 @@
   --ink: #12345a;
   --soft-blue: #eaf3fc;
   --line: #dce5ee;
+  /* Signal is for marks and dots only (2.6:1). Use --signal-text for small green text. */
+  --signal-text: #148153;
+  --signal-on-dark: #66d9a2;
+  /* --eyebrow passes 4.5:1 for small text; --meta (3.9:1) is large sizes only. */
+  --eyebrow: #42627f;
+  --meta: #73849a;
+  --surface-subtle: #f0f5fa;
+  --navy-700: #174e83;
+  --blue-hover: #12538f;
+  --on-dark-heading: #fff;
+  --on-dark-body: #c1d1e0;
+  --on-dark-line: #45607d;
+  --scrim: rgb(18 52 90 / 75%);
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --shadow-card: 0 12px 42px rgb(18 52 90 / 10%);
+  --space-1: 7px;
+  --space-2: 10px;
+  --space-3: 15px;
+  --space-4: 23px;
+  --space-5: 50px;
+  --space-section: 75px;
 }
 html {
   scroll-behavior: smooth;
@@ -36,7 +58,7 @@ html {
   display: inline-block;
   width: 7px;
   height: 7px;
-  background: #21b975;
+  background: var(--signal);
   flex-shrink: 0;
   border-radius: 1px;
 }
@@ -50,7 +72,7 @@ html {
   letter-spacing: 0.11em;
   line-height: 1.7;
   text-transform: uppercase;
-  color: #42627f;
+  color: var(--eyebrow);
 }
 .utility-bar {
   background: #f1f6fa;
@@ -165,14 +187,14 @@ html {
   font-size: 0.875rem;
   font-weight: 600;
   border: 1px solid var(--blue);
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   transition:
     background 0.2s,
     transform 0.2s;
 }
 .design-button:hover {
-  background: #12538f;
-  border-color: #12538f;
+  background: var(--blue-hover);
+  border-color: var(--blue-hover);
   transform: translateY(-2px);
 }
 .design-button svg,
@@ -193,7 +215,7 @@ html {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }
 .mobile-nav {
   display: grid;
@@ -250,7 +272,7 @@ button:focus-visible {
   color: var(--blue);
 }
 .hero-copy h1 .headline-stop {
-  color: #21b975;
+  color: var(--signal);
 }
 .hero-description {
   font-size: 1.0625rem;
@@ -294,7 +316,7 @@ button:focus-visible {
   line-height: 1.5;
 }
 .hero-note svg {
-  color: #248057;
+  color: var(--blue);
   flex-shrink: 0;
 }
 .hero-visual {
@@ -304,8 +326,9 @@ button:focus-visible {
   position: relative;
   height: 495px;
   overflow: hidden;
-  border-radius: 3px;
+  border-radius: var(--radius-md);
   background: #d5e3ed;
+  box-shadow: var(--shadow-card);
 }
 .hero-photo {
   object-fit: cover;
@@ -345,17 +368,15 @@ button:focus-visible {
   font-size: 0.625rem;
   color: white;
   letter-spacing: 0.12em;
-  background: rgb(18 52 90 / 75%);
+  background: var(--scrim);
   padding: 7px 9px;
 }
 .handoff-card {
   margin-top: 18px;
   background: #fff;
-  box-shadow: 0 12px 42px rgb(18 52 90 / 10%);
   padding: 22px 25px;
   border: 1px solid var(--line);
-  border-top: 3px solid #1768b2;
-  border-radius: 2px;
+  border-radius: var(--radius-md);
 }
 .handoff-title {
   display: flex;
@@ -399,20 +420,19 @@ button:focus-visible {
   top: -2px;
   width: 5px;
   height: 5px;
-  background: #21b975;
+  background: var(--signal);
 }
 /* center node: Five Nines as the solution between port and site */
 .handoff-core {
   padding: 8px 15px;
   background: var(--blue);
   color: #fff;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  box-shadow: 0 6px 16px rgb(23 104 178 / 30%);
 }
 .handoff-card > p {
   font-size: 0.75rem;
@@ -450,7 +470,7 @@ button:focus-visible {
   color: #5f7284;
 }
 .design-section {
-  padding-block: 94px;
+  padding-block: var(--space-section);
 }
 .redesign-home h2 {
   font-size: clamp(2rem, 3vw, 3rem);
@@ -481,7 +501,7 @@ button:focus-visible {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 .sector-card {
@@ -514,7 +534,7 @@ button:focus-visible {
 .sector-top > span {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: #73849a;
+  color: var(--eyebrow);
 }
 .sector-card h3 {
   font-size: 1.17rem;
@@ -546,8 +566,8 @@ button:focus-visible {
   flex-shrink: 0;
 }
 .experience-section {
-  padding-block: 74px;
-  background: #f0f5fa;
+  padding-block: var(--space-section);
+  background: var(--surface-subtle);
   border-block: 1px solid var(--line);
 }
 .experience-grid {
@@ -560,7 +580,7 @@ button:focus-visible {
   margin-bottom: 20px;
 }
 .experience-copy {
-  border-left: 2px solid #21b975;
+  border-left: 1px solid var(--line);
   padding-left: 34px;
 }
 .experience-copy > p {
@@ -576,7 +596,7 @@ button:focus-visible {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 .capability-options {
@@ -615,10 +635,10 @@ button:focus-visible {
   font-weight: 700;
 }
 .capability-options button[aria-pressed="true"] > span {
-  color: #148153;
+  color: var(--signal-text);
 }
 .capability-options button[aria-pressed="true"] > svg {
-  background: #21b975;
+  background: var(--signal);
   color: var(--ink);
   width: 28px;
   height: 28px;
@@ -639,7 +659,7 @@ button:focus-visible {
 .capability-detail-top > span {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: #6c7f90;
+  color: var(--eyebrow);
 }
 .capability-detail h3 {
   font-size: 1.8rem;
@@ -666,12 +686,12 @@ button:focus-visible {
   font-size: 0.8125rem;
 }
 .capability-detail li svg {
-  color: #168353;
+  color: var(--blue);
 }
 .process-section {
-  padding-block: 75px;
-  background: #174e83;
-  color: white;
+  padding-block: var(--space-section);
+  background: var(--navy-700);
+  color: var(--on-dark-heading);
 }
 .process-section .eyebrow {
   color: #b5d0e6;
@@ -680,7 +700,7 @@ button:focus-visible {
   align-items: center;
 }
 .process-section .section-heading > p {
-  color: #bdcedf;
+  color: var(--on-dark-body);
 }
 .process-grid {
   display: grid;
@@ -689,13 +709,13 @@ button:focus-visible {
   padding-top: 13px;
 }
 .process-grid article {
-  border-top: 1px solid #45607d;
+  border-top: 1px solid var(--on-dark-line);
   padding-top: 25px;
 }
 .step-number {
   font-family: var(--font-mono);
   font-size: 0.8125rem;
-  color: #66d9a2;
+  color: var(--signal-on-dark);
 }
 .process-grid h3 {
   font-size: 1.3rem;
@@ -704,7 +724,7 @@ button:focus-visible {
   margin: 22px 0 13px;
 }
 .process-grid p {
-  color: #c1d1e0;
+  color: var(--on-dark-body);
   font-size: 0.9375rem;
   line-height: 1.8;
   max-width: 335px;
@@ -730,7 +750,8 @@ button:focus-visible {
 }
 .reach-panel {
   border: 1px solid var(--line);
-  border-top: 3px solid var(--blue);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 .reach-row {
   padding: 26px;
@@ -776,12 +797,12 @@ button:focus-visible {
   color: #5b7083;
 }
 .reach-footer svg {
-  color: #138153;
+  color: var(--blue);
 }
 .closing-section {
   background: #e6f0fb;
   border-block: 1px solid var(--line);
-  padding-block: 64px;
+  padding-block: var(--space-section);
 }
 .closing-inner {
   display: flex;

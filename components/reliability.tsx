@@ -11,14 +11,14 @@ export function Reliability() {
           </h2>
           <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
             &ldquo;Five nines&rdquo; is SLA vocabulary borrowed from infrastructure availability
-            targets — 99.999% reliability, the highest tier a system can commit to. We hold
-            physical freight to the same standard: over a full year, that&apos;s just over five
-            minutes where a load is unaccounted for.
+            targets. 99.999% availability leaves just over five minutes of downtime a year.
+            It&apos;s an inspiration, not a claim: the standard we work toward when we plan,
+            connect and stay with every move.
           </p>
         </div>
 
         {/* Nines ladder */}
-        <div className="mt-12 overflow-hidden rounded-xl border border-border">
+        <div className="mt-12 overflow-hidden rounded-md border border-border">
           <div className="grid grid-cols-3 gap-4 bg-card/60 px-5 py-3 font-mono text-[11px] uppercase tracking-wider text-muted-foreground sm:grid-cols-[1fr_1fr_1.4fr]">
             <span>Reliability</span>
             <span className="hidden sm:block">Tier</span>
@@ -52,8 +52,8 @@ export function Reliability() {
             The commitments we run to
           </span>
           <p className="mt-2 max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground">
-            These are the standards we hold ourselves to on every load &mdash; the targets and
-            tolerances we run to and report against monthly, not numbers dressed up after the fact.
+            How we work every load. The first figure is the standard we aim for; the rest
+            describe how the move is run.
           </p>
           <dl className="mt-8 grid grid-cols-2 gap-8 sm:grid-cols-4">
           {reliabilityStats.map((stat) => (
