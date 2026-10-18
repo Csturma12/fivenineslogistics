@@ -19,6 +19,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CapabilityExplorer } from "@/components/capability-explorer";
 import { FiveNinesStandard } from "@/components/five-nines-standard";
+import { MissionCriticalExecutions } from "@/components/mission-critical-executions";
 import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title:
@@ -26,6 +27,13 @@ export const metadata: Metadata = {
   description:
     "Freight coordination for data centers, plant maintenance, construction and international shippers. Houston-based expertise. Nationwide and global partner capacity. 24/7 dispatch.",
 };
+const heroTrust = [
+  "MC# 841023 / DOT# 2436508",
+  "1-Hour Spot Quote SLA",
+  "TWIC & Plant-PPE Verified Network",
+  "Zero Double-Brokering Policy",
+  "50 States + MX/CA",
+];
 const sectors = [
   {
     number: "01",
@@ -82,15 +90,15 @@ export default function Page() {
               accounted for<span className="headline-stop">.</span>
             </h1>
             <p className="hero-description">
-              When a delivery holds up an entire operation, you need more than a
-              truck. You need a partner who understands what’s on the line.
-              Inspired by the discipline behind always-on systems, we build
-              every move around preparation, visibility and a team that stays
-              accountable.
+              Built for operations that measure downtime in dollars per minute.
+              From data center switchgear and refinery turnarounds to
+              white-label 3PL execution, we engineer every move around hard
+              install windows, verified equipment, and 24/7 human
+              accountability.
             </p>
             <div className="hero-actions">
               <RequestCapacityTrigger className="design-button">
-                Plan your shipment
+                Request Capacity
                 <ArrowUpRight size={19} aria-hidden="true" />
               </RequestCapacityTrigger>
               <a href={site.phoneHref} className="text-link">
@@ -98,12 +106,17 @@ export default function Page() {
                 <ArrowRight size={17} aria-hidden="true" />
               </a>
             </div>
-            <p className="hero-support">
-              Built for the freight that keeps critical work moving.
-            </p>
+            <ul className="hero-trust" aria-label="Operating credentials">
+              {heroTrust.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
             <div className="hero-note">
               <ShieldCheck size={18} aria-hidden="true" />
-              <span>Plant-floor experience. One accountable team. Five Nines.</span>
+              <span>
+                Authorized agency of Primary Freight LLC — established credit,
+                BMC-84 surety bond, national scale.
+              </span>
             </div>
           </div>
           <div className="hero-visual">
@@ -155,20 +168,23 @@ export default function Page() {
         <section className="operating-strip" aria-label="Operating reach">
           <div className="design-container operating-grid">
             <div>
+              <strong>MC# 841023</strong>
+              <span>
+                Primary Freight LLC authority · BMC-84 bond · established
+                credit
+              </span>
+            </div>
+            <div>
               <strong>24/7</strong>
-              <span>Dispatch access</span>
+              <span>Live dispatch · 1-hour spot quote SLA</span>
             </div>
             <div>
               <strong>50 states</strong>
-              <span>Domestic coverage</span>
-            </div>
-            <div>
-              <strong>MX + CA</strong>
-              <span>Cross-border coordination</span>
+              <span>Domestic coverage · MX + CA cross-border</span>
             </div>
             <div>
               <strong>Global</strong>
-              <span>Ocean & forwarding partners</span>
+              <span>Ocean, forwarding & 3PL execution partners</span>
             </div>
           </div>
         </section>
@@ -212,6 +228,7 @@ export default function Page() {
             ))}
           </div>
         </section>
+        <MissionCriticalExecutions />
         <section className="experience-section">
           <div className="design-container experience-grid">
             <div>
@@ -226,7 +243,7 @@ export default function Page() {
             </div>
             <div className="experience-copy">
               <p>Our founder spent ten years in plant maintenance, specializing in refractory work, followed by ten years coordinating logistics across the lower 48, Alaska, Hawaii, Canada and Mexico.</p>
-              <p>Today, we’re building on that experience with plans to bring aboard seasoned drivers our founder has worked with and trusts. Their knowledge from behind the wheel will strengthen how we plan each move, from equipment selection to the final delivery.</p>
+              <p>Backed by 20+ years of combined plant-floor refractory and North American logistics execution, our team pairs field-tested drivers and dedicated assets with a rigorously vetted nationwide carrier network.</p>
               <Link href="/company" className="text-link">
                 The story behind Five Nines
                 <ArrowUpRight size={18} aria-hidden="true" />
@@ -247,7 +264,7 @@ export default function Page() {
                 Work the whole move.
               </h2>
             </div>
-            <Link href="/modes" className="text-link">
+            <Link href="/capabilities" className="text-link">
               All modes & services
               <ArrowUpRight size={18} aria-hidden="true" />
             </Link>
@@ -310,7 +327,7 @@ export default function Page() {
               established partners. We connect the international shipment to the
               work happening on the ground.
             </p>
-            <Link href="/modes#ocean" className="text-link">
+            <Link href="/capabilities#ocean" className="text-link">
               Explore our capabilities
               <ArrowUpRight size={18} aria-hidden="true" />
             </Link>

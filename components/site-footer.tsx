@@ -7,7 +7,7 @@ const groups = [
   {
     label: "Capabilities",
     links: [
-      { href: "/modes", label: "Modes & equipment" },
+      { href: "/capabilities", label: "Capabilities & equipment specs" },
       { href: "/consulting", label: "Supply chain consulting" },
       { href: "/request-capacity", label: "Request capacity", panel: true },
     ],
@@ -25,8 +25,8 @@ const groups = [
     label: "Partners",
     links: [
       { href: "/carriers", label: "Haul with us" },
-      { href: "/portal", label: "Customer & carrier portal" },
-      { href: "/portal/customer#documents", label: "Request documents" },
+      { href: "/portal", label: "Control Tower Portal" },
+      { href: "/request-documents", label: "Compliance & onboarding" },
     ],
   },
 ];
@@ -86,16 +86,21 @@ export function SiteFooter() {
         <div className="footer-legal">
           <p>
             Five Nines Logistics is a 3PL and freight brokerage operating
-            as an agent of Primary Freight LLC, MC# 841023. Capacity may be
-            owned, affiliated, or provided through vetted carrier and facility
-            partners. The applicable operating provider is identified in
-            shipment documentation.
+            as an authorized agency of Primary Freight LLC, MC# 841023 / U.S.
+            DOT# 2436508. Every load is arranged under Primary Freight&apos;s
+            established broker authority, BMC-84 surety bond, and national
+            credit standing. Capacity may be owned, affiliated, or provided
+            through vetted carrier and facility partners; the applicable
+            operating provider is identified in shipment documentation.
           </p>
           <div>
             <span>
               © {new Date().getFullYear()} Five Nines Logistics · Houston, Texas
             </span>
-            <span>Authority & insurance documents available on request.</span>
+            <span>
+              <Link href="/request-documents">W-9, COI & authority packet</Link> ·
+              Zero double-brokering policy.
+            </span>
           </div>
         </div>
       </div>

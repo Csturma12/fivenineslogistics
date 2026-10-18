@@ -79,10 +79,12 @@ export function FiveNinesStandard() {
               behind your shipment.
             </p>
             <p>
-              The number inspires our operating discipline. Rather than a measure
-              of our current performance, it guides our standard operating
-              procedures and challenges us to pursue 99.999% efficiency in
-              logistics planning and transportation.
+              In mission-critical infrastructure, &ldquo;Five Nines&rdquo;
+              (99.999% availability) is the gold standard for zero-interruption
+              systems. We apply that same engineering discipline to heavy and
+              critical freight—replacing guesswork with documented Methods of
+              Procedure (MOP), redundant capacity, and proactive exception
+              management.
             </p>
           </div>
           <aside className={styles.math} aria-label="The math behind the name">

@@ -70,6 +70,25 @@ html {
   align-items: center;
   gap: 9px;
 }
+.utility-left {
+  gap: 18px !important;
+}
+.utility-standard {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.utility-reach {
+  padding-left: 18px;
+  border-left: 1px solid var(--line);
+  white-space: nowrap;
+}
 .utility-right {
   gap: 20px !important;
 }
@@ -272,6 +291,39 @@ button:focus-visible {
   color: #53677d;
   max-width: 420px;
   }
+.hero-trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+  max-width: 560px;
+  list-style: none;
+  padding: 0;
+}
+.hero-trust li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: #f4f8fc;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.hero-trust li::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: #21b975;
+  flex-shrink: 0;
+}
   .text-link {
   display: inline-flex;
   align-items: center;
@@ -941,7 +993,8 @@ button:focus-visible {
     width: calc(100% - 64px);
   }
   .desktop-nav {
-    gap: 17px;
+    gap: 15px;
+    font-size: 0.8125rem;
   }
   .header-inner {
     gap: 20px;
@@ -980,13 +1033,15 @@ button:focus-visible {
     gap: 28px;
   }
 }
-@media (max-width: 1000px) {
+@media (max-width: 1120px) {
   .desktop-nav {
     display: none;
   }
   .menu-toggle {
     display: flex;
   }
+}
+@media (max-width: 1000px) {
   .hero-copy h1 {
     font-size: 4.65vw;
   }
@@ -1059,8 +1114,12 @@ button:focus-visible {
   .utility-signin {
     padding-left: 12px;
   }
-  .utility-phone {
+  .utility-reach,
+  .utility-right .utility-signin {
     display: none;
+  }
+  .utility-standard {
+    font-size: 0.6rem;
   }
   .header-inner {
     height: 76px;

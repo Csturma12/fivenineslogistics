@@ -6,10 +6,11 @@ import { FiveNinesForged } from "@/components/five-nines-forged";
 import { useRequestCapacity } from "@/components/request-capacity-panel";
 import { site } from "@/lib/site";
 const links = [
-  { href: "/who-we-serve", label: "Who we serve" },
-  { href: "/modes", label: "Capabilities" },
-  { href: "/company", label: "Our company" },
-  { href: "/carriers", label: "For carriers" },
+  { href: "/who-we-serve", label: "Who We Serve" },
+  { href: "/capabilities", label: "Capabilities" },
+  { href: "/request-documents", label: "Compliance & Onboarding" },
+  { href: "/work-with-us", label: "Work With Us" },
+  { href: "/portal", label: "Control Tower Portal" },
 ];
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -21,24 +22,24 @@ export function SiteHeader() {
       </a>
       <div className="utility-bar">
         <div className="design-container utility-inner">
-          <span>
-            <i className="brand-node" aria-hidden="true" />
-            Houston roots. Global reach.
+          <span className="utility-left">
+            <span className="utility-standard">
+              <i className="brand-node" aria-hidden="true" />
+              99.999% Operating Standard
+            </span>
+            <span className="utility-reach">
+              Houston Roots · Global Reach · {site.mc}
+            </span>
           </span>
           <span className="utility-right">
             <a href={site.phoneHref}>
-              24/7 dispatch{" "}
-              <span className="utility-phone">· {site.phone}</span>
+              24/7 Live Dispatch:{" "}
+              <span className="utility-phone">{site.phone}</span>
               <ArrowUpRight size={13} aria-hidden="true" />
             </a>
-            <Link href="/portal/customer" className="utility-signin">
-              Shipper sign in
-              <ArrowUpRight size={13} aria-hidden="true" />
-            </Link>
-            <Link href="/portal" className="utility-signin">
-              Carrier sign in
-              <ArrowUpRight size={13} aria-hidden="true" />
-            </Link>
+            <a href={`mailto:${site.dispatchEmail}`} className="utility-signin">
+              {site.dispatchEmail}
+            </a>
           </span>
         </div>
       </div>
@@ -67,7 +68,7 @@ export function SiteHeader() {
               onClick={openPanel}
               className="design-button header-cta"
             >
-              Request capacity
+              Request Capacity
               <ArrowUpRight size={16} aria-hidden="true" />
             </button>
             <button
@@ -97,14 +98,14 @@ export function SiteHeader() {
                 <ArrowUpRight size={18} aria-hidden="true" />
               </Link>
             ))}
-            <Link href="/portal/customer" onClick={() => setOpen(false)}>
-              Shipper sign in
+            <a href={site.phoneHref} onClick={() => setOpen(false)}>
+              24/7 Live Dispatch: {site.phone}
               <ArrowUpRight size={18} aria-hidden="true" />
-            </Link>
-            <Link href="/portal" onClick={() => setOpen(false)}>
-              Carrier sign in
+            </a>
+            <a href={`mailto:${site.dispatchEmail}`} onClick={() => setOpen(false)}>
+              {site.dispatchEmail}
               <ArrowUpRight size={18} aria-hidden="true" />
-            </Link>
+            </a>
             <button
               type="button"
               className="design-button"
@@ -113,7 +114,7 @@ export function SiteHeader() {
                 openPanel();
               }}
             >
-              Request capacity
+              Request Capacity
             </button>
           </nav>
         )}

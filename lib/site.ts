@@ -319,7 +319,7 @@ export const heroSpec: { label: string; value: string }[] = [
 
 export const navLinks = [
   { href: "/who-we-serve", label: "Industries" },
-  { href: "/modes", label: "Modes" },
+  { href: "/capabilities", label: "Modes" },
   { href: "/loads", label: "Load Board" },
   { href: "/carrier-vetting", label: "Vetting" },
   { href: "/consulting", label: "Consulting" },
@@ -329,7 +329,7 @@ export const navLinks = [
 
 export const footerLinks = [
   { href: "/who-we-serve", label: "Who We Serve" },
-  { href: "/modes", label: "Modes" },
+  { href: "/capabilities", label: "Modes" },
   { href: "/loads", label: "Load Board" },
   { href: "/carrier-vetting", label: "Vetting & Fraud Prevention" },
   { href: "/carriers", label: "Carriers" },
@@ -494,7 +494,7 @@ export type CompanyValue = {
 export const companyStory: CompanyValue[] = [
   {
     title: "Where we come from",
-    body: "Our roots are on the plant floor. Our founder spent ten years in plant maintenance, specializing in refractory work, followed by ten years coordinating logistics across the lower 48, Alaska, Hawaii, Canada and Mexico.\n\nFive Nines brings that broad experience to a business with strong roots in Texas and the Gulf. We understand both sides of the delivery: doing the work inside the facility and coordinating the freight that supports it.\n\nNow we’re building that team further, with plans to bring aboard experienced drivers our founder has worked with and counts among the most reliable he’s known. Their firsthand knowledge of equipment, routes and delivery-site realities will help shape how we plan and execute each move.",
+    body: "Our roots are on the plant floor. Our founder spent ten years in plant maintenance, specializing in refractory work, followed by ten years coordinating logistics across the lower 48, Alaska, Hawaii, Canada and Mexico.\n\nFive Nines brings that broad experience to a business with strong roots in Texas and the Gulf. We understand both sides of the delivery: doing the work inside the facility and coordinating the freight that supports it.\n\nBacked by 20+ years of combined plant-floor refractory and North American logistics execution, our team pairs field-tested drivers and dedicated assets with a rigorously vetted nationwide carrier network. Their firsthand knowledge of equipment, routes and delivery-site realities shapes how we plan and execute each move.",
   },
   {
     title: "How we're structured",
