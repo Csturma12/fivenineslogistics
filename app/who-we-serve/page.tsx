@@ -6,12 +6,13 @@ import { RequestCapacityButton } from "@/components/request-capacity-trigger"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { NetworkCta } from "@/components/network-cta"
+import { GatewayNetwork } from "@/components/gateway-network"
 import { sectors, whoWeServePage, whoWeServeInputs, site } from "@/lib/site"
 
 export const metadata: Metadata = {
   title: "Who We Serve | Five Nines Logistics",
   description:
-    "Refractory and plant maintenance, data centers, oil & gas turnarounds, and mission-critical contractors — the operations that measure downtime in dollars per minute. One tolerance for failure, whatever you move.",
+    "Refractory and plant maintenance, PFV distributors, data center EPCs, refinery turnarounds, mission-critical contractors, and 3PLs, forwarders & NVOCCs needing a white-label domestic execution arm. One tolerance for failure, whatever you move.",
 }
 
 export default function WhoWeServePage() {
@@ -53,7 +54,11 @@ export default function WhoWeServePage() {
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
             <div className="grid gap-px overflow-hidden rounded-xl border border-border bg-border">
               {sectors.map((sector, i) => (
-                <div key={sector.code} className="bg-card">
+                <div
+                  key={sector.code}
+                  id={sector.code.startsWith("3PL") ? "3pl-partners" : undefined}
+                  className="scroll-mt-24 bg-card"
+                >
                   <div className="grid gap-8 p-6 sm:p-10 lg:grid-cols-[1.4fr_1fr]">
                     <div>
                       <div className="flex items-center gap-3">
@@ -130,6 +135,7 @@ export default function WhoWeServePage() {
           </div>
         </section>
 
+        <GatewayNetwork />
         <NetworkCta />
       </main>
       <SiteFooter />

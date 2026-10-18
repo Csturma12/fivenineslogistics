@@ -427,6 +427,56 @@ export const sectors: Sector[] = [
       "Scheduled and expedited delivery",
     ],
   },
+  {
+    code: "3PLs, Freight Forwarders & NVOCCs",
+    title: "The specialized domestic execution arm for global moves",
+    description:
+      "Most 3PLs and international forwarders excel at ocean bookings, air freight, or standard dry van—until a client drops an out-of-gauge port transload, a Gulf Coast refinery delivery, or a crane-timed flatbed project on their desk. Backed by Primary Freight LLC (MC# 841023), Five Nines steps in with 100% written non-solicitation protection, blind BOLs, white-label check-calls, and seamless port-to-jobsite execution.",
+    points: [
+      "100% Non-Solicitation Protection & Blind BOLs",
+      "Port of Houston & 20-Gateway Heavy Transload",
+      "Flatbed, Step Deck, RGN & TWIC Drayage",
+      "Direct Slack/Teams & EDI Status Feeds",
+    ],
+  },
+]
+
+/* ---------- Gateway network, grouped by capability ---------- */
+
+export type HubGroup = {
+  id: string
+  title: string
+  codes: string[]
+  capabilities: string[]
+}
+
+export const hubGroups: HubGroup[] = [
+  {
+    id: "port",
+    title: "Port & Heavy Transload Gateways",
+    codes: ["PORT", "HOU", "LAX", "SEA", "NOLA", "MOB", "ORF", "EWR"],
+    capabilities: [
+      "TWIC Drayage",
+      "Overweight Corridor Access",
+      "Container Stripping",
+      "60k-lb Heavy Lift & Overhead Crane Transload",
+    ],
+  },
+  {
+    id: "petrochem",
+    title: "Petrochemical, PFV & Permian Corridors",
+    codes: ["HOU", "BTR", "MID", "DFW", "SAT", "HSL"],
+    capabilities: ["24/7 Hotshot", "Pipe-Staked Flatbeds", "Turnaround Staging Yards"],
+  },
+  {
+    id: "cross-border",
+    title: "Cross-Border & Heavy Industrial Gateways",
+    codes: ["STR", "MEM", "CHI", "SDF", "MAR", "BYH", "PHX"],
+    capabilities: [
+      "Mexico/Canada Heavy-Haul Thru-Trailer & Transload",
+      "Midwest Data Center Corridor Staging",
+    ],
+  },
 ]
 
 /* ---------- Who We Serve page ---------- */

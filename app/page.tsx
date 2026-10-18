@@ -62,10 +62,11 @@ const sectors = [
   {
     number: "04",
     icon: Globe2,
-    title: "Global freight partners",
+    title: "3PLs, forwarders & NVOCCs",
     description:
-      "A domestic execution partner for international cargo. Port, transload and final mile connected.",
+      "White-label domestic execution for global moves. OOG port transload, heavy haul and jobsite flatbed under blind BOLs.",
     label: "The local leg of a global move",
+    href: "/who-we-serve#3pl-partners",
   },
 ];
 export default function Page() {
@@ -210,7 +211,7 @@ export default function Page() {
           <div className="sector-grid">
             {sectors.map((sector) => (
               <Link
-                href="/who-we-serve"
+                href={"href" in sector ? sector.href : "/who-we-serve"}
                 key={sector.number}
                 className="sector-card"
               >
