@@ -42,6 +42,7 @@ const sectors = [
     description:
       "Switchgear, generators and critical equipment. Delivery coordinated around your go-live.",
     label: "Built around the install window",
+    href: "/who-we-serve",
   },
   {
     number: "02",
@@ -50,6 +51,7 @@ const sectors = [
     description:
       "Refractory, valves and line-down parts. Freight planned for the shutdown and the restart.",
     label: "The trade we came up in",
+    href: "/who-we-serve",
   },
   {
     number: "03",
@@ -58,6 +60,7 @@ const sectors = [
     description:
       "Steel, machinery and oversize loads. Site access, equipment and delivery sequence aligned.",
     label: "From fabrication to foundation",
+    href: "/who-we-serve",
   },
   {
     number: "04",
@@ -211,7 +214,7 @@ export default function Page() {
           <div className="sector-grid">
             {sectors.map((sector) => (
               <Link
-                href={"href" in sector ? sector.href : "/who-we-serve"}
+                href={sector.href}
                 key={sector.number}
                 className="sector-card"
               >
