@@ -2,7 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { RequestCapacityProvider } from "@/components/request-capacity-panel";
+import { RequestCapacityProvider } from "@/components/RequestCapacityDrawer";
 import "./globals.css";
 import "./redesign.css";
 
