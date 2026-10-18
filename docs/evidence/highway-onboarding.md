@@ -9,21 +9,21 @@ database write, or signup was used.
 
 | Rendered behavior | Before | After |
 | --- | --- | --- |
-| Setup, no configured Highway URL | One link to `chris@shipfivenines.com`; subject `Highway setup invitation` | Checklist and panel both link to `onboarding@shipfivenines.com`; an **Email onboarding** button is visible |
+| Setup, no configured Highway URL | One link to `chris@shipfivenines.com`; subject `Highway setup invitation` | Checklist and panel both link to `dispatch@fivenineslogistics.com`; an **Email onboarding** button is visible |
 | Setup, configured `https://app.highway.com/setup` | Direct Highway link; no email action | Same onboarding email actions; zero direct Highway links |
-| Blocked load board, Highway incomplete | Zero email links | One link to `onboarding@shipfivenines.com` |
+| Blocked load board, Highway incomplete | Zero email links | One link to `dispatch@fivenineslogistics.com` |
 | Email subject | Generic invitation request | `Highway setup request - Example Carrier & Sons` |
 | Carrier already verified in Highway | Status badge and generic setup instructions | States that verification is complete; **Contact onboarding** opens a support draft rather than a setup request |
 
 The after render contains:
 
-> To complete Highway setup, email onboarding@shipfivenines.com with your company
+> To complete Highway setup, email dispatch@fivenineslogistics.com with your company
 > name and DOT/MC number. Our onboarding team will send you the next steps.
 
 The draft body prompts for carrier company, DOT number, optional MC number,
 contact name, and phone. A focused helper check confirmed that a carrier name
 containing query-like text and line breaks stays encoded within the subject/body;
-the recipient remains exactly `onboarding@shipfivenines.com` and there are only
+the recipient remains exactly `dispatch@fivenineslogistics.com` and there are only
 two query fields (`subject` and `body`). An empty company uses the subject
 `Highway setup request`.
 

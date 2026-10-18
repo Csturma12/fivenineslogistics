@@ -37,7 +37,7 @@ test("unverified carrier setup renders onboarding drafts with company and requir
     const links = mailtos(html);
     assert.ok(links.length > 0);
     for (const link of links) {
-      assert.equal(link.pathname, "onboarding@shipfivenines.com");
+      assert.equal(link.pathname, "dispatch@fivenineslogistics.com");
       assert.equal(link.searchParams.get("subject"), "Highway setup request - Example Carrier & Sons");
       const body = link.searchParams.get("body")!;
       for (const text of ["Please help me complete Highway setup.", "DOT number:", "MC number (if applicable):", "Contact name:", "Phone:"])
@@ -54,7 +54,7 @@ test("verified carriers get a support draft rather than a repeated setup request
   const links = mailtos(html);
   assert.ok(links.length > 0);
   for (const link of links) {
-    assert.equal(link.pathname, "onboarding@shipfivenines.com");
+    assert.equal(link.pathname, "dispatch@fivenineslogistics.com");
     assert.equal(link.searchParams.get("subject"), "Highway setup support - Example Carrier & Sons");
     const body = link.searchParams.get("body")!;
     assert.ok(body.includes("I need help with my existing Highway setup."));
@@ -66,7 +66,7 @@ test("carrier text cannot inject mail recipients or query fields in either draft
   for (const intent of ["setup", "help"] as const) {
     const url = new URL(highwayOnboardingMailto("Acme & Sons?bcc=other@example.test\r\nInjected", intent));
     assert.equal(url.protocol, "mailto:");
-    assert.equal(url.pathname, "onboarding@shipfivenines.com");
+    assert.equal(url.pathname, "dispatch@fivenineslogistics.com");
     assert.deepEqual([...url.searchParams.keys()], ["subject", "body"]);
     assert.equal(url.searchParams.get("bcc"), null);
     assert.ok(url.searchParams.get("subject")!.includes("Acme & Sons?bcc=other@example.test Injected"));
@@ -91,7 +91,7 @@ test("blocked load boards offer setup email only when Highway is incomplete", ()
   assert.ok(incomplete.includes("To complete Highway setup, email"));
   const links = mailtos(incomplete);
   assert.equal(links.length, 1);
-  assert.equal(links[0].pathname, "onboarding@shipfivenines.com");
+  assert.equal(links[0].pathname, "dispatch@fivenineslogistics.com");
   assert.equal(links[0].searchParams.get("subject"), "Highway setup request - Example Carrier & Sons");
   const verified = renderToStaticMarkup(createElement(CarrierBoard, {
     data: workspace("verified"), act: noAction, busy: false,

@@ -30,7 +30,7 @@ const roleCopy = {
       "Your email must be verified before access opens.",
       "Sign in to continue directly to the agent desk.",
     ],
-    emailPlaceholder: "you@shipfivenines.com",
+    emailPlaceholder: "you@fivenineslogistics.com",
     companyPlaceholder: "Five Nines Logistics",
   },
   customer: {

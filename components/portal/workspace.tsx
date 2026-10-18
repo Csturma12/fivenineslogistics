@@ -470,7 +470,7 @@ export function PortalWorkspace({
         ) : null}
         <p className="mt-8 text-xs leading-6 text-slate-500">
           Need help?{" "}
-          <a className="underline" href="mailto:info@shipfivenines.com">
+          <a className="underline" href="mailto:dispatch@fivenineslogistics.com">
             Contact your Five Nines coordinator
           </a>
           .

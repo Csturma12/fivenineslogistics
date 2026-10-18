@@ -11,12 +11,13 @@ export const site = {
   // Verified from Primary Freight LLC ACORD 25 certificate (Cottingham & Butler), policy period 4/12/2026–4/12/2027.
   insurance: "$1M auto liability · $1M/$2M general liability · $4M umbrella · $150K contingent cargo",
   location: "Houston, TX",
-  quotesEmail: "quotes@fivenineslogistics.com",
-  // Role addresses on shipfivenines.com. These are mailto: contacts (visitors write TO them),
-  // so they do not need Resend domain verification — only inbound receiving/forwarding at the mail host.
-  dispatchEmail: "dispatch@shipfivenines.com", // capacity requests
-  onboardingEmail: "onboarding@shipfivenines.com", // carrier onboarding
-  infoEmail: "info@shipfivenines.com", // general questions
+  dot: "U.S. DOT# 2436508",
+  quotesEmail: "dispatch@fivenineslogistics.com",
+  // One public contact address on the fivenineslogistics.com domain. Every mailto: on the site
+  // resolves here so shippers and carriers never see a second domain (anti-phishing / anti-double-brokering).
+  dispatchEmail: "dispatch@fivenineslogistics.com", // capacity requests
+  onboardingEmail: "dispatch@fivenineslogistics.com", // carrier onboarding
+  infoEmail: "dispatch@fivenineslogistics.com", // general questions
 }
 
 export type Mode = {
