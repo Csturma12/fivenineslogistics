@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { RequestCapacityButton } from "@/components/request-capacity-trigger"
 import { CoverageMap } from "@/components/coverage-map"
-import { hubs, site } from "@/lib/site"
+import { site } from "@/lib/site"
 
 export function NetworkCta() {
   return (
@@ -22,18 +22,6 @@ export function NetworkCta() {
               move reports into the same control tower, so capacity requests are routed against
               current carrier and equipment availability — not a spreadsheet.
             </p>
-
-            <div className="mt-8 grid grid-cols-4 gap-3 sm:grid-cols-4">
-              {hubs.map((hub) => (
-                <div
-                  key={hub.code}
-                  className="rounded-lg border border-border bg-card/50 px-3 py-3 text-center"
-                >
-                  <div className="font-mono text-sm font-semibold text-primary">{hub.code}</div>
-                  <div className="mt-0.5 text-[11px] text-muted-foreground">{hub.city}</div>
-                </div>
-              ))}
-            </div>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <RequestCapacityButton size="lg" className="font-medium">
