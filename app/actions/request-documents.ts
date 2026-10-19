@@ -7,6 +7,7 @@ export type DocumentRequestState = {
   status: "idle" | "success" | "error"
   ticket?: string
   message?: string
+  values?: Record<string, string> & { documents?: string[] }
 }
 
 const LEAD_INBOX = process.env.LEAD_INBOX_EMAIL || "sturma@blbxcritical.com"
@@ -27,16 +28,19 @@ export async function submitDocumentRequest(
   const mcNumber = field("mc_number")
   const notes = field("notes")
   const documents = formData.getAll("documents").map(String)
+  // React resets the form after an action; echoing values back keeps the user's entries on error.
+  const values = { audience, name, company, email, phone, mc_number: mcNumber, notes, documents }
+  const fail = (message: string): DocumentRequestState => ({ status: "error", message, values })
 
   const missing = Object.entries({ name, company, email }).filter(([, v]) => !v).map(([k]) => k)
   if (missing.length) {
-    return { status: "error", message: `Missing required field(s): ${missing.join(", ")}.` }
+    return fail(`Missing required field(s): ${missing.join(", ")}.`)
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { status: "error", message: "Please enter a valid work email address." }
+    return fail("Please enter a valid work email address.")
   }
   if (!documents.length) {
-    return { status: "error", message: "Select at least one document." }
+    return fail("Select at least one document.")
   }
 
   const ticket = `DOC-${Math.floor(1000 + Math.random() * 9000)}`
@@ -88,10 +92,9 @@ export async function submitDocumentRequest(
 
   if (error) {
     console.log("[request-documents] Resend send failed:", error.message)
-    return {
-      status: "error",
-      message: `Something went wrong sending your request. Email ${site.dispatchEmail} or call ${site.phone} and we'll send the packet manually.`,
-    }
+    return fail(
+      `Something went wrong sending your request. Email ${site.dispatchEmail} or call ${site.phone} and we'll send the packet manually.`,
+    )
   }
 
   return { status: "success", ticket }

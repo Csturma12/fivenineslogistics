@@ -488,7 +488,7 @@ function Confirmation({ submission, onClose }: { submission: Submission; onClose
       </p>
       <div className="flex flex-wrap gap-3 pt-2">
         <Link
-          href="/request-documents"
+          href="/request-documents#request"
           onClick={onClose}
           className="rounded border border-slate-700 bg-slate-800 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-slate-700"
         >
