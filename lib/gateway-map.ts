@@ -29,6 +29,33 @@ export const mapNodes: Record<string, MapNode> = {
   EWR: { x: 91, y: 28, label: "above" },
 }
 
+export type CorridorId = "port" | "petrochem" | "cross-border"
+
+export type HubDetail = { corridors: CorridorId[]; capabilities: string[] }
+
+export const hubDetails: Record<string, HubDetail> = {
+  SEA: { corridors: ["port"], capabilities: ["TWIC Port Drayage", "Heavy Container Stripping", "PNW Flatbed Hub"] },
+  LAX: { corridors: ["port"], capabilities: ["TWIC Port Drayage", "60k-lb Heavy Transload", "West Coast Expedited"] },
+  PHX: { corridors: ["cross-border"], capabilities: ["Southwest Data Center Staging", "Step-Deck & RGN Hub", "Secured Laydown"] },
+  STR: { corridors: ["cross-border"], capabilities: ["MX/US Heavy-Haul Customs Yard", "Thru-Trailer Cross-Border", "Bonded Transload"] },
+  MID: { corridors: ["petrochem"], capabilities: ["Permian Basin 24/7 Hotshot", "Pipe-Staked Flatbeds", "Oilfield Rigging"] },
+  HSL: { corridors: ["petrochem", "cross-border"], capabilities: ["North TX Intermodal & Rail Ramp", "Laydown Yard Staging", "Heavy Open-Deck"] },
+  DFW: { corridors: ["petrochem", "cross-border"], capabilities: ["Hyperscale Data Center Corridor", "24/7 Team Expedited", "Cross-Dock & Storage"] },
+  SAT: { corridors: ["petrochem", "cross-border"], capabilities: ["South TX Industrial Staging", "Laredo Cross-Border Relay", "Flatbed & Hotshot"] },
+  HOU: { corridors: ["port", "petrochem"], capabilities: ["Five Nines HQ Control Tower", "Refinery Turnaround & PFV", "24/7 Line-Down Hotshot"] },
+  PORT: { corridors: ["port", "petrochem"], capabilities: ["100% TWIC Port Extraction", "OOG Flatrack & Bridge Crane", "Heavy-Lift Transload"] },
+  BTR: { corridors: ["petrochem"], capabilities: ["Chemical Corridor Turnarounds", "Refractory & Valve Hotshot", "TWIC Plant Delivery"] },
+  NOLA: { corridors: ["port", "petrochem"], capabilities: ["Lower Mississippi Port Drayage", "Breakbulk & Barge Transload", "Heavy Flatbed"] },
+  MOB: { corridors: ["port"], capabilities: ["Gulf Port Heavy Transload", "Steel & Pipe Mill Outbound", "Step-Deck & RGN"] },
+  MAR: { corridors: ["cross-border"], capabilities: ["Mid-South Rail & Barge Hub", "Structural Steel & Pipe", "Open-Deck Staging"] },
+  BYH: { corridors: ["cross-border"], capabilities: ["Arkansas Steel Mill Corridor", "Heavy Coil & Plate Flatbed", "Dedicated Open-Deck"] },
+  MEM: { corridors: ["cross-border"], capabilities: ["Central U.S. Priority Hub", "24/7 Expedited Relay", "Cross-Dock & Laydown"] },
+  CHI: { corridors: ["cross-border"], capabilities: ["Midwest Industrial & Rail Hub", "Canada Cross-Border Relay", "Heavy Machinery"] },
+  SDF: { corridors: ["cross-border"], capabilities: ["Ohio Valley Data Center Alley", "Switchgear & Transformer Staging", "Time-Critical FTL"] },
+  ORF: { corridors: ["port", "cross-border"], capabilities: ["Mid-Atlantic Port Drayage", "Northern VA Data Center Corridor", "OOG Transload"] },
+  EWR: { corridors: ["port"], capabilities: ["NY/NJ Port & Heavy Drayage", "Northeast Industrial Final Mile", "Bonded Warehousing"] },
+}
+
 export const mapLinks: [string, string][] = [
   ["SEA", "LAX"],
   ["SEA", "DFW"],
