@@ -14,7 +14,7 @@ const capabilities = [
       "Oversize & heavy haul",
       "Crane & rigging coordination",
     ],
-    href: "/modes#flatbed",
+    href: "/capabilities#flatbed",
     index: "01",
   },
   {
@@ -28,7 +28,7 @@ const capabilities = [
       "Dedicated trucks",
       "Team-driver options",
     ],
-    href: "/modes#expedited",
+    href: "/capabilities#expedited",
     index: "02",
   },
   {
@@ -42,7 +42,7 @@ const capabilities = [
       "Port & rail drayage",
       "Cross-border coordination",
     ],
-    href: "/modes#ocean",
+    href: "/capabilities#ocean",
     index: "03",
   },
   {
@@ -56,7 +56,7 @@ const capabilities = [
       "Transload & distribution",
       "Final-mile coordination",
     ],
-    href: "/modes#warehousing",
+    href: "/capabilities#warehousing",
     index: "04",
   },
 ];

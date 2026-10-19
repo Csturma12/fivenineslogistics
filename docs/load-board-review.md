@@ -4,7 +4,7 @@ The carrier portal shows all eligible available loads for approved and Highway-v
 
 The customer portal reads every shipment whose stored `customer_account_id` exactly equals the approved user's staff-linked TAI bill-to ID. The Fly relay and bridge carry a bill-to ID obtained from that shipment's TAI webhook; missing IDs stay unscoped. Customer history, status and last reported tracking are private to the matching account. Customer name/email matching does not grant access.
 
-Carrier bids require an approved profile with contact name, phone and account email. The bid procedure stores an internal snapshot with those details and the load/bid amount in the durable outbox. `dispatch@shipfivenines.com` is the new recipient, while legacy queued bid notifications addressed to the old inbox are sent to dispatch by the renderer. The outbox attempts immediate delivery and retries when the portal or bridge flushes it. A submitted bid is an offer for dispatch review, not a carrier assignment.
+Carrier bids require an approved profile with contact name, phone and account email. The bid procedure stores an internal snapshot with those details and the load/bid amount in the durable outbox. `dispatch@fivenineslogistics.com` is the new recipient, while legacy queued bid notifications addressed to the old inbox are sent to dispatch by the renderer. The outbox attempts immediate delivery and retries when the portal or bridge flushes it. A submitted bid is an offer for dispatch review, not a carrier assignment.
 
 ## Release checks
 

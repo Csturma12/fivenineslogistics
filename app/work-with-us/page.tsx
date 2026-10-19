@@ -95,9 +95,12 @@ export default function WorkWithUsPage() {
               Build with a growing freight practice.
             </h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-              Five Nines is early, experienced, and expanding. We are accepting interest now from agents,
-              owner-operators, accounting, and operations people who want to grow with a company that
-              treats its people the way it treats its freight—accountable, direct, and built to last.
+              Five Nines is established, field-tested, and selectively expanding our national footprint.
+              Backed by 20+ years of combined plant-floor refractory and North American logistics execution,
+              our team pairs field-tested drivers and dedicated assets with a rigorously vetted nationwide
+              carrier network. We are accepting interest now from agents, owner-operators, accounting, and
+              operations people who want to grow with a company that treats its people the way it treats its
+              freight—accountable, direct, and built to last.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button render={<Link href={applyHref} />} nativeButton={false} size="lg" className="font-medium">
