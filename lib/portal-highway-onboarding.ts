@@ -1,4 +1,4 @@
-export const HIGHWAY_ONBOARDING_EMAIL = "onboarding@shipfivenines.com";
+export const HIGHWAY_ONBOARDING_EMAIL = "dispatch@fivenineslogistics.com";
 
 /** Opens a carrier-written draft; it never sends email or changes verification. */
 export function highwayOnboardingMailto(company: string, intent: "setup" | "help" = "setup"): string {

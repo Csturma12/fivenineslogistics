@@ -112,7 +112,7 @@ export default function GrowthPage() {
                 Five Nines is the next chapter of a ten-year freight career—not a first day in
                 logistics. Built by an operations and account manager already overseeing up to 500
                 shipments a week, we are moving toward a customer and carrier centered network that
-                brings solutions across every aspect of the supply chain. Our staff brings drivers
+                plans, connects and stays with every leg of the move. Our staff brings drivers
                 with 10+ years on the road, foremen and superintendents from the field, and a decade
                 of field work in the refractory industry. This page tracks where we take it next.
               </p>

@@ -185,7 +185,7 @@ async function stopChild(child) {
             assert.match(sample.text, view === 'customer' ? /Customer portal/ : /Carrier portal/);
             assert.doesNotMatch(sample.text, /\/api\/portal\/documents\?id=/);
             if (view === 'setup') {
-                assert.match(sample.text, /onboarding@shipfivenines\.com/);
+                assert.match(sample.text, /dispatch@fivenineslogistics\.com/);
                 assert.match(sample.text, /awaiting_invitation/);
             }
         }

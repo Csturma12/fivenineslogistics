@@ -380,7 +380,7 @@ export function WorkspaceDesk({
       </Panel>
       <Panel title="Email delivery queue">
         <p className="mb-4 text-sm text-slate-600">
-          Carrier bids and reservations go to dispatch@shipfivenines.com. Saved
+          Carrier bids and reservations go to dispatch@fivenineslogistics.com. Saved
           alerts remain in the queue if email delivery fails. Items older than
           23 hours require manual follow-up.
         </p>

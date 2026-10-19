@@ -40,7 +40,7 @@ export function ModesTeaser() {
 
         <div className="mt-8">
           <Button
-            render={<Link href="/modes" />}
+            render={<Link href="/capabilities" />}
             nativeButton={false}
             size="lg"
             variant="outline"

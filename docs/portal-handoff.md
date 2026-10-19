@@ -104,7 +104,7 @@ The development preview returns 404 outside development and never bypasses API a
    Other portal users retain their customer/carrier access and ownership restrictions.
    Staff password recovery returns to the desk. Auth confirmation/callback redirects
    accept only the app destinations in `lib/portal-auth-routing.ts`.
-   Carriers currently request Highway setup by emailing `onboarding@shipfivenines.com`
+   Carriers currently request Highway setup by emailing `dispatch@fivenineslogistics.com`
    from the checklist, verification panel or blocked load board. The mailto action
    opens a draft; it does not send or change verification/approval. Optional
    `HIGHWAY_SETUP_URL` still accepts only HTTPS Highway domains and remains in the

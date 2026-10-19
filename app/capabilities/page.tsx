@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { NetworkCta } from "@/components/network-cta";
 import { DedicatedFleet } from "@/components/dedicated-fleet";
+import { EquipmentReference } from "@/components/equipment-reference";
 import {
   modes,
   site,
@@ -18,9 +19,9 @@ import {
 } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Modes & Services | Five Nines Logistics",
+  title: "Capabilities & Equipment Specs | Five Nines Logistics",
   description:
-    "A Houston-based 3PL arranging flatbed, dry van, sprinter van, refrigerated trucking, expedited, drayage, hotshot, heavy haul, crane and rigging, ocean, LTL, and warehousing through nationwide and global partners.",
+    "Flatbed, step deck, RGN heavy haul, hotshot, port drayage and transload, crane and rigging, ocean, LTL, and warehousing — with an equipment engineering reference so you can verify legal tolerances before you quote. Authorized agency of Primary Freight LLC (MC# 841023).",
 };
 
 export default function ModesPage() {
@@ -31,10 +32,10 @@ export default function ModesPage() {
         <section className="hero-grid border-b border-border">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
             <span className="font-mono text-xs uppercase tracking-wider text-primary">
-              Modes &amp; Services
+              Capabilities
             </span>
             <h1 className="mt-4 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl">
-              Twelve modes. One tolerance for failure.
+              Twelve modes. Verified equipment. One tolerance for failure.
             </h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
               Owned capacity, affiliated carriers, and a vetted nationwide and
@@ -49,13 +50,13 @@ export default function ModesPage() {
                 <ArrowRight className="size-4" data-icon="inline-end" />
               </RequestCapacityButton>
               <Button
-                render={<Link href="/loads" />}
+                render={<Link href="#equipment-reference" />}
                 nativeButton={false}
                 size="lg"
                 variant="outline"
                 className="font-medium"
               >
-                View Load Board
+                Equipment Spec Reference
                 <ArrowRight className="size-4" data-icon="inline-end" />
               </Button>
             </div>
@@ -63,6 +64,8 @@ export default function ModesPage() {
         </section>
 
         <DedicatedFleet />
+
+        <EquipmentReference />
 
         <section className="border-b border-border">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">

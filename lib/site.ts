@@ -11,12 +11,13 @@ export const site = {
   // Verified from Primary Freight LLC ACORD 25 certificate (Cottingham & Butler), policy period 4/12/2026–4/12/2027.
   insurance: "$1M auto liability · $1M/$2M general liability · $4M umbrella · $150K contingent cargo",
   location: "Houston, TX",
-  quotesEmail: "quotes@fivenineslogistics.com",
-  // Role addresses on shipfivenines.com. These are mailto: contacts (visitors write TO them),
-  // so they do not need Resend domain verification — only inbound receiving/forwarding at the mail host.
-  dispatchEmail: "dispatch@shipfivenines.com", // capacity requests
-  onboardingEmail: "onboarding@shipfivenines.com", // carrier onboarding
-  infoEmail: "info@shipfivenines.com", // general questions
+  dot: "U.S. DOT# 2436508",
+  quotesEmail: "dispatch@fivenineslogistics.com",
+  // One public contact address on the fivenineslogistics.com domain. Every mailto: on the site
+  // resolves here so shippers and carriers never see a second domain (anti-phishing / anti-double-brokering).
+  dispatchEmail: "dispatch@fivenineslogistics.com", // capacity requests
+  onboardingEmail: "dispatch@fivenineslogistics.com", // carrier onboarding
+  infoEmail: "dispatch@fivenineslogistics.com", // general questions
 }
 
 export type Mode = {
@@ -256,14 +257,14 @@ export const ninesLadder: NinesRow[] = [
   { level: "99%", downtimePerYear: "3 days, 15 hours", tier: "Uncommitted freight" },
   { level: "99.9%", downtimePerYear: "8 hours, 45 minutes", tier: "Premium carriers" },
   { level: "99.99%", downtimePerYear: "52 minutes, 34 seconds", tier: "Managed logistics" },
-  { level: "99.999%", downtimePerYear: "5 minutes, 15 seconds", tier: "Five Nines SLA", highlight: true },
+  { level: "99.999%", downtimePerYear: "5 minutes, 15 seconds", tier: "The standard we work toward", highlight: true },
 ]
 
 export const reliabilityStats = [
-  { value: "99.999%", label: "On-time arrival — the standard we run every load to" },
-  { value: "<1 hr", label: "Answer from dispatch, any hour" },
-  { value: "24/7/365", label: "Control tower coverage" },
-  { value: "0", label: "Tolerance for a quietly missed window" },
+  { value: "99.999%", label: "The standard we work toward. An inspiration, not a measured result." },
+  { value: "24/7", label: "Dispatch access, any hour" },
+  { value: "1", label: "Coordinator who stays with your move" },
+  { value: "4", label: "Constraints confirmed before booking: window, dimensions, value, site" },
 ]
 
 export type Lane = {
@@ -318,7 +319,7 @@ export const heroSpec: { label: string; value: string }[] = [
 
 export const navLinks = [
   { href: "/who-we-serve", label: "Industries" },
-  { href: "/modes", label: "Modes" },
+  { href: "/capabilities", label: "Modes" },
   { href: "/loads", label: "Load Board" },
   { href: "/carrier-vetting", label: "Vetting" },
   { href: "/consulting", label: "Consulting" },
@@ -328,7 +329,7 @@ export const navLinks = [
 
 export const footerLinks = [
   { href: "/who-we-serve", label: "Who We Serve" },
-  { href: "/modes", label: "Modes" },
+  { href: "/capabilities", label: "Modes" },
   { href: "/loads", label: "Load Board" },
   { href: "/carrier-vetting", label: "Vetting & Fraud Prevention" },
   { href: "/carriers", label: "Carriers" },
@@ -426,6 +427,56 @@ export const sectors: Sector[] = [
       "Scheduled and expedited delivery",
     ],
   },
+  {
+    code: "3PLs, Freight Forwarders & NVOCCs",
+    title: "The specialized domestic execution arm for global moves",
+    description:
+      "Most 3PLs and international forwarders excel at ocean bookings, air freight, or standard dry van—until a client drops an out-of-gauge port transload, a Gulf Coast refinery delivery, or a crane-timed flatbed project on their desk. Backed by Primary Freight LLC (MC# 841023), Five Nines steps in with 100% written non-solicitation protection, blind BOLs, white-label check-calls, and seamless port-to-jobsite execution.",
+    points: [
+      "100% Non-Solicitation Protection & Blind BOLs",
+      "Port of Houston & 20-Gateway Heavy Transload",
+      "Flatbed, Step Deck, RGN & TWIC Drayage",
+      "Direct Slack/Teams & EDI Status Feeds",
+    ],
+  },
+]
+
+/* ---------- Gateway network, grouped by capability ---------- */
+
+export type HubGroup = {
+  id: string
+  title: string
+  codes: string[]
+  capabilities: string[]
+}
+
+export const hubGroups: HubGroup[] = [
+  {
+    id: "port",
+    title: "Port & Heavy Transload Gateways",
+    codes: ["PORT", "HOU", "LAX", "SEA", "NOLA", "MOB", "ORF", "EWR"],
+    capabilities: [
+      "TWIC Drayage",
+      "Overweight Corridor Access",
+      "Container Stripping",
+      "60k-lb Heavy Lift & Overhead Crane Transload",
+    ],
+  },
+  {
+    id: "petrochem",
+    title: "Petrochemical, PFV & Permian Corridors",
+    codes: ["HOU", "BTR", "MID", "DFW", "SAT", "HSL"],
+    capabilities: ["24/7 Hotshot", "Pipe-Staked Flatbeds", "Turnaround Staging Yards"],
+  },
+  {
+    id: "cross-border",
+    title: "Cross-Border & Heavy Industrial Gateways",
+    codes: ["STR", "MEM", "CHI", "SDF", "MAR", "BYH", "PHX"],
+    capabilities: [
+      "Mexico/Canada Heavy-Haul Thru-Trailer & Transload",
+      "Midwest Data Center Corridor Staging",
+    ],
+  },
 ]
 
 /* ---------- Who We Serve page ---------- */
@@ -493,7 +544,7 @@ export type CompanyValue = {
 export const companyStory: CompanyValue[] = [
   {
     title: "Where we come from",
-    body: "Our roots are on the plant floor. Our founder spent ten years in plant maintenance, specializing in refractory work, followed by ten years coordinating logistics across the lower 48, Alaska, Hawaii, Canada and Mexico.\n\nFive Nines brings that broad experience to a business with strong roots in Texas and the Gulf. We understand both sides of the delivery: doing the work inside the facility and coordinating the freight that supports it.\n\nNow we’re building that team further, with plans to bring aboard experienced drivers our founder has worked with and counts among the most reliable he’s known. Their firsthand knowledge of equipment, routes and delivery-site realities will help shape how we plan and execute each move.",
+    body: "Our roots are on the plant floor. Our founder spent ten years in plant maintenance, specializing in refractory work, followed by ten years coordinating logistics across the lower 48, Alaska, Hawaii, Canada and Mexico.\n\nFive Nines brings that broad experience to a business with strong roots in Texas and the Gulf. We understand both sides of the delivery: doing the work inside the facility and coordinating the freight that supports it.\n\nBacked by 20+ years of combined plant-floor refractory and North American logistics execution, our team pairs field-tested drivers and dedicated assets with a rigorously vetted nationwide carrier network. Their firsthand knowledge of equipment, routes and delivery-site realities shapes how we plan and execute each move.",
   },
   {
     title: "How we're structured",
@@ -501,7 +552,7 @@ export const companyStory: CompanyValue[] = [
   },
   {
     title: "Why 'five nines'",
-    body: "99.999% uptime is the standard mission-critical facilities hold their own systems to. It's the standard your freight partner should meet too. We borrowed the language on purpose — it's the bar we hold every load to, and we'll report against it in the open.",
+    body: "99.999% uptime is the standard mission-critical facilities hold their own systems to. We borrowed the language on purpose. It isn't a measure of our performance. It's the standard we work toward: prepare thoroughly, stay connected and keep every handoff accounted for.",
   },
 ]
 
