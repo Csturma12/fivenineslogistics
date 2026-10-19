@@ -1,56 +1,5 @@
 import { hubs } from "@/lib/site"
-
-// Approximate relative positions (percent of viewBox) for each hub, arranged
-// to read as a stylized US network map without depending on real geo data.
-const positions: Record<string, { x: number; y: number }> = {
-  SEA: { x: 10, y: 10 },
-  LAX: { x: 11, y: 52 },
-  PHX: { x: 22, y: 60 },
-  STR: { x: 33, y: 72 },
-  MID: { x: 39, y: 67 },
-  HSL: { x: 44, y: 55 },
-  DFW: { x: 51, y: 63 },
-  SAT: { x: 50, y: 83 },
-  HOU: { x: 57, y: 76 },
-  PORT: { x: 61, y: 83 },
-  BTR: { x: 67, y: 73 },
-  NOLA: { x: 71, y: 80 },
-  MOB: { x: 76, y: 71 },
-  MAR: { x: 59, y: 44 },
-  BYH: { x: 63, y: 40 },
-  MEM: { x: 64, y: 50 },
-  CHI: { x: 70, y: 28 },
-  SDF: { x: 75, y: 39 },
-  ORF: { x: 89, y: 43 },
-  EWR: { x: 91, y: 29 },
-}
-
-const links: [string, string][] = [
-  ["SEA", "LAX"],
-  ["SEA", "DFW"],
-  ["LAX", "PHX"],
-  ["PHX", "STR"],
-  ["STR", "DFW"],
-  ["MID", "DFW"],
-  ["HSL", "DFW"],
-  ["DFW", "HOU"],
-  ["DFW", "MEM"],
-  ["HOU", "SAT"],
-  ["HOU", "PORT"],
-  ["HOU", "BTR"],
-  ["BTR", "NOLA"],
-  ["NOLA", "MOB"],
-  ["MOB", "MEM"],
-  ["MEM", "MAR"],
-  ["MEM", "BYH"],
-  ["MEM", "SDF"],
-  ["SDF", "CHI"],
-  ["DFW", "CHI"],
-  ["CHI", "EWR"],
-  ["SDF", "ORF"],
-  ["MEM", "ORF"],
-  ["ORF", "EWR"],
-]
+import { MAP_VIEWBOX, labelPosition, mapLinks, mapNodes } from "@/lib/gateway-map"
 
 export function CoverageMap() {
   return (
@@ -62,10 +11,10 @@ export function CoverageMap() {
         <span className="font-mono text-xs uppercase tracking-wider text-status-ok">{hubs.length} hubs live</span>
       </div>
 
-      <svg viewBox="0 0 100 100" className="w-full flex-1" role="img" aria-label="Five Nines Logistics gateway network map">
-        {links.map(([a, b]) => {
-          const from = positions[a]
-          const to = positions[b]
+      <svg viewBox={MAP_VIEWBOX} className="w-full flex-1" role="img" aria-label="Five Nines Logistics gateway network map">
+        {mapLinks.map(([a, b]) => {
+          const from = mapNodes[a]
+          const to = mapNodes[b]
           return (
             <line
               key={`${a}-${b}`}
@@ -80,18 +29,19 @@ export function CoverageMap() {
         })}
 
         {hubs.map((hub) => {
-          const pos = positions[hub.code]
+          const pos = mapNodes[hub.code]
           if (!pos) return null
+          const label = labelPosition(pos)
           return (
             <g key={hub.code}>
-              <circle cx={pos.x} cy={pos.y} r="2.6" className="fill-background stroke-primary" strokeWidth="0.6" />
+              <circle cx={pos.x} cy={pos.y} r="2.2" className="fill-background stroke-primary" strokeWidth="0.6" />
               <circle cx={pos.x} cy={pos.y} r="0.9" className="fill-primary" />
               <text
-                x={pos.x}
-                y={pos.y - 4.5}
-                textAnchor="middle"
+                x={label.x}
+                y={label.y}
+                textAnchor={label.anchor}
                 className="fill-foreground font-mono"
-                style={{ fontSize: "3.4px" }}
+                style={{ fontSize: "3.3px" }}
               >
                 {hub.code}
               </text>
