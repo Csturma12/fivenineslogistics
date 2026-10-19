@@ -131,8 +131,8 @@ export default function RequestDocumentsPage() {
         </section>
 
         <section id="request" className="scroll-mt-24 border-b border-border bg-card/30">
-          <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1fr_1.1fr]">
-            <div>
+          <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 sm:py-20 lg:grid-cols-[1fr_1.1fr] lg:gap-x-12">
+            <div className="lg:col-start-1 lg:row-start-1">
               <p className="font-mono text-xs uppercase tracking-wider text-primary">Request documents</p>
               <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                 One form. The whole packet.
@@ -142,7 +142,12 @@ export default function RequestDocumentsPage() {
                 authority, BMC-84 bond, agency letter and non-solicitation agreement. Carriers receive the Primary
                 Freight broker–carrier agreement and Highway verification invite.
               </p>
-              <div className="mt-8 rounded-xl border border-border bg-card p-6">
+            </div>
+            <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+              <DocumentRequestForm />
+            </div>
+            <div className="lg:col-start-1 lg:row-start-2">
+              <div className="rounded-xl border border-border bg-card p-6">
                 <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Carrier minimums</p>
                 <ul className="mt-3 flex flex-col gap-2">
                   {carrierRequirements.map((req) => (
@@ -158,7 +163,6 @@ export default function RequestDocumentsPage() {
                 </Link>
               </div>
             </div>
-            <DocumentRequestForm />
           </div>
         </section>
 

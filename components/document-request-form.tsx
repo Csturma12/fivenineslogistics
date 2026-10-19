@@ -48,10 +48,20 @@ export function DocumentRequestForm({ defaultAudience = "shipper" }: { defaultAu
   const [audience, setAudience] = useState<Audience>(defaultAudience)
   const [state, formAction, pending] = useActionState(submitDocumentRequest, initialState)
   const packet = packets[audience]
+  const saved = state.status === "error" ? state.values : undefined
+  const savedDocs = saved?.audience === audience ? saved.documents : undefined
 
   if (state.status === "success") {
     return (
-      <div className="rounded-xl border border-border bg-card p-8" role="status">
+      <div
+        ref={(el) => {
+          el?.scrollIntoView({ behavior: "smooth", block: "start" })
+          el?.focus({ preventScroll: true })
+        }}
+        tabIndex={-1}
+        className="scroll-mt-24 rounded-xl border border-border bg-card p-8 outline-none"
+        role="status"
+      >
         <div className="flex items-center gap-3">
           <span className="flex size-9 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary">
             <Check className="size-4" aria-hidden="true" />
@@ -108,7 +118,7 @@ export function DocumentRequestForm({ defaultAudience = "shipper" }: { defaultAu
                   key={doc}
                   className="flex items-start gap-3 rounded-md border border-border bg-card/50 px-3 py-2.5 text-sm text-foreground"
                 >
-                  <input type="checkbox" name="documents" value={doc} defaultChecked className="mt-0.5 accent-[#1768b2]" />
+                  <input type="checkbox" name="documents" value={doc} defaultChecked={savedDocs ? savedDocs.includes(doc) : true} className="mt-0.5 accent-[#1768b2]" />
                   <span>{doc}</span>
                 </label>
               ))}
@@ -119,29 +129,29 @@ export function DocumentRequestForm({ defaultAudience = "shipper" }: { defaultAu
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="doc-name" className={labelClass}>Contact name</label>
-            <input id="doc-name" name="name" required placeholder="Jordan Reyes" className={inputClass} />
+            <input id="doc-name" name="name" required defaultValue={saved?.name} placeholder="Jordan Reyes" className={inputClass} />
           </div>
           <div>
             <label htmlFor="doc-company" className={labelClass}>Company</label>
-            <input id="doc-company" name="company" required placeholder="Acme Industrial" className={inputClass} />
+            <input id="doc-company" name="company" required defaultValue={saved?.company} placeholder="Acme Industrial" className={inputClass} />
           </div>
           <div>
             <label htmlFor="doc-email" className={labelClass}>Work email</label>
-            <input id="doc-email" name="email" type="email" required placeholder="jordan@acme.com" className={inputClass} />
+            <input id="doc-email" name="email" type="email" required defaultValue={saved?.email} placeholder="jordan@acme.com" className={inputClass} />
           </div>
           <div>
             <label htmlFor="doc-phone" className={labelClass}>Phone</label>
-            <input id="doc-phone" name="phone" type="tel" placeholder="(555) 010-4477" className={inputClass} />
+            <input id="doc-phone" name="phone" type="tel" defaultValue={saved?.phone} placeholder="(555) 010-4477" className={inputClass} />
           </div>
           {audience === "carrier" && (
             <div className="sm:col-span-2">
               <label htmlFor="doc-mc" className={labelClass}>Your MC / DOT number</label>
-              <input id="doc-mc" name="mc_number" placeholder="MC# 000000 / DOT# 0000000" className={inputClass} />
+              <input id="doc-mc" name="mc_number" defaultValue={saved?.mc_number} placeholder="MC# 000000 / DOT# 0000000" className={inputClass} />
             </div>
           )}
           <div className="sm:col-span-2">
             <label htmlFor="doc-notes" className={labelClass}>Notes (vendor portal, COI holder wording, deadlines)</label>
-            <textarea id="doc-notes" name="notes" rows={3} className={`${inputClass} h-auto resize-y py-3`} />
+            <textarea id="doc-notes" name="notes" rows={3} defaultValue={saved?.notes} className={`${inputClass} h-auto resize-y py-3`} />
           </div>
         </div>
 
