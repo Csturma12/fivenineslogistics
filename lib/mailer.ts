@@ -26,14 +26,22 @@ export type MailMessage = {
 
 type ServiceAccount = { client_email: string; private_key: string }
 
+// Accepts the key file as raw JSON or base64. Also repairs a paste that lost its
+// leading `{"` (pasting the file on mobile drops it), e.g. `type": "service_account", ...}`.
+function normalizeKeyJson(raw: string): string {
+  const value = raw.trim()
+  if (value.startsWith("{")) return value
+  if (/^"?type"\s*:/.test(value)) return `{"${value.replace(/^"/, "")}`
+  return Buffer.from(value, "base64").toString("utf8")
+}
+
 function config() {
   const raw = process.env.GOOGLE_SA_JSON
   const impersonate = process.env.MAIL_IMPERSONATE
   const missing = [!raw && "GOOGLE_SA_JSON", !impersonate && "MAIL_IMPERSONATE"].filter(Boolean)
   if (missing.length) throw new Error(`Email is not configured: missing ${missing.join(", ")}.`)
 
-  const json = raw!.trim().startsWith("{") ? raw! : Buffer.from(raw!, "base64").toString("utf8")
-  const account = JSON.parse(json) as ServiceAccount
+  const account = JSON.parse(normalizeKeyJson(raw!)) as ServiceAccount
   if (!account.client_email || !account.private_key) {
     throw new Error("GOOGLE_SA_JSON is not a valid service account key (client_email/private_key missing).")
   }
