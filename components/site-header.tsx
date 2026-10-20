@@ -31,6 +31,8 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [portalOpen, setPortalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const openedByHoverRef = useRef(false);
   const { openPanel } = useRequestCapacity();
 
   useEffect(() => {
@@ -39,11 +41,20 @@ export function SiteHeader() {
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
+        openedByHoverRef.current = false;
         setPortalOpen(false);
       }
     }
     function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setPortalOpen(false);
+      if (event.key === "Escape") {
+        const hadFocusInside =
+          dropdownRef.current?.contains(document.activeElement) ?? false;
+        openedByHoverRef.current = false;
+        setPortalOpen(false);
+        if (hadFocusInside) {
+          triggerRef.current?.focus();
+        }
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleEscape);
@@ -102,15 +113,29 @@ export function SiteHeader() {
             <div
               ref={dropdownRef}
               className="portal-dropdown"
-              onMouseEnter={() => setPortalOpen(true)}
-              onMouseLeave={() => setPortalOpen(false)}
+              onMouseEnter={() => {
+                if (!portalOpen) openedByHoverRef.current = true;
+                setPortalOpen(true);
+              }}
+              onMouseLeave={() => {
+                openedByHoverRef.current = false;
+                setPortalOpen(false);
+              }}
             >
               <button
+                ref={triggerRef}
                 type="button"
                 className="portal-dropdown__trigger"
                 aria-expanded={portalOpen}
                 aria-haspopup="menu"
-                onClick={() => setPortalOpen((prev) => !prev)}
+                onClick={() => {
+                  if (openedByHoverRef.current) {
+                    openedByHoverRef.current = false;
+                    setPortalOpen(true);
+                    return;
+                  }
+                  setPortalOpen((prev) => !prev);
+                }}
               >
                 Control Tower Portal
                 <ChevronDown
@@ -135,7 +160,10 @@ export function SiteHeader() {
                       href={item.href}
                       role="menuitem"
                       className="portal-dropdown__item"
-                      onClick={() => setPortalOpen(false)}
+                      onClick={() => {
+                        openedByHoverRef.current = false;
+                        setPortalOpen(false);
+                      }}
                     >
                       <span className="portal-dropdown__icon" aria-hidden="true">
                         {item.kind === "shipper" ? (

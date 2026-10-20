@@ -188,7 +188,7 @@ export function PortalWorkspace({
         <div className="mb-8 flex flex-wrap items-start justify-between gap-5">
           <div className="flex items-start gap-4">
             <span className="mt-1 inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-[#12345a] text-white shadow-xs">
-              {!desk && viewRole === "carrier" ? (
+              {!desk && (viewRole || initialRole) === "carrier" ? (
                 <FiveNinesFlatbedMark className="size-6" />
               ) : (
                 <FiveNinesMark className="size-6" />
@@ -196,7 +196,14 @@ export function PortalWorkspace({
             </span>
             <div>
               <p className="font-mono text-xs uppercase tracking-[.2em] text-blue-600">
-                Five Nines · {desk ? "Operations" : viewRole === "carrier" ? "Carrier Control Tower" : "Shipper Control Tower"}
+                Five Nines ·{" "}
+                {desk
+                  ? "Operations"
+                  : (viewRole || initialRole) === "carrier"
+                    ? "Carrier Control Tower"
+                    : (viewRole || initialRole) === "customer"
+                      ? "Shipper Control Tower"
+                      : "Your connection"}
               </p>
               <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
                 {desk

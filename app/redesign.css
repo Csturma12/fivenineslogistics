@@ -213,7 +213,7 @@ html {
 }
 .portal-dropdown__menu {
   position: absolute;
-  top: calc(100% + 2px);
+  top: 100%;
   right: 0;
   width: 310px;
   background: #0b111e;
