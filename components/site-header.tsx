@@ -1,16 +1,17 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, FileText, LockKeyhole, Menu, X, type LucideIcon } from "lucide-react";
 import { FiveNinesForged } from "@/components/five-nines-forged";
 import { useRequestCapacity } from "@/components/request-capacity-panel";
 import { site } from "@/lib/site";
-const links = [
+type NavLink = { href: string; label: string; hint?: string; icon?: LucideIcon; kind?: "portal" };
+const links: NavLink[] = [
   { href: "/who-we-serve", label: "Who We Serve" },
   { href: "/capabilities", label: "Capabilities" },
-  { href: "/request-documents", label: "Compliance & Onboarding" },
+  { href: "/request-documents", label: "Compliance & Onboarding", hint: "W-9 · COI · authority packet", icon: FileText },
   { href: "/work-with-us", label: "Work With Us" },
-  { href: "/portal", label: "Control Tower Portal" },
+  { href: "/portal", label: "Control Tower Portal", hint: "Carrier & shipper sign in", icon: LockKeyhole, kind: "portal" },
 ];
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -56,9 +57,10 @@ export function SiteHeader() {
             </span>
           </Link>
           <nav className="desktop-nav" aria-label="Primary">
-            {links.map((link) => (
-              <Link key={link.href} href={link.href}>
-                {link.label}
+            {links.map(({ href, label, icon: Icon, kind }) => (
+              <Link key={href} href={href} className={kind === "portal" ? "nav-portal" : undefined}>
+                {Icon ? <Icon size={15} aria-hidden="true" /> : null}
+                {kind === "portal" ? "Portal Sign In" : label}
               </Link>
             ))}
           </nav>
@@ -88,13 +90,24 @@ export function SiteHeader() {
             className="mobile-nav"
             aria-label="Mobile navigation"
           >
-            {links.map((link) => (
+            {links.map(({ href, label, hint, icon: Icon, kind }) => (
               <Link
-                key={link.href}
-                href={link.href}
+                key={href}
+                href={href}
                 onClick={() => setOpen(false)}
+                className={kind === "portal" ? "mobile-nav-portal" : undefined}
               >
-                {link.label}
+                <span className="mobile-nav-label">
+                  {Icon ? (
+                    <span className="mobile-nav-icon">
+                      <Icon size={18} aria-hidden="true" />
+                    </span>
+                  ) : null}
+                  <span className="mobile-nav-text">
+                    {label}
+                    {hint ? <small>{hint}</small> : null}
+                  </span>
+                </span>
                 <ArrowUpRight size={18} aria-hidden="true" />
               </Link>
             ))}
