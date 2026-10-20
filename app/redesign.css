@@ -156,12 +156,98 @@ html {
   white-space: nowrap;
 }
 .desktop-nav > a,
-.portal-link {
+.portal-link,
+.portal-dropdown__trigger {
   transition: color 0.2s;
 }
 .desktop-nav > a:hover,
-.portal-link:hover {
+.portal-link:hover,
+.portal-dropdown__trigger:hover {
   color: var(--blue);
+}
+.portal-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.portal-dropdown__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 8px 0;
+  cursor: pointer;
+}
+.portal-dropdown__chevron {
+  transition: transform 0.18s ease;
+  opacity: 0.7;
+}
+.portal-dropdown__chevron.is-open {
+  transform: rotate(180deg);
+}
+.portal-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 0;
+  width: 310px;
+  background: #0b111e;
+  color: #f8fafc;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 6px;
+  box-shadow: 0 20px 42px -12px rgb(8 13 26 / 45%);
+  z-index: 70;
+}
+.portal-dropdown__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 4px;
+  color: #f8fafc;
+  transition: background 0.15s ease;
+  white-space: normal;
+}
+.portal-dropdown__item + .portal-dropdown__item {
+  border-top: 1px solid rgb(30 41 59 / 75%);
+}
+.portal-dropdown__item:hover {
+  background: #131d31;
+}
+.portal-dropdown__icon {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: #080d1a;
+  border: 1px solid #1e293b;
+  color: #f8fafc;
+}
+.portal-dropdown__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.portal-dropdown__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #fff;
+}
+.portal-dropdown__sub {
+  font-size: 0.74rem;
+  line-height: 1.35;
+  color: #94a3b8;
 }
 .header-actions {
   display: flex;

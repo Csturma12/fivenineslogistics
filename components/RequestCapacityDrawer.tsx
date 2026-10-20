@@ -488,6 +488,13 @@ function Confirmation({ submission, onClose }: { submission: Submission; onClose
       </p>
       <div className="flex flex-wrap gap-3 pt-2">
         <Link
+          href="/portal/customer"
+          onClick={onClose}
+          className="rounded border border-amber-500/50 bg-amber-500 px-4 py-2.5 text-xs font-bold text-slate-950 transition hover:bg-amber-400"
+        >
+          Open Shipper Portal →
+        </Link>
+        <Link
           href="/request-documents"
           onClick={onClose}
           className="rounded border border-slate-700 bg-slate-800 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-slate-700"

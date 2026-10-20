@@ -22,10 +22,11 @@ const groups = [
     ],
   },
   {
-    label: "Partners",
+    label: "Partners & Portals",
     links: [
+      { href: "/portal/customer", label: "Shipper Portal" },
+      { href: "/portal", label: "Carrier Portal" },
       { href: "/carriers", label: "Haul with us" },
-      { href: "/portal", label: "Control Tower Portal" },
       { href: "/request-documents", label: "Compliance & onboarding" },
     ],
   },

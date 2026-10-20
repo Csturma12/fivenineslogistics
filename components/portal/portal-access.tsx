@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from "lucide-react"
 import { FiveNinesMark } from "@/components/five-nines-mark"
+import { FiveNinesFlatbedMark } from "@/components/five-nines-flatbed-mark"
 import { createClient } from "@/lib/supabase/client"
 import { RequestCapacityTrigger } from "@/components/request-capacity-trigger"
 import { isAgentDeskEmail } from "@/lib/portal-access-policy"
@@ -34,7 +35,7 @@ const roleCopy = {
     companyPlaceholder: "Five Nines Logistics",
   },
   customer: {
-    eyebrow: "Customer access",
+    eyebrow: "Shipper & customer access",
     title: "A direct line to your freight team.",
     description:
       "Create an account to reach the team coordinating your freight. Confirm your email once, then sign in anytime with your password.",
@@ -169,9 +170,22 @@ export function PortalSignIn({ role }: { role: Role }) {
   return (
     <div className="grid overflow-hidden rounded-xl border border-border lg:grid-cols-2">
       <div className="flex flex-col justify-between gap-10 bg-navy p-6 text-navy-foreground sm:p-8">
-        <div className="flex items-center gap-2.5">
-          <FiveNinesMark className="h-7 w-7 shrink-0 text-navy-foreground" />
-          <span className="text-sm font-semibold tracking-tight">FIVE NINES</span>
+        <div className="flex items-center gap-3">
+          {role === "carrier" ? (
+            <FiveNinesFlatbedMark className="h-8 w-8 shrink-0 text-navy-foreground" animated />
+          ) : (
+            <FiveNinesMark className="h-7 w-7 shrink-0 text-navy-foreground" animated />
+          )}
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold tracking-tight">FIVE NINES</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-navy-foreground/60">
+              {role === "carrier"
+                ? "Carrier Control Tower"
+                : role === "staff"
+                  ? "Operations Desk"
+                  : "Shipper Control Tower"}
+            </span>
+          </div>
         </div>
 
         <div>

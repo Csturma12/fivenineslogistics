@@ -5,6 +5,8 @@ import { centralToday, type Workspace } from "@/lib/portal-contract";
 import { readPortalBody, uploadDocument } from "@/lib/portal-upload-client";
 import { portalView } from "@/lib/portal-view";
 import { SignOutButton } from "./sign-out-button";
+import { FiveNinesMark } from "@/components/five-nines-mark";
+import { FiveNinesFlatbedMark } from "@/components/five-nines-flatbed-mark";
 import { ProfileForm, LoadRequestForm, UploadForm } from "./workspace-forms";
 import { CarrierBoard } from "./carrier-board";
 import { WorkspaceDesk } from "./workspace-desk";
@@ -184,22 +186,31 @@ export function PortalWorkspace({
       ) : null}
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-14">
         <div className="mb-8 flex flex-wrap items-start justify-between gap-5">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-[.2em] text-blue-600">
-              Five Nines · {desk ? "Operations" : "Your connection"}
-            </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-              {desk
-                ? "Portal review desk"
-                : viewRole === "carrier"
-                  ? "Carrier portal"
-                  : viewRole === "customer"
-                    ? "Customer portal"
-                    : "Welcome to your portal"}
-            </h1>
-            <p className="mt-3 text-sm text-slate-500">
-              {data?.email || "Secure account access"}
-            </p>
+          <div className="flex items-start gap-4">
+            <span className="mt-1 inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-[#12345a] text-white shadow-xs">
+              {!desk && viewRole === "carrier" ? (
+                <FiveNinesFlatbedMark className="size-6" />
+              ) : (
+                <FiveNinesMark className="size-6" />
+              )}
+            </span>
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[.2em] text-blue-600">
+                Five Nines · {desk ? "Operations" : viewRole === "carrier" ? "Carrier Control Tower" : "Shipper Control Tower"}
+              </p>
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+                {desk
+                  ? "Portal review desk"
+                  : viewRole === "carrier"
+                    ? "Carrier portal"
+                    : viewRole === "customer"
+                      ? "Customer portal"
+                      : "Welcome to your portal"}
+              </h1>
+              <p className="mt-2 text-sm text-slate-500">
+                {data?.email || "Secure account access"}
+              </p>
+            </div>
           </div>
           {data ? (
             <div className="flex flex-wrap items-center gap-3">
