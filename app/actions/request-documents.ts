@@ -1,6 +1,6 @@
 "use server"
 
-import { Resend } from "resend"
+import { sendMail } from "@/lib/mailer"
 import { site } from "@/lib/site"
 
 export type DocumentRequestState = {
@@ -69,25 +69,16 @@ export async function submitDocumentRequest(
       </table>
     </div>`
 
-  if (!process.env.RESEND_API_KEY || !process.env.RESEND_EMAIL_DOMAIN) {
-    console.log("[request-documents] Resend not configured; request logged only.", { ticket, rows })
-    return { status: "success", ticket }
-  }
-
-  const resend = new Resend(process.env.RESEND_API_KEY)
-  const { error } = await resend.emails.send(
-    {
-      from: `Five Nines Compliance <dispatch@${process.env.RESEND_EMAIL_DOMAIN}>`,
+  try {
+    await sendMail({
+      fromName: "Five Nines Compliance",
       to: [LEAD_INBOX],
       replyTo: email,
       subject: `Document request ${ticket} · ${company} · ${audience}`,
       html,
-    },
-    { idempotencyKey: `document-request/${email}/${documents.join("|")}` },
-  )
-
-  if (error) {
-    console.log("[request-documents] Resend send failed:", error.message)
+    })
+  } catch (error) {
+    console.error("[request-documents] send failed:", error instanceof Error ? error.message : error, { ticket })
     return {
       status: "error",
       message: `Something went wrong sending your request. Email ${site.dispatchEmail} or call ${site.phone} and we'll send the packet manually.`,

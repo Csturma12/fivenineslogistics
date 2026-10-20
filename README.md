@@ -31,3 +31,17 @@ To learn more, take a look at the following resources:
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 - [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+
+## Email (Gmail API)
+
+All outbound mail goes through `lib/mailer.ts` and is sent as `dispatch@fivenineslogistics.com` via the Gmail API (service account + domain-wide delegation). Resend is not used.
+
+Env vars (server-only, set in Vercel project Vars):
+
+- `GOOGLE_SA_JSON` — service account key JSON (raw or base64)
+- `MAIL_IMPERSONATE` — licensed Workspace user the app sends as (must have dispatch@ as a "Send mail as" address, or own it)
+- `MAIL_FROM` — optional, defaults to `dispatch@fivenineslogistics.com`
+
+Setup: enable the Gmail API in a Google Cloud project, create a service account and key, then in Google Admin → Security → API controls → Domain-wide delegation add its client ID with scope `https://www.googleapis.com/auth/gmail.send`.
+
+Test: `pnpm mail:test you@example.com`

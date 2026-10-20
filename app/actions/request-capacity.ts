@@ -1,6 +1,6 @@
 "use server"
 
-import { Resend } from "resend"
+import { sendMail } from "@/lib/mailer"
 
 // Where production leads land now that the domain is verified.
 const LEAD_INBOX = "sturma@blbxcritical.com"
@@ -55,8 +55,6 @@ export async function submitRequestCapacity(
   }
 
   const ticket = requestType === "consulting" ? ticketId().replace("RC-", "SC-") : ticketId()
-  const resend = new Resend(process.env.RESEND_API_KEY)
-  const from = `Five Nines Dispatch <dispatch@${process.env.RESEND_EMAIL_DOMAIN}>`
 
   const rows: Array<[string, string]> = [
     ["Request type", requestType === "consulting" ? "Supply chain consultation" : "Capacity"],
@@ -92,19 +90,16 @@ export async function submitRequestCapacity(
       </div>
     </div>`
 
-  const { error } = await resend.emails.send(
-    {
-      from,
+  try {
+    await sendMail({
+      fromName: "Five Nines Dispatch",
       to: [LEAD_INBOX],
       replyTo: email,
       subject: `${requestType === "consulting" ? "Consultation" : "Capacity"} request ${ticket} · ${company}`,
       html,
-    },
-    { idempotencyKey: `${requestType}-request/${email}/${origin}-${destination}` },
-  )
-
-  if (error) {
-    console.log("[v0] Resend send failed:", error.message)
+    })
+  } catch (error) {
+    console.error("[request-capacity] send failed:", error instanceof Error ? error.message : error, { ticket })
     return {
       status: "error",
       message: "Something went wrong sending your request. Call 24/7 dispatch and we'll log it manually.",

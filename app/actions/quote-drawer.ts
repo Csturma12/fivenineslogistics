@@ -1,6 +1,6 @@
 "use server"
 
-import { Resend } from "resend"
+import { sendMail } from "@/lib/mailer"
 import { site } from "@/lib/site"
 
 export type QuoteMode = "STANDARD-SPOT" | "PROJECT-RFP" | "EMERGENCY-HOTSHOT"
@@ -128,30 +128,20 @@ export async function notifyQuoteDrawer(mode: QuoteMode, formData: FormData): Pr
       }
     </div>`
 
-  if (!process.env.RESEND_API_KEY || !process.env.RESEND_EMAIL_DOMAIN) {
-    console.log("[quote-drawer] Resend not configured; submission logged only.", { reference, mode, rows })
-    return { ok: true, reference }
-  }
-
-  const resend = new Resend(process.env.RESEND_API_KEY)
-  const from = `Five Nines Dispatch <dispatch@${process.env.RESEND_EMAIL_DOMAIN}>`
   const to = [LEAD_INBOX]
   if (mode === "EMERGENCY-HOTSHOT" && DISPATCH_PAGER) to.push(DISPATCH_PAGER)
 
-  const { error } = await resend.emails.send(
-    {
-      from,
+  try {
+    await sendMail({
+      fromName: "Five Nines Dispatch",
       to,
       replyTo: contactEmail || undefined,
       subject,
       html,
       attachments: attachments.length ? attachments : undefined,
-    },
-    { idempotencyKey: `quote-drawer/${reference}` },
-  )
-
-  if (error) {
-    console.log("[quote-drawer] Resend send failed:", error.message)
+    })
+  } catch (error) {
+    console.error("[quote-drawer] send failed:", error instanceof Error ? error.message : error, { reference, mode })
     return {
       ok: persisted,
       reference,
