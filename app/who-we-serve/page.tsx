@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button"
 import { RequestCapacityButton } from "@/components/request-capacity-trigger"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
-import { NetworkCta } from "@/components/network-cta"
-import { GatewayNetwork } from "@/components/gateway-network"
+import { UnifiedGatewayNetwork } from "@/components/unified-gateway-network"
 import { sectors, whoWeServePage, whoWeServeInputs, site } from "@/lib/site"
 
 export const metadata: Metadata = {
@@ -135,8 +134,7 @@ export default function WhoWeServePage() {
           </div>
         </section>
 
-        <GatewayNetwork />
-        <NetworkCta />
+        <UnifiedGatewayNetwork />
       </main>
       <SiteFooter />
     </>

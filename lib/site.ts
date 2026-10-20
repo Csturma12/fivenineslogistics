@@ -257,14 +257,14 @@ export const ninesLadder: NinesRow[] = [
   { level: "99%", downtimePerYear: "3 days, 15 hours", tier: "Uncommitted freight" },
   { level: "99.9%", downtimePerYear: "8 hours, 45 minutes", tier: "Premium carriers" },
   { level: "99.99%", downtimePerYear: "52 minutes, 34 seconds", tier: "Managed logistics" },
-  { level: "99.999%", downtimePerYear: "5 minutes, 15 seconds", tier: "Five Nines SLA", highlight: true },
+  { level: "99.999%", downtimePerYear: "5 minutes, 15 seconds", tier: "The standard we work toward", highlight: true },
 ]
 
 export const reliabilityStats = [
-  { value: "99.999%", label: "On-time arrival — the standard we run every load to" },
-  { value: "<1 hr", label: "Answer from dispatch, any hour" },
-  { value: "24/7/365", label: "Control tower coverage" },
-  { value: "0", label: "Tolerance for a quietly missed window" },
+  { value: "99.999%", label: "The standard we work toward. An inspiration, not a measured result." },
+  { value: "24/7", label: "Dispatch access, any hour" },
+  { value: "1", label: "Coordinator who stays with your move" },
+  { value: "4", label: "Constraints confirmed before booking: window, dimensions, value, site" },
 ]
 
 export type Lane = {
@@ -552,7 +552,7 @@ export const companyStory: CompanyValue[] = [
   },
   {
     title: "Why 'five nines'",
-    body: "99.999% uptime is the standard mission-critical facilities hold their own systems to. It's the standard your freight partner should meet too. We borrowed the language on purpose — it's the bar we hold every load to, and we'll report against it in the open.",
+    body: "99.999% uptime is the standard mission-critical facilities hold their own systems to. We borrowed the language on purpose. It isn't a measure of our performance. It's the standard we work toward: prepare thoroughly, stay connected and keep every handoff accounted for.",
   },
 ]
 

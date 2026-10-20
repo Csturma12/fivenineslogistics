@@ -250,7 +250,7 @@ export default function Page() {
               <p>Backed by 20+ years of combined plant-floor refractory and North American logistics execution, our team pairs field-tested drivers and dedicated assets with a rigorously vetted nationwide carrier network.</p>
               <Link href="/company" className="text-link">
                 The story behind Five Nines
-                <ArrowUpRight size={18} aria-hidden="true" />
+                <ArrowRight size={17} aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function Page() {
             </div>
             <Link href="/capabilities" className="text-link">
               All modes & services
-              <ArrowUpRight size={18} aria-hidden="true" />
+              <ArrowRight size={17} aria-hidden="true" />
             </Link>
           </div>
           <CapabilityExplorer />
@@ -333,7 +333,7 @@ export default function Page() {
             </p>
             <Link href="/capabilities#ocean" className="text-link">
               Explore our capabilities
-              <ArrowUpRight size={18} aria-hidden="true" />
+              <ArrowRight size={17} aria-hidden="true" />
             </Link>
           </div>
           <div className="reach-panel">
@@ -343,7 +343,6 @@ export default function Page() {
                 <h3>Nationwide</h3>
                 <p>All 50 states · Specialized and general freight</p>
               </div>
-              <ArrowUpRight aria-hidden="true" size={19} />
             </div>
             <div className="reach-row">
               <span className="reach-code">NA</span>
@@ -351,7 +350,6 @@ export default function Page() {
                 <h3>Across both borders</h3>
                 <p>Mexico & Canada · Coordinated handoffs</p>
               </div>
-              <ArrowUpRight aria-hidden="true" size={19} />
             </div>
             <div className="reach-row">
               <span className="reach-code">
@@ -361,7 +359,6 @@ export default function Page() {
                 <h3>International</h3>
                 <p>Ocean partners · Port-to-door execution</p>
               </div>
-              <ArrowUpRight aria-hidden="true" size={19} />
             </div>
             <div className="reach-footer">
               <Clock3 size={16} aria-hidden="true" />
