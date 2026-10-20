@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
   const supabase = createAdminClient()
 
   // generateLink(type:signup) creates the (unconfirmed) user AND returns a
-  // confirmation token we email ourselves via Resend — the built-in Supabase
+  // confirmation token we email ourselves via the Gmail mailer — the built-in Supabase
   // mailer only reaches org addresses and is heavily rate-limited.
   const { data: linkData, error: linkErr } = await supabase.auth.admin.generateLink({
     type: "signup",
