@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { FiveNinesMark } from "@/components/five-nines-mark";
+import { FiveNinesFlatbedMark } from "@/components/five-nines-flatbed-mark";
 import { portalIdentity, profileFor } from "@/lib/portal-service";
 import { PortalProblem, type PortalRole } from "@/lib/portal-contract";
 import { canUsePortalSamples } from "@/lib/portal-sample-access";
@@ -39,11 +41,13 @@ export async function PortalEntry({ role }: { role: PortalRole }) {
       {user ? <PortalWorkspace initialRole={role} /> : (
         <section className="border-t border-border bg-grid-technical">
           <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-            <div className="mb-8 flex flex-wrap items-start justify-between gap-5">
+            <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
               <div>
-                <p className="font-mono text-xs uppercase tracking-wider text-primary">Ship Five Nines · Secure access</p>
+                <p className="font-mono text-xs uppercase tracking-wider text-primary">
+                  Ship Five Nines · Control Tower Access
+                </p>
                 <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                  {role === "carrier" ? "Carrier portal" : "Customer portal"}
+                  {role === "carrier" ? "Carrier portal" : "Shipper & customer portal"}
                 </h1>
                 <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
                   {role === "carrier"
@@ -51,9 +55,36 @@ export async function PortalEntry({ role }: { role: PortalRole }) {
                     : "Request capacity, access company documents and follow shipments linked to your verified account."}
                 </p>
               </div>
-              <Link className="text-sm font-medium text-primary underline underline-offset-4" href={role === "carrier" ? "/portal/customer" : "/portal"}>
-                {role === "carrier" ? "Looking for the customer portal?" : "Looking for the carrier portal?"}
-              </Link>
+              <div
+                role="navigation"
+                aria-label="Switch portal role"
+                className="inline-flex rounded-lg border border-border bg-card p-1 shadow-xs"
+              >
+                <Link
+                  href="/portal/customer"
+                  aria-current={role === "customer" ? "page" : undefined}
+                  className={`inline-flex items-center gap-2 rounded-md px-3.5 py-2 font-mono text-xs uppercase tracking-wider transition-colors ${
+                    role === "customer"
+                      ? "bg-navy text-navy-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <FiveNinesMark className="h-4 w-4 shrink-0" />
+                  Shipper Portal
+                </Link>
+                <Link
+                  href="/portal"
+                  aria-current={role === "carrier" ? "page" : undefined}
+                  className={`inline-flex items-center gap-2 rounded-md px-3.5 py-2 font-mono text-xs uppercase tracking-wider transition-colors ${
+                    role === "carrier"
+                      ? "bg-navy text-navy-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <FiveNinesFlatbedMark className="h-4 w-4 shrink-0" />
+                  Carrier Portal
+                </Link>
+              </div>
             </div>
             <PortalSignIn role={role} />
           </div>

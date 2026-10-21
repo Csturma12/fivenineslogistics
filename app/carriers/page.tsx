@@ -37,9 +37,18 @@ export default function CarriersPage() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
+                render={<Link href="/portal" />}
+                nativeButton={false}
+                size="lg"
+                className="font-medium"
+              >
+                Carrier Portal & Setup
+              </Button>
+              <Button
                 render={<Link href={`mailto:${site.onboardingEmail}`} />}
                 nativeButton={false}
                 size="lg"
+                variant="outline"
                 className="font-medium"
               >
                 <Mail className="size-4" data-icon="inline-start" />
