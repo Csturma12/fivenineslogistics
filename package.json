@@ -9,7 +9,8 @@
     "check": "tsc --noEmit",
     "test": "node --import tsx --test tests/portal.test.ts tests/portal-master-packet.test.ts tests/portal-packet-contract.test.ts tests/portal-upload-client.test.ts tests/portal-access-policy.test.ts tests/portal-auth-routing.test.ts tests/portal-sample-access.test.ts tests/portal-highway-onboarding.test.ts tests/portal-load-window.test.ts",
     "test:access": "node tests/portal-access-http.cjs",
-    "test:access:webpack": "node tests/portal-access-http.cjs --webpack"
+    "test:access:webpack": "node tests/portal-access-http.cjs --webpack",
+    "mail:test": "node --env-file-if-exists=.env.development.local --import tsx scripts/mail-test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -25,7 +26,6 @@
     "pdf-lib": "^1.17.1",
     "react": "^19",
     "react-dom": "^19",
-    "resend": "^6.28.0",
     "shadcn": "^4.11.0",
     "swr": "^2.5.1",
     "tailwind-merge": "^3.3.1",
