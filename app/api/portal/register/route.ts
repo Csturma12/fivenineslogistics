@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { publicOrigin } from "@/lib/public-origin"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendPortalEmail, verifyEmailHtml } from "@/lib/portal-mail"
 import { isAgentDeskEmail } from "@/lib/portal-access-policy"
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
     password,
     options: {
       data: { full_name: fullName },
-      redirectTo: `${req.nextUrl.origin}/auth/confirm`,
+      redirectTo: `${publicOrigin(req)}/auth/confirm`,
     },
   })
 
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Could not finish setting up your account. Try again." }, { status: 500 })
   }
 
-  const confirmUrl = `${req.nextUrl.origin}/auth/confirm?token_hash=${hashedToken}&type=signup&next=${encodeURIComponent(
+  const confirmUrl = `${publicOrigin(req)}/auth/confirm?token_hash=${hashedToken}&type=signup&next=${encodeURIComponent(
     role === "staff" ? "/agent-desk" : "/portal/home",
   )}`
 

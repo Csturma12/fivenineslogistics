@@ -19,7 +19,7 @@ import { isAgentDeskEmail } from "@/lib/portal-access-policy"
 
 type Role = "customer" | "carrier" | "staff"
 type Mode = "signin" | "register"
-type Status = "idle" | "submitting" | "confirm" | "recovered" | "error"
+type Status = "idle" | "submitting" | "confirm" | "recovered" | "linkSent" | "error"
 
 const roleCopy = {
   staff: {
@@ -164,8 +164,36 @@ export function PortalSignIn({ role }: { role: Role }) {
     }
   }
 
+  async function handleEmailLink() {
+    if (role === "staff") return
+    if (!email) {
+      setStatus("error")
+      setError("Enter your email above, then tap the link button again.")
+      return
+    }
+    setStatus("submitting")
+    setError("")
+    try {
+      const response = await fetch("/api/portal/access", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, role }),
+      })
+      const data = (await response.json()) as { error?: string }
+      if (!response.ok) {
+        setStatus("error")
+        setError(data.error ?? "We couldn't send your link. Try again.")
+        return
+      }
+      setStatus("linkSent")
+    } catch {
+      setStatus("error")
+      setError("We couldn't reach the portal. Check your connection and try again.")
+    }
+  }
+
   const showConfirmPanel = status === "confirm"
-  const showRecoveredPanel = status === "recovered"
+  const showRecoveredPanel = status === "recovered" || status === "linkSent"
 
   return (
     <div className="grid overflow-hidden rounded-xl border border-border lg:grid-cols-2">
@@ -210,7 +238,7 @@ export function PortalSignIn({ role }: { role: Role }) {
         </div>
 
         <p className="font-mono text-[10px] uppercase tracking-wider text-navy-foreground/45">
-          Email-verified · encrypted passwords · secure sessions
+          Email-verified · encrypted passwords �� secure sessions
         </p>
       </div>
 
@@ -241,8 +269,17 @@ export function PortalSignIn({ role }: { role: Role }) {
               <h2 className="text-xl font-semibold tracking-tight text-foreground">Check your email</h2>
             </div>
             <p className="text-[13px] leading-relaxed text-muted-foreground">
-              If an account exists for <span className="font-medium text-foreground">{email}</span>, we sent a
-              link to reset your password. It expires in about an hour.
+              {status === "linkSent" ? (
+                <>
+                  If <span className="font-medium text-foreground">{email}</span> is approved for the portal, we
+                  sent a one-tap sign-in link. It expires in about an hour.
+                </>
+              ) : (
+                <>
+                  If an account exists for <span className="font-medium text-foreground">{email}</span>, we sent a
+                  link to reset your password. It expires in about an hour.
+                </>
+              )}
             </p>
             <button
               type="button"
@@ -392,6 +429,18 @@ export function PortalSignIn({ role }: { role: Role }) {
                   className="self-start font-mono text-[11px] uppercase tracking-wider text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
                 >
                   Forgot password?
+                </button>
+              )}
+
+              {mode === "signin" && role !== "staff" && (
+                <button
+                  type="button"
+                  onClick={handleEmailLink}
+                  disabled={status === "submitting"}
+                  className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border py-2.5 font-mono text-xs uppercase tracking-wider text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+                >
+                  <MailCheck className="size-3.5" aria-hidden="true" />
+                  Email me a sign-in link
                 </button>
               )}
             </form>

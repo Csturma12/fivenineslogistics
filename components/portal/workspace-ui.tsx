@@ -151,6 +151,9 @@ export function LoadFacts({ load }: { load: PortalLoad }) {
             ? `${Number(load.weight_lbs).toLocaleString()} lb`
             : "Not provided",
         ],
+        ...(load.rate_usd !== undefined
+          ? [["Rate", load.rate_usd ? usd(load.rate_usd) : "Call for rate"]]
+          : []),
         ...(load.dimensions ? [["Dimensions", load.dimensions]] : []),
       ].map(([label, value]) => (
         <div key={label}>
