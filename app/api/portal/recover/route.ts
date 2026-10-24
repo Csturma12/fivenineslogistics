@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { publicOrigin } from "@/lib/public-origin"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendPortalEmail, resetEmailHtml } from "@/lib/portal-mail"
 
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
   const { data: linkData, error: linkErr } = await supabase.auth.admin.generateLink({
     type: "recovery",
     email,
-    options: { redirectTo: `${req.nextUrl.origin}/auth/confirm` },
+    options: { redirectTo: `${publicOrigin(req)}/auth/confirm` },
   })
 
   // Never leak whether an account exists — always report the same outcome.
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ outcome: "sent" })
   }
 
-  const confirmUrl = `${req.nextUrl.origin}/auth/confirm?token_hash=${hashedToken}&type=recovery&next=${encodeURIComponent(
+  const confirmUrl = `${publicOrigin(req)}/auth/confirm?token_hash=${hashedToken}&type=recovery&next=${encodeURIComponent(
     "/portal/reset-password",
   )}`
 

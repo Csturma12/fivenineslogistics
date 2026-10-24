@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { publicOrigin } from "@/lib/public-origin"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendPortalEmail } from "@/lib/portal-mail"
 
@@ -98,7 +99,7 @@ export async function POST(req: NextRequest) {
     const { data: linkData, error: linkErr } = await supabase.auth.admin.generateLink({
       type: "magiclink",
       email,
-      options: { redirectTo: `${req.nextUrl.origin}/auth/confirm` },
+      options: { redirectTo: `${publicOrigin(req)}/auth/confirm` },
     })
 
     const hashedToken = linkData?.properties?.hashed_token
@@ -109,7 +110,7 @@ export async function POST(req: NextRequest) {
 
     // Point the recipient at our OWN confirm route (SSR token_hash flow),
     // not Supabase's implicit-hash redirect.
-    const confirmUrl = `${req.nextUrl.origin}/auth/confirm?token_hash=${hashedToken}&type=magiclink&next=${encodeURIComponent(
+    const confirmUrl = `${publicOrigin(req)}/auth/confirm?token_hash=${hashedToken}&type=magiclink&next=${encodeURIComponent(
       "/portal/home",
     )}`
 
