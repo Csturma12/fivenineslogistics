@@ -24,7 +24,7 @@ import {
   result,
   sameOrigin,
 } from "@/lib/portal-service";
-import { syncOpenLoads } from "@/lib/portal-load-sync";
+import { syncOpenLoads, taiCarrierRates } from "@/lib/portal-load-sync";
 import { pickupWindow } from "@/lib/portal-load-window";
 import { isTaiTrailerType } from "@/lib/tai-equipment";
 
@@ -203,7 +203,7 @@ export async function GET(request: Request) {
             (afterId) => {
               const query = db
                 .from("fn_loads")
-                .select(LOAD_FIELDS, { count: "exact" })
+                .select(`${LOAD_FIELDS},external_id`, { count: "exact" })
                 .eq("status", "available")
                 .is("reserved_by", null)
                 .gte("updated_at", new Date(now - 86400000).toISOString())
@@ -218,7 +218,16 @@ export async function GET(request: Request) {
           );
           loadVersion = loadVersionToken("carrier", snapshot.version, eligibility);
           snapshot.rows.sort((a, b) => comparePickupDate(a, b, "asc"));
-          loads = snapshot.rows.map((row) => carrierLoad(row, process.env.PORTAL_AUTO_BOOK_ENABLED === "true"));
+          const rates = await taiCarrierRates(
+            snapshot.rows.map((row) => String(row.external_id || "")),
+          ).catch((error) => {
+            console.error("TAI rate lookup failed", error instanceof Error ? error.message : error);
+            return new Map<string, number>();
+          });
+          loads = snapshot.rows.map((row) => ({
+            ...carrierLoad(row, process.env.PORTAL_AUTO_BOOK_ENABLED === "true"),
+            rate_usd: rates.get(String(row.external_id || "")) ?? null,
+          }));
         }
       }
       const historyRows = historyIds.length

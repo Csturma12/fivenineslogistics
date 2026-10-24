@@ -88,7 +88,7 @@ type Response = {
 };
 
 type Preset = "next7" | "last7" | "last30" | "last90" | "year" | "all" | "custom";
-type SortKey = "stage" | "loadNumber" | "customer" | "carrier" | "pickup" | "origin" | "destination" | "delivery" | "weight" | "po";
+type SortKey = "stage" | "loadNumber" | "customer" | "carrier" | "pickup" | "origin" | "destination" | "delivery" | "equipment" | "weight" | "po";
 
 const PRESETS: { value: Preset; label: string }[] = [
   { value: "next7", label: "Next 7 days" },
@@ -243,6 +243,7 @@ export function ShipmentBoard({
     { key: "origin", label: "Origin" },
     { key: "destination", label: "Destination" },
     { key: "delivery", label: "Delivery" },
+    { key: "equipment", label: "Equipment" },
     { key: "weight", label: "Weight", align: "right" },
     { key: "po", label: "PO #" },
   ];
@@ -498,6 +499,7 @@ export function ShipmentBoard({
                         <td className="whitespace-nowrap px-3 py-2">{s.origin}</td>
                         <td className="whitespace-nowrap px-3 py-2">{s.destination}</td>
                         <td className="whitespace-nowrap px-3 py-2 tabular-nums">{shortDate(s.delivery)}</td>
+                        <td className="whitespace-nowrap px-3 py-2">{s.equipment || "—"}</td>
                         <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums">
                           {s.weight ? `${s.weight.toLocaleString()} lb` : "—"}
                         </td>

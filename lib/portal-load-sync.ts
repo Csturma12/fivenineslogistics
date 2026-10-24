@@ -135,6 +135,26 @@ async function runSync(window: PickupWindow) {
   return written;
 }
 
+/** Carrier buy rates from TAI keyed by load number. Only `buy` is read — never sell or margin. */
+export async function taiCarrierRates(loadNumbers: string[]) {
+  const rates = new Map<string, number>();
+  const ids = [...new Set(loadNumbers.filter(Boolean))];
+  const main = createLoadsAdminClient();
+  for (let i = 0; i < ids.length; i += 200) {
+    const { data, error } = await main
+      .from("shipments")
+      .select("shipment_id,buy")
+      .in("shipment_id", ids.slice(i, i + 200))
+      .gt("buy", 0);
+    if (error) throw new Error(`Rate read failed: ${error.message}`);
+    for (const row of (data ?? []) as { shipment_id: string | number; buy: number | string }[]) {
+      const buy = Number(row.buy);
+      if (Number.isFinite(buy) && buy > 0 && buy < 1_000_000) rates.set(String(row.shipment_id), buy);
+    }
+  }
+  return rates;
+}
+
 /** Pulls uncovered TAI shipments (Committed + Quote) onto the carrier board on demand. */
 export async function syncOpenLoads({ window, force = false }: { window: PickupWindow; force?: boolean }) {
   const key = `${window.from}:${window.through}`;

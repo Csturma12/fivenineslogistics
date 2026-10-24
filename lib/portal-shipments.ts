@@ -16,6 +16,7 @@ export type PortalShipment = {
   origin: string
   destination: string
   weight: number | null
+  equipment: string | null
   po: string | null
   /** A POD exists in TAI or was uploaded by the carrier through the portal. */
   podOnFile: boolean
@@ -50,13 +51,14 @@ type Row = {
   to_city: string | null
   to_state: string | null
   total_weight: number | string | null
+  equipment_type: string | null
   customer_po: string | null
   pod_document_count: number | string | null
 }
 
 // Never select buy/sell/margin — this feeds customer- and carrier-facing views.
 const BASE_COLUMNS =
-  "id, shipment_id, status, carrier_name, current_location, ship_date, delivery_date, from_city, from_state, to_city, to_state, total_weight, customer_po, pod_document_count"
+  "id, shipment_id, status, carrier_name, current_location, ship_date, delivery_date, from_city, from_state, to_city, to_state, total_weight, equipment_type, customer_po, pod_document_count"
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
 
@@ -99,6 +101,7 @@ function toShipment(row: Row, includeCustomer: boolean): PortalShipment {
     origin: place(row.from_city, row.from_state),
     destination: place(row.to_city, row.to_state),
     weight: Number.isFinite(weight) && weight > 0 ? weight : null,
+    equipment: row.equipment_type || null,
     po: row.customer_po || null,
     podOnFile: Number(row.pod_document_count) > 0,
     uploads: { pod: 0, invoice: 0 },

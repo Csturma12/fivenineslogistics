@@ -26,6 +26,8 @@ export type PortalLoad = {
   status: string;
   auto_book: boolean;
   carrier_offer_usd: number | null;
+  /** Carrier (buy) rate posted in TAI. Never the customer sell rate. */
+  rate_usd?: number | null;
   tracking_location?: string | null;
   tracking_at?: string | null;
   external_id?: string;
