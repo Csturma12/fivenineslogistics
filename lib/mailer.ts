@@ -28,8 +28,20 @@ type ServiceAccount = { client_email: string; private_key: string }
 
 // Accepts the key file as raw JSON or base64. Also repairs a paste that lost its
 // leading `{"` (pasting the file on mobile drops it), e.g. `type": "service_account", ...}`.
+function unwrapShellQuoted(value: string): string {
+  // Values copied from `vercel env pull` or a shell can arrive as $'...' with \n escapes.
+  const ansi = value.match(/^\$'([\s\S]*)'$/)
+  if (ansi) {
+    return ansi[1].replace(/\\(\\|n|t|r|'|")/g, (_, ch: string) =>
+      ch === "n" ? "\n" : ch === "t" ? "\t" : ch === "r" ? "\r" : ch,
+    )
+  }
+  const quoted = value.match(/^(['"])([\s\S]*)\1$/)
+  return quoted && quoted[2].trim().startsWith("{") ? quoted[2] : value
+}
+
 function normalizeKeyJson(raw: string): string {
-  const value = raw.trim()
+  const value = unwrapShellQuoted(raw.trim()).trim()
   if (value.startsWith("{")) return value
   if (/^"?type"\s*:/.test(value)) return `{"${value.replace(/^"/, "")}`
   return Buffer.from(value, "base64").toString("utf8")
