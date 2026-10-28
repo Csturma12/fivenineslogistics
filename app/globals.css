@@ -46,6 +46,9 @@
   --color-status-warn-dark: var(--status-warn-dark);
   --color-status-alert: var(--status-alert);
   --color-signal: var(--signal);
+  --color-lane-green: var(--lane-green);
+  --color-lane-orange: var(--lane-orange);
+  --color-lane-red: var(--lane-red);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -80,7 +83,11 @@
   --border: oklch(0.23 0.03 255 / 12%);
   --input: oklch(0.23 0.03 255 / 14%);
   --ring: oklch(0.47 0.14 256);
-  --navy: oklch(0.19 0.008 255);
+  --navy: oklch(0.28 0.07 255);
+  /* Capacity corridors on navy: green = port, orange = refinery/petrochem, red = cross-border/data center. */
+  --lane-green: oklch(0.78 0.19 150);
+  --lane-orange: oklch(0.76 0.17 55);
+  --lane-red: oklch(0.68 0.21 22);
   --navy-foreground: oklch(0.95 0.006 250);
   /* functional status scale — live state, not brand */
   --status-ok: oklch(0.6 0.14 152);

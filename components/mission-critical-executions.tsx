@@ -40,59 +40,59 @@ const executions = [
 export function MissionCriticalExecutions() {
   return (
     <section
-      className="border-y border-slate-800 bg-[#080D1A] text-slate-100"
+      className="border-y border-navy-foreground/10 bg-navy text-navy-foreground"
       aria-labelledby="executions-title"
     >
       <div className="design-container py-20 sm:py-24">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-amber-400">
-              <span className="mr-2 inline-block size-1.5 rounded-sm bg-emerald-400 align-middle" aria-hidden="true" />
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-status-ok-dark">
+              <span className="mr-2 inline-block size-1.5 rounded-sm bg-status-ok-dark align-middle" aria-hidden="true" />
               Recent mission-critical executions
             </p>
             <h2
               id="executions-title"
-              className="mt-4 max-w-2xl text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl"
+              className="mt-4 max-w-2xl text-balance text-3xl font-semibold tracking-tight text-navy-foreground sm:text-4xl"
             >
               Proof the method holds under a live clock.
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-relaxed text-slate-400">
+          <p className="max-w-md text-sm leading-relaxed text-navy-foreground/60">
             Three representative moves from the last operating quarter: the load, the constraint
             that made it critical, and exactly how the handoffs were executed.
           </p>
         </div>
 
-        <div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-slate-800 bg-slate-800 lg:grid-cols-3">
+        <div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-navy-foreground/10 bg-navy-foreground/10 lg:grid-cols-3">
           {executions.map((item) => {
             const Icon = item.icon;
             return (
-              <article key={item.index} className="flex flex-col bg-[#0B111E] p-6 sm:p-8">
+              <article key={item.index} className="flex flex-col bg-navy-foreground/[0.03] p-6 sm:p-8">
                 <div className="flex items-center justify-between">
-                  <Icon className="size-5 text-amber-400" strokeWidth={1.5} aria-hidden="true" />
-                  <span className="font-mono text-[11px] tracking-widest text-slate-500">{item.index}</span>
+                  <Icon className="size-5 text-status-ok-dark" strokeWidth={1.5} aria-hidden="true" />
+                  <span className="font-mono text-[11px] tracking-widest text-navy-foreground/50">{item.index}</span>
                 </div>
-                <h3 className="mt-5 text-lg font-semibold leading-snug text-white">{item.vertical}</h3>
-                <p className="mt-1 font-mono text-xs uppercase tracking-wider text-slate-400">{item.lane}</p>
+                <h3 className="mt-5 text-lg font-semibold leading-snug text-navy-foreground">{item.vertical}</h3>
+                <p className="mt-1 font-mono text-xs uppercase tracking-wider text-navy-foreground/60">{item.lane}</p>
 
                 <dl className="mt-6 flex flex-col gap-4 text-sm">
                   <div>
-                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">Load</dt>
-                    <dd className="mt-1 leading-relaxed text-slate-200">{item.load}</dd>
+                    <dt className="font-mono text-[11px] uppercase tracking-wider text-navy-foreground/50">Load</dt>
+                    <dd className="mt-1 leading-relaxed text-navy-foreground/85">{item.load}</dd>
                   </div>
                   <div>
-                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">Constraint</dt>
-                    <dd className="mt-1 leading-relaxed text-slate-200">{item.constraint}</dd>
+                    <dt className="font-mono text-[11px] uppercase tracking-wider text-navy-foreground/50">Constraint</dt>
+                    <dd className="mt-1 leading-relaxed text-navy-foreground/85">{item.constraint}</dd>
                   </div>
                   <div>
-                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">Execution</dt>
-                    <dd className="mt-1 leading-relaxed text-slate-200">{item.execution}</dd>
+                    <dt className="font-mono text-[11px] uppercase tracking-wider text-navy-foreground/50">Execution</dt>
+                    <dd className="mt-1 leading-relaxed text-navy-foreground/85">{item.execution}</dd>
                   </div>
                 </dl>
 
                 <div className="mt-auto pt-6">
-                  <span className="inline-flex items-center gap-2 rounded border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-emerald-400">
-                    <span className="size-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                  <span className="inline-flex items-center gap-2 rounded border border-status-ok-dark/30 bg-status-ok-dark/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-status-ok-dark">
+                    <span className="size-1.5 rounded-full bg-status-ok-dark" aria-hidden="true" />
                     {item.status}
                   </span>
                 </div>
@@ -102,12 +102,12 @@ export function MissionCriticalExecutions() {
         </div>
 
         <div className="mt-8 flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-slate-400">
+          <p className="text-navy-foreground/60">
             Every execution is documented with a Method of Procedure, securement photos, and a signed POD.
           </p>
           <Link
             href="/who-we-serve"
-            className="inline-flex items-center gap-2 font-semibold text-amber-400 transition hover:text-amber-300"
+            className="inline-flex items-center gap-2 font-semibold text-status-ok-dark transition hover:text-status-ok-dark"
           >
             See who we run these for
             <ArrowUpRight size={16} aria-hidden="true" />

@@ -8,6 +8,7 @@ export type MapNode = { x: number; y: number; label: LabelPlacement }
 // tight clusters (MAR/BYH/MEM, HOU/PORT/SAT, BTR/NOLA/MOB) stay legible at phone width.
 export const mapNodes: Record<string, MapNode> = {
   SEA: { x: 10, y: 12, label: "above" },
+  OAK: { x: 8, y: 33, label: "right" },
   LAX: { x: 11, y: 52, label: "above" },
   PHX: { x: 22, y: 60, label: "above" },
   STR: { x: 32, y: 73, label: "below" },
@@ -25,8 +26,12 @@ export const mapNodes: Record<string, MapNode> = {
   MEM: { x: 65, y: 50, label: "right" },
   CHI: { x: 70, y: 26, label: "above" },
   SDF: { x: 77, y: 39, label: "above" },
+  SAV: { x: 83, y: 64, label: "left" },
+  CHS: { x: 88, y: 57, label: "right" },
   ORF: { x: 89, y: 46, label: "below" },
-  EWR: { x: 91, y: 28, label: "above" },
+  EWR: { x: 88, y: 30, label: "left" },
+  KRN: { x: 92, y: 23, label: "above" },
+  STI: { x: 95, y: 33, label: "below" },
 }
 
 export type CorridorId = "port" | "petrochem" | "cross-border"
@@ -54,10 +59,16 @@ export const hubDetails: Record<string, HubDetail> = {
   SDF: { corridors: ["cross-border"], capabilities: ["Ohio Valley Data Center Alley", "Switchgear & Transformer Staging", "Time-Critical FTL"] },
   ORF: { corridors: ["port", "cross-border"], capabilities: ["Mid-Atlantic Port Drayage", "Northern VA Data Center Corridor", "OOG Transload"] },
   EWR: { corridors: ["port"], capabilities: ["NY/NJ Port & Heavy Drayage", "Northeast Industrial Final Mile", "Bonded Warehousing"] },
+  OAK: { corridors: ["port"], capabilities: ["Port of Oakland TWIC Drayage", "NorCal Heavy Transload", "Container Stripping"] },
+  SAV: { corridors: ["port"], capabilities: ["Port of Savannah TWIC Drayage", "60k-lb Heavy Transload", "Southeast Distribution Relay"] },
+  CHS: { corridors: ["port"], capabilities: ["Port of Charleston TWIC Drayage", "OOG Flatrack Transload", "Southeast Industrial Final Mile"] },
+  KRN: { corridors: ["port"], capabilities: ["Kearny Rail & Port Drayage", "NY/NJ Container Transload", "Chassis & Yard Staging"] },
+  STI: { corridors: ["port"], capabilities: ["Howland Hook Terminal Drayage", "TWIC Container Pulls", "NY Metro Final Mile"] },
 }
 
 export const mapLinks: [string, string][] = [
-  ["SEA", "LAX"],
+  ["SEA", "OAK"],
+  ["OAK", "LAX"],
   ["SEA", "DFW"],
   ["LAX", "PHX"],
   ["PHX", "STR"],
@@ -81,6 +92,11 @@ export const mapLinks: [string, string][] = [
   ["SDF", "ORF"],
   ["MEM", "ORF"],
   ["ORF", "EWR"],
+  ["MOB", "SAV"],
+  ["SAV", "CHS"],
+  ["CHS", "ORF"],
+  ["EWR", "KRN"],
+  ["EWR", "STI"],
 ]
 
 export function labelPosition(node: MapNode) {

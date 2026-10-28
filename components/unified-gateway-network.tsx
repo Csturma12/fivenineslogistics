@@ -18,9 +18,9 @@ import {
 type CorridorFilter = "all" | CorridorId
 
 const corridorStyle: Record<CorridorId, { tile: string; dot: string; stroke: string }> = {
-  port: { tile: "border-emerald-400/70 bg-emerald-500/10", dot: "bg-emerald-400", stroke: "#34d399" },
-  petrochem: { tile: "border-amber-400/70 bg-amber-500/10", dot: "bg-amber-400", stroke: "#fbbf24" },
-  "cross-border": { tile: "border-sky-400/70 bg-sky-500/10", dot: "bg-sky-400", stroke: "#38bdf8" },
+  port: { tile: "border-lane-green/70 bg-lane-green/10", dot: "bg-lane-green", stroke: "var(--lane-green)" },
+  petrochem: { tile: "border-lane-orange/70 bg-lane-orange/10", dot: "bg-lane-orange", stroke: "var(--lane-orange)" },
+  "cross-border": { tile: "border-lane-red/70 bg-lane-red/10", dot: "bg-lane-red", stroke: "var(--lane-red)" },
 }
 
 const filters: { id: CorridorFilter; label: string }[] = [
@@ -30,8 +30,9 @@ const filters: { id: CorridorFilter; label: string }[] = [
   { id: "cross-border", label: "Data Center & Cross-Border (MX/CA)" },
 ]
 
-const neutralStroke = "#94a3b8"
-const selectedStroke = "#f59e0b"
+const neutralStroke = "color-mix(in oklch, var(--navy-foreground) 55%, transparent)"
+const dimStroke = "color-mix(in oklch, var(--navy-foreground) 18%, transparent)"
+const selectedStroke = "var(--navy-foreground)"
 const DEFAULT_HUB = "HOU"
 
 export function UnifiedGatewayNetwork() {
@@ -50,22 +51,22 @@ export function UnifiedGatewayNetwork() {
   return (
     <section
       id="gateway-network"
-      className="scroll-mt-24 border-y border-slate-800 bg-[#080D1A] text-slate-100"
+      className="scroll-mt-24 border-y border-navy-foreground/10 bg-navy text-navy-foreground"
       aria-labelledby="gateway-title"
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 sm:py-20">
         <div className="flex max-w-3xl flex-col gap-4">
-          <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] text-amber-400">
-            <span className="size-2 rounded-full bg-emerald-400" aria-hidden="true" />
+          <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] text-status-ok-dark">
+            <span className="size-2 rounded-full bg-status-ok-dark" aria-hidden="true" />
             Gateway network · {hubs.length} hubs · 2,400+ monitored lanes
           </p>
           <h2
             id="gateway-title"
-            className="text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl"
+            className="text-balance text-3xl font-semibold tracking-tight text-navy-foreground sm:text-4xl"
           >
             Every gateway, grouped by what it can actually do for your freight.
           </h2>
-          <p className="text-pretty text-base leading-relaxed text-slate-400">
+          <p className="text-pretty text-base leading-relaxed text-navy-foreground/60">
             Regional gateways feed a network of 2,400+ monitored lanes across all 50 states, Canada,
             and Mexico. At every hub, our partners unload containers, transload flatracks, stage
             project cargo, and complete the final mile, routed against current carrier and equipment
@@ -88,8 +89,8 @@ export function UnifiedGatewayNetwork() {
                 aria-pressed={active}
                 className={`flex min-h-11 shrink-0 items-center gap-2 rounded-md border px-4 font-mono text-xs uppercase tracking-wide transition ${
                   active
-                    ? "border-slate-300 bg-slate-100 font-semibold text-[#080D1A]"
-                    : "border-slate-700 text-slate-300 hover:border-slate-500"
+                    ? "border-navy-foreground bg-navy-foreground font-semibold text-navy"
+                    : "border-navy-foreground/15 text-navy-foreground/70 hover:border-navy-foreground/30"
                 }`}
               >
                 {f.id !== "all" ? (
@@ -102,12 +103,12 @@ export function UnifiedGatewayNetwork() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
-          <div className="flex flex-col overflow-hidden rounded-md border border-slate-800 bg-[#0B111E] lg:col-span-5">
-            <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
-              <span className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
+          <div className="flex flex-col overflow-hidden rounded-md border border-navy-foreground/10 bg-navy-foreground/[0.03] lg:col-span-5">
+            <div className="flex items-center justify-between border-b border-navy-foreground/10 px-4 py-3">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-navy-foreground/60">
                 Network topology
               </span>
-              <span className="font-mono text-[11px] uppercase tracking-wider text-slate-400" aria-live="polite">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-navy-foreground/60" aria-live="polite">
                 {litCount} of {hubs.length} highlighted
               </span>
             </div>
@@ -128,8 +129,8 @@ export function UnifiedGatewayNetwork() {
                     y1={from.y}
                     x2={to.x}
                     y2={to.y}
-                    stroke={lit ? accentStroke : "#1e293b"}
-                    strokeOpacity={lit ? 0.55 : 1}
+                    style={{ stroke: lit ? accentStroke : dimStroke }}
+                    strokeOpacity={lit ? 0.7 : 1}
                     strokeWidth="0.4"
                   />
                 )
@@ -139,7 +140,7 @@ export function UnifiedGatewayNetwork() {
                 if (!node) return null
                 const selected = hub.code === selectedCode
                 const lit = isLit(hub.code)
-                const ring = selected ? selectedStroke : lit ? accentStroke : "#334155"
+                const ring = selected ? selectedStroke : lit ? accentStroke : dimStroke
                 const label = labelPosition(node)
                 return (
                   <g
@@ -153,18 +154,20 @@ export function UnifiedGatewayNetwork() {
                       cx={node.x}
                       cy={node.y}
                       r={selected ? 2.8 : 2.2}
-                      fill="#080D1A"
-                      stroke={ring}
+                      style={{ fill: "var(--navy)", stroke: ring }}
                       strokeWidth={selected ? 0.8 : 0.6}
                     />
-                    <circle cx={node.x} cy={node.y} r={selected ? 1.1 : 0.8} fill={ring} />
+                    <circle cx={node.x} cy={node.y} r={selected ? 1.1 : 0.8} style={{ fill: ring }} />
                     <text
                       x={label.x}
                       y={label.y}
                       textAnchor={label.anchor}
-                      fill={selected ? "#fbbf24" : lit ? "#f1f5f9" : "#475569"}
                       className="font-mono"
-                      style={{ fontSize: "3.3px", fontWeight: selected || lit ? 600 : 400 }}
+                      style={{
+                        fill: selected || lit ? "var(--navy-foreground)" : dimStroke,
+                        fontSize: "3.3px",
+                        fontWeight: selected || lit ? 600 : 400,
+                      }}
                     >
                       {hub.code}
                     </text>
@@ -173,13 +176,13 @@ export function UnifiedGatewayNetwork() {
               })}
             </svg>
 
-            <div className="flex flex-col gap-3 border-t border-slate-800 p-4" aria-live="polite">
+            <div className="flex flex-col gap-3 border-t border-navy-foreground/10 p-4" aria-live="polite">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex flex-col gap-1">
-                  <span className="font-mono text-xs uppercase tracking-wider text-amber-400">
+                  <span className="font-mono text-xs uppercase tracking-wider text-status-ok-dark">
                     Active hub · {selectedHub.code}
                   </span>
-                  <h3 className="text-lg font-semibold text-white">{selectedHub.city} Gateway</h3>
+                  <h3 className="text-lg font-semibold text-navy-foreground">{selectedHub.city} Gateway</h3>
                 </div>
                 <div className="flex shrink-0 gap-1.5 pt-1">
                   {selectedDetail?.corridors.map((c) => (
@@ -191,9 +194,9 @@ export function UnifiedGatewayNetwork() {
                 {selectedDetail?.capabilities.map((cap) => (
                   <li
                     key={cap}
-                    className="flex items-center gap-1.5 rounded border border-slate-700 bg-slate-800/60 px-2.5 py-1 font-mono text-xs text-slate-200"
+                    className="flex items-center gap-1.5 rounded border border-navy-foreground/15 bg-navy-foreground/10 px-2.5 py-1 font-mono text-xs text-navy-foreground/85"
                   >
-                    <Check className="size-3 text-emerald-400" aria-hidden="true" />
+                    <Check className="size-3 text-status-ok-dark" aria-hidden="true" />
                     {cap}
                   </li>
                 ))}
@@ -208,7 +211,7 @@ export function UnifiedGatewayNetwork() {
               const detail = hubDetails[hub.code]
               const tone =
                 corridor === "all" || !lit
-                  ? "border-slate-700 bg-[#0B111E]"
+                  ? "border-navy-foreground/15 bg-navy-foreground/[0.03]"
                   : corridorStyle[corridor].tile
               return (
                 <li key={hub.code}>
@@ -218,17 +221,17 @@ export function UnifiedGatewayNetwork() {
                     aria-pressed={selected}
                     aria-label={`${hub.code}, ${hub.city}`}
                     className={`flex min-h-14 w-full flex-col items-center justify-center rounded-md border px-1 py-2 text-center transition lg:items-start lg:p-3 lg:text-left ${
-                      lit ? `${tone} text-white` : "border-slate-800 bg-transparent text-slate-500 opacity-60 hover:opacity-90"
-                    } ${selected ? "ring-2 ring-amber-400/80 ring-offset-2 ring-offset-[#080D1A]" : ""}`}
+                      lit ? `${tone} text-navy-foreground` : "border-navy-foreground/10 bg-transparent text-navy-foreground/50 opacity-60 hover:opacity-90"
+                    } ${selected ? "ring-2 ring-navy-foreground/80 ring-offset-2 ring-offset-navy" : ""}`}
                   >
                     <span
-                      className={`font-mono text-sm font-semibold tracking-wide ${selected ? "text-amber-300" : ""}`}
+                      className={`font-mono text-sm font-semibold tracking-wide ${selected ? "text-status-ok-dark" : ""}`}
                     >
                       {hub.code}
                     </span>
-                    <span className="w-full truncate text-[11px] text-slate-400">{hub.city}</span>
+                    <span className="w-full truncate text-[11px] text-navy-foreground/60">{hub.city}</span>
                     {detail ? (
-                      <span className="mt-1 hidden w-full truncate font-mono text-[11px] text-slate-500 lg:block">
+                      <span className="mt-1 hidden w-full truncate font-mono text-[11px] text-navy-foreground/50 lg:block">
                         {detail.capabilities[0]}
                       </span>
                     ) : null}
@@ -249,7 +252,7 @@ export function UnifiedGatewayNetwork() {
             nativeButton={false}
             size="lg"
             variant="outline"
-            className="border-slate-700 bg-transparent font-medium text-slate-100 hover:bg-slate-800 hover:text-white"
+            className="border-navy-foreground/15 bg-transparent font-medium text-navy-foreground hover:bg-navy-foreground/10 hover:text-navy-foreground"
           >
             Talk to Dispatch
           </Button>

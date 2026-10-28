@@ -62,7 +62,7 @@ const specs: Spec[] = [
     name: "Expedited Hotshot (40' Gooseneck) & Box Truck",
     short: "Hotshot",
     rows: [
-      ["Max weight", "16,500 lbs (Non-CDL) to 22,000 lbs (CDL)"],
+      ["Max weight", "11,000 lbs (Non-CDL) to 18,000 lbs (CDL)"],
       ["Deck length", "40' gooseneck · 26' box w/ liftgate"],
       ["Dispatch", "Instant 60-minute dispatch for line-down emergencies"],
       ["Service", "Direct, straight-through, exclusive use"],
@@ -81,23 +81,23 @@ export function EquipmentReference() {
   return (
     <section
       id="equipment-reference"
-      className="scroll-mt-24 border-y border-slate-800 bg-[#080D1A] text-slate-100"
+      className="scroll-mt-24 border-y border-navy-foreground/10 bg-navy text-navy-foreground"
       aria-labelledby="equipment-title"
     >
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-amber-400">
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-status-ok-dark">
               Equipment engineering reference
             </p>
             <h2
               id="equipment-title"
-              className="mt-4 max-w-2xl text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl"
+              className="mt-4 max-w-2xl text-balance text-3xl font-semibold tracking-tight text-navy-foreground sm:text-4xl"
             >
               Verify legal tolerances before you quote.
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-relaxed text-slate-400">
+          <p className="max-w-md text-sm leading-relaxed text-navy-foreground/60">
             Legal limits below are U.S. interstate baselines without permits. Anything over them is a
             permitted move and gets a routed MOP, not a guess.
           </p>
@@ -114,8 +114,8 @@ export function EquipmentReference() {
               onClick={() => setActive(s.id)}
               className={`rounded-md border px-4 py-3 text-left transition ${
                 s.id === active
-                  ? "border-amber-400/70 bg-amber-500/10 text-white"
-                  : "border-slate-800 bg-[#0B111E] text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                  ? "border-status-ok-dark/70 bg-status-ok-dark/10 text-navy-foreground"
+                  : "border-navy-foreground/10 bg-navy-foreground/[0.03] text-navy-foreground/60 hover:border-navy-foreground/20 hover:text-navy-foreground/85"
               }`}
             >
               <span className="block font-mono text-[11px] uppercase tracking-wider">{s.short}</span>
@@ -124,26 +124,26 @@ export function EquipmentReference() {
           ))}
         </div>
 
-        <div className="mt-6 grid gap-px overflow-hidden rounded-lg border border-slate-800 bg-slate-800 lg:grid-cols-[1.1fr_1fr]">
-          <div className="bg-[#0B111E] p-6 sm:p-8">
-            <h3 className="text-xl font-semibold text-white">{spec.name}</h3>
-            <dl className="mt-5 divide-y divide-slate-800 border-y border-slate-800">
+        <div className="mt-6 grid gap-px overflow-hidden rounded-lg border border-navy-foreground/10 bg-navy-foreground/10 lg:grid-cols-[1.1fr_1fr]">
+          <div className="bg-navy-foreground/[0.03] p-6 sm:p-8">
+            <h3 className="text-xl font-semibold text-navy-foreground">{spec.name}</h3>
+            <dl className="mt-5 divide-y divide-navy-foreground/10 border-y border-navy-foreground/10">
               {spec.rows.map(([k, v]) => (
                 <div key={k} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] gap-4 py-3">
-                  <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">{k}</dt>
-                  <dd className="font-mono text-sm font-semibold text-emerald-300">{v}</dd>
+                  <dt className="font-mono text-[11px] uppercase tracking-wider text-navy-foreground/50">{k}</dt>
+                  <dd className="font-mono text-sm font-semibold text-status-ok-dark">{v}</dd>
                 </div>
               ))}
             </dl>
-            <p className="mt-5 text-sm leading-relaxed text-slate-400">{spec.note}</p>
+            <p className="mt-5 text-sm leading-relaxed text-navy-foreground/60">{spec.note}</p>
           </div>
-          <div className="flex flex-col bg-[#0B111E] p-6 sm:p-8">
-            <h4 className="font-mono text-[11px] uppercase tracking-wider text-slate-500">Securement & gear on board</h4>
+          <div className="flex flex-col bg-navy-foreground/[0.03] p-6 sm:p-8">
+            <h4 className="font-mono text-[11px] uppercase tracking-wider text-navy-foreground/50">Securement & gear on board</h4>
             <ul className="mt-3 flex flex-wrap gap-2">
               {spec.gear.map((g) => (
                 <li
                   key={g}
-                  className="rounded border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs text-slate-200"
+                  className="rounded border border-navy-foreground/15 bg-navy-foreground/5 px-2.5 py-1 text-xs text-navy-foreground/85"
                 >
                   {g}
                 </li>
@@ -153,7 +153,7 @@ export function EquipmentReference() {
               <button
                 type="button"
                 onClick={openPanel}
-                className="inline-flex items-center gap-2 rounded bg-amber-500 px-4 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-amber-400"
+                className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-primary/90"
               >
                 Spec a {spec.short.toLowerCase()} move
                 <ArrowRight size={16} aria-hidden="true" />
@@ -163,10 +163,10 @@ export function EquipmentReference() {
         </div>
 
         {/* Full comparison table for scanning across trailer types */}
-        <div className="mt-10 overflow-x-auto rounded-lg border border-slate-800">
+        <div className="mt-10 overflow-x-auto rounded-lg border border-navy-foreground/10">
           <table className="w-full min-w-[720px] border-collapse text-left text-sm">
             <caption className="sr-only">Trailer specification comparison</caption>
-            <thead className="bg-[#0B111E] font-mono text-[11px] uppercase tracking-wider text-slate-400">
+            <thead className="bg-navy-foreground/[0.03] font-mono text-[11px] uppercase tracking-wider text-navy-foreground/60">
               <tr>
                 <th scope="col" className="px-4 py-3">Trailer</th>
                 <th scope="col" className="px-4 py-3">Max weight</th>
@@ -175,34 +175,34 @@ export function EquipmentReference() {
                 <th scope="col" className="px-4 py-3">Length / width</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
-              <tr className="bg-[#080D1A]">
-                <th scope="row" className="px-4 py-3 font-semibold text-white">Flatbed 48'/53'</th>
-                <td className="px-4 py-3 font-mono text-emerald-300">48,000 lbs</td>
-                <td className="px-4 py-3 font-mono text-slate-200">5'0" (60")</td>
-                <td className="px-4 py-3 font-mono text-slate-200">8'6" (102")</td>
-                <td className="px-4 py-3 font-mono text-slate-200">48'–53' · 8'6" (102") wide</td>
+            <tbody className="divide-y divide-navy-foreground/10">
+              <tr className="bg-navy">
+                <th scope="row" className="px-4 py-3 font-semibold text-navy-foreground">Flatbed 48'/53'</th>
+                <td className="px-4 py-3 font-mono text-status-ok-dark">48,000 lbs</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">5'0" (60")</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">8'6" (102")</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">48'–53' · 8'6" (102") wide</td>
               </tr>
-              <tr className="bg-[#080D1A]">
-                <th scope="row" className="px-4 py-3 font-semibold text-white">Step deck 48'/53'</th>
-                <td className="px-4 py-3 font-mono text-emerald-300">46,000–48,000 lbs</td>
-                <td className="px-4 py-3 font-mono text-slate-200">3'6" (42")</td>
-                <td className="px-4 py-3 font-mono text-slate-200">10'0"–10'2"</td>
-                <td className="px-4 py-3 font-mono text-slate-200">37'–43' lower deck</td>
+              <tr className="bg-navy">
+                <th scope="row" className="px-4 py-3 font-semibold text-navy-foreground">Step deck 48'/53'</th>
+                <td className="px-4 py-3 font-mono text-status-ok-dark">46,000–48,000 lbs</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">3'6" (42")</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">10'0"–10'2"</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">37'–43' lower deck</td>
               </tr>
-              <tr className="bg-[#080D1A]">
-                <th scope="row" className="px-4 py-3 font-semibold text-white">Double drop / RGN</th>
-                <td className="px-4 py-3 font-mono text-emerald-300">40,000 lbs legal · 150,000+ lbs permitted</td>
-                <td className="px-4 py-3 font-mono text-slate-200">18"–24"</td>
-                <td className="px-4 py-3 font-mono text-slate-200">11'6"–12'0"</td>
-                <td className="px-4 py-3 font-mono text-slate-200">29' well (up to 50' stretch)</td>
+              <tr className="bg-navy">
+                <th scope="row" className="px-4 py-3 font-semibold text-navy-foreground">Double drop / RGN</th>
+                <td className="px-4 py-3 font-mono text-status-ok-dark">40,000 lbs legal · 150,000+ lbs permitted</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">18"–24"</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">11'6"–12'0"</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">29' well (up to 50' stretch)</td>
               </tr>
-              <tr className="bg-[#080D1A]">
-                <th scope="row" className="px-4 py-3 font-semibold text-white">Hotshot 40' / box truck</th>
-                <td className="px-4 py-3 font-mono text-emerald-300">16,500 lbs (Non-CDL) – 22,000 lbs (CDL)</td>
-                <td className="px-4 py-3 font-mono text-slate-200">~34" gooseneck</td>
-                <td className="px-4 py-3 font-mono text-slate-200">8'6" (102") within 13'6" overall</td>
-                <td className="px-4 py-3 font-mono text-slate-200">40' deck · 60-min dispatch</td>
+              <tr className="bg-navy">
+                <th scope="row" className="px-4 py-3 font-semibold text-navy-foreground">Hotshot 40' / box truck</th>
+                <td className="px-4 py-3 font-mono text-status-ok-dark">11,000 lbs (Non-CDL) – 18,000 lbs (CDL)</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">~34" gooseneck</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">8'6" (102") within 13'6" overall</td>
+                <td className="px-4 py-3 font-mono text-navy-foreground/85">40' deck · 60-min dispatch</td>
               </tr>
             </tbody>
           </table>
