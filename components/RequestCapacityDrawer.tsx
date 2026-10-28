@@ -198,13 +198,13 @@ export function RequestCapacityDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Request capacity"
-        className={`absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col justify-between overflow-y-auto border-l border-navy-foreground/10 bg-navy-foreground/[0.03] text-navy-foreground shadow-2xl transition-transform duration-300 ease-out ${
+        className={`absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col justify-between overflow-y-auto border-l border-navy-foreground/10 bg-navy text-navy-foreground shadow-2xl transition-transform duration-300 ease-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div>
           {/* Sticky header */}
-          <div className="sticky top-0 z-20 border-b border-navy-foreground/10 bg-navy-foreground/[0.03]/95 px-6 py-5 backdrop-blur">
+          <div className="sticky top-0 z-20 border-b border-navy-foreground/10 bg-navy px-6 py-5">
             <div className="mb-2 flex items-center justify-between">
               <span className="rounded border border-status-ok-dark/20 bg-status-ok-dark/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-widest text-status-ok-dark">
                 5N / Dispatch &amp; Capacity Desk · {site.mc}
@@ -238,7 +238,7 @@ export function RequestCapacityDrawer({
                 onClick={() => setTab("single")}
                 className={tabButton(
                   "single",
-                  "border-navy-foreground/15 bg-navy-foreground/10 text-navy-foreground",
+                  "border-status-ok-dark/40 bg-status-ok-dark/10 text-navy-foreground",
                   "border-transparent text-navy-foreground/60 hover:text-navy-foreground/85",
                 )}
               >
@@ -252,11 +252,11 @@ export function RequestCapacityDrawer({
                 onClick={() => setTab("upload")}
                 className={tabButton(
                   "upload",
-                  "border-navy-foreground/15 bg-navy-foreground/10 text-navy-foreground",
+                  "border-status-warn-dark/40 bg-status-warn-dark/10 text-navy-foreground",
                   "border-transparent text-navy-foreground/60 hover:text-navy-foreground/85",
                 )}
               >
-                <div className="font-mono text-[11px] text-navy-foreground/60">02 / MULTI-LANE &amp; BOM</div>
+                <div className="font-mono text-[11px] text-status-warn-dark">02 / MULTI-LANE &amp; BOM</div>
                 <div className="truncate text-xs font-semibold">Upload Spec / RFP</div>
               </button>
               <button
@@ -340,7 +340,7 @@ export function RequestCapacityDrawer({
                             key={value}
                             className="flex items-center gap-2 rounded border border-navy-foreground/10 bg-navy-foreground/5 px-3 py-2"
                           >
-                            <input type="checkbox" name="site_req" value={value} className="accent-primary" /> {label}
+                            <input type="checkbox" name="site_req" value={value} className="accent-status-ok-dark" /> {label}
                           </label>
                         ))}
                       </div>
@@ -357,7 +357,7 @@ export function RequestCapacityDrawer({
                     <button
                       type="submit"
                       disabled={pending}
-                      className="w-full rounded bg-primary px-5 py-3 text-sm font-bold tracking-wide text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
+                      className="w-full rounded bg-status-ok-dark px-5 py-3 text-sm font-bold tracking-wide text-navy transition hover:bg-status-ok-dark/90 disabled:opacity-60"
                     >
                       {pending ? "Posting to the board…" : "Confirm Capacity & Pricing (60-Min SLA) →"}
                     </button>
@@ -366,7 +366,7 @@ export function RequestCapacityDrawer({
 
                 {tab === "upload" && (
                   <form onSubmit={handleSubmit("PROJECT-RFP")} className="space-y-4">
-                    <div className="rounded-lg border-2 border-dashed border-navy-foreground/15 bg-navy-foreground/5 p-6 text-center transition hover:border-status-ok-dark">
+                    <div className="rounded-lg border-2 border-dashed border-navy-foreground/15 bg-navy-foreground/5 p-6 text-center transition hover:border-status-warn-dark">
                       <p className="mb-1 text-sm font-medium text-navy-foreground/85">
                         Drag &amp; drop your BOM, Packing List, CAD Spec, or Multi-Lane RFP
                       </p>
@@ -377,7 +377,7 @@ export function RequestCapacityDrawer({
                         required
                         multiple
                         accept=".xlsx,.xls,.csv,.pdf,.docx,.doc,.png,.jpg,.jpeg,.dwg,.dxf"
-                        className="mx-auto block text-xs text-navy-foreground/70 file:mr-3 file:rounded file:border-0 file:bg-primary file:px-4 file:py-2 file:text-xs file:font-semibold file:text-primary-foreground"
+                        className="mx-auto block text-xs text-navy-foreground/70 file:mr-3 file:rounded file:border-0 file:bg-status-warn-dark file:px-4 file:py-2 file:text-xs file:font-semibold file:text-navy"
                       />
                     </div>
                     <textarea
@@ -394,7 +394,7 @@ export function RequestCapacityDrawer({
                     <button
                       type="submit"
                       disabled={pending}
-                      className="w-full rounded bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
+                      className="w-full rounded bg-status-warn-dark px-5 py-3 text-sm font-bold text-navy transition hover:bg-status-warn-dark/90 disabled:opacity-60"
                     >
                       {pending ? "Uploading specs…" : "Submit Project Specs for Pricing →"}
                     </button>
@@ -420,7 +420,7 @@ export function RequestCapacityDrawer({
                     <button
                       type="submit"
                       disabled={pending}
-                      className="flex w-full items-center justify-center gap-2 rounded bg-destructive px-5 py-3 text-sm font-bold text-navy-foreground transition hover:bg-destructive disabled:opacity-60"
+                      className="flex w-full items-center justify-center gap-2 rounded bg-destructive px-5 py-3 text-sm font-bold text-navy-foreground transition hover:bg-destructive/90 disabled:opacity-60"
                     >
                       <Zap size={16} aria-hidden="true" />
                       {pending ? "Paging dispatch…" : "Trigger 15-Minute Emergency Callback →"}
@@ -490,7 +490,7 @@ function Confirmation({ submission, onClose }: { submission: Submission; onClose
         <Link
           href="/portal/customer"
           onClick={onClose}
-          className="rounded border border-status-ok-dark/50 bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition hover:bg-primary/90"
+          className="rounded border border-status-ok-dark/50 bg-status-ok-dark px-4 py-2.5 text-xs font-bold text-navy transition hover:bg-status-ok-dark/90"
         >
           Open Shipper Portal →
         </Link>
