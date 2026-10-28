@@ -62,7 +62,7 @@ const specs: Spec[] = [
     name: "Expedited Hotshot (40' Gooseneck) & Box Truck",
     short: "Hotshot",
     rows: [
-      ["Max weight", "16,500 lbs (Non-CDL) to 22,000 lbs (CDL)"],
+      ["Max weight", "11,000 lbs (Non-CDL) to 18,000 lbs (CDL)"],
       ["Deck length", "40' gooseneck · 26' box w/ liftgate"],
       ["Dispatch", "Instant 60-minute dispatch for line-down emergencies"],
       ["Service", "Direct, straight-through, exclusive use"],
@@ -199,7 +199,7 @@ export function EquipmentReference() {
               </tr>
               <tr className="bg-navy">
                 <th scope="row" className="px-4 py-3 font-semibold text-navy-foreground">Hotshot 40' / box truck</th>
-                <td className="px-4 py-3 font-mono text-status-ok-dark">16,500 lbs (Non-CDL) – 22,000 lbs (CDL)</td>
+                <td className="px-4 py-3 font-mono text-status-ok-dark">11,000 lbs (Non-CDL) – 18,000 lbs (CDL)</td>
                 <td className="px-4 py-3 font-mono text-navy-foreground/85">~34" gooseneck</td>
                 <td className="px-4 py-3 font-mono text-navy-foreground/85">8'6" (102") within 13'6" overall</td>
                 <td className="px-4 py-3 font-mono text-navy-foreground/85">40' deck · 60-min dispatch</td>
