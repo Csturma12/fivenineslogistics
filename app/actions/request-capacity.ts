@@ -3,7 +3,7 @@
 import { sendMail } from "@/lib/mailer"
 
 // Where production leads land now that the domain is verified.
-const LEAD_INBOX = "sturma@blbxcritical.com"
+const LEAD_INBOX = process.env.LEAD_INBOX_EMAIL || "chriss@primarycompanies.com"
 
 export type RequestState = {
   status: "idle" | "success" | "error"

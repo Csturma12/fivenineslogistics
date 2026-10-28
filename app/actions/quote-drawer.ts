@@ -12,7 +12,7 @@ export type QuoteDrawerResult = {
 }
 
 // Inbox that reads production leads; override per environment without a code change.
-const LEAD_INBOX = process.env.LEAD_INBOX_EMAIL || "sturma@blbxcritical.com"
+const LEAD_INBOX = process.env.LEAD_INBOX_EMAIL || "chriss@primarycompanies.com"
 // Optional email-to-SMS gateway (e.g. 2055550100@vtext.com) that pages the on-call coordinator.
 const DISPATCH_PAGER = process.env.DISPATCH_PAGER_EMAIL
 
