@@ -190,7 +190,7 @@ export function RequestCapacityDrawer({
     <div className={`fixed inset-0 z-[70] ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}>
       <div
         onClick={onClose}
-        className={`absolute inset-0 bg-navy/80 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`absolute inset-0 bg-navy/40 backdrop-blur-[2px] transition-opacity duration-300 ${
           open ? "opacity-100" : "opacity-0"
         }`}
       />
@@ -198,13 +198,13 @@ export function RequestCapacityDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Request capacity"
-        className={`absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col justify-between overflow-y-auto border-l border-navy-foreground/10 bg-navy text-navy-foreground shadow-2xl transition-transform duration-300 ease-out ${
+        className={`absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col justify-between overflow-y-auto border-l border-navy-foreground/10 bg-navy/60 text-navy-foreground backdrop-blur-xl shadow-2xl transition-transform duration-300 ease-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div>
           {/* Sticky header */}
-          <div className="sticky top-0 z-20 border-b border-navy-foreground/10 bg-navy px-6 py-5">
+          <div className="sticky top-0 z-20 border-b border-navy-foreground/10 bg-navy/40 px-6 py-5 backdrop-blur-xl">
             <div className="mb-2 flex items-center justify-between">
               <span className="rounded border border-status-ok-dark/20 bg-status-ok-dark/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-widest text-status-ok-dark">
                 5N / Dispatch &amp; Capacity Desk · {site.mc}
@@ -432,7 +432,7 @@ export function RequestCapacityDrawer({
           </div>
         </div>
 
-        <div className="flex flex-col gap-1 border-t border-navy-foreground/10 bg-navy px-6 py-4 text-xs text-navy-foreground/60 sm:flex-row sm:justify-between">
+        <div className="flex flex-col gap-1 border-t border-navy-foreground/10 bg-navy/40 px-6 py-4 text-xs text-navy-foreground/60 sm:flex-row sm:justify-between">
           <span>
             24/7 Dispatch:{" "}
             <a href={site.phoneHref} className="text-status-ok-dark">
