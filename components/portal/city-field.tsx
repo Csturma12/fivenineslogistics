@@ -17,21 +17,44 @@ function useDebounced(value: string, ms = 200) {
   return debounced;
 }
 
-/** "City, ST" input with city and ZIP autocomplete. */
-export function CityField({
-  label,
+type CityInputTheme = {
+  input: string;
+  list: string;
+  option: string;
+  optionActive: string;
+  city: string;
+  zip: string;
+};
+
+const lightTheme: CityInputTheme = {
+  input: `${input} text-base`,
+  list: "border-slate-200 bg-white",
+  option: "text-base",
+  optionActive: "bg-slate-100",
+  city: "text-slate-900",
+  zip: "text-xs text-slate-500",
+};
+
+/** "City, ST" input with city and ZIP autocomplete. Renders no label. */
+export function CityInput({
+  id: idProp,
   name,
+  label,
   value = "",
   required = false,
   placeholder = "City or ZIP",
+  theme = lightTheme,
 }: {
-  label: string;
+  id?: string;
   name: string;
+  label: string;
   value?: string;
   required?: boolean;
   placeholder?: string;
+  theme?: CityInputTheme;
 }) {
-  const id = useId();
+  const generatedId = useId();
+  const id = idProp ?? generatedId;
   const listId = `${id}-list`;
   const [text, setText] = useState(value);
   const [open, setOpen] = useState(false);
@@ -53,12 +76,9 @@ export function CityField({
 
   return (
     <div className="relative">
-      <label htmlFor={id} className="block text-sm font-medium text-slate-700">
-        {label}
-      </label>
       <input
         id={id}
-        className={`${input} text-base`}
+        className={theme.input}
         name={name}
         value={text}
         required={required}
@@ -99,7 +119,7 @@ export function CityField({
           id={listId}
           role="listbox"
           aria-label={`${label} suggestions`}
-          className="absolute inset-x-0 top-full z-20 mt-1 max-h-72 overflow-auto rounded-md border border-slate-200 bg-white py-1 shadow-lg"
+          className={`absolute inset-x-0 top-full z-20 mt-1 max-h-72 overflow-auto rounded-md border py-1 shadow-lg ${theme.list}`}
         >
           {places.map((place, i) => (
             <li
@@ -107,18 +127,51 @@ export function CityField({
               id={`${listId}-${i}`}
               role="option"
               aria-selected={i === active}
-              className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 px-3 text-base ${
-                i === active ? "bg-slate-100" : ""
+              className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 px-3 ${theme.option} ${
+                i === active ? theme.optionActive : ""
               }`}
               onMouseDown={(e) => e.preventDefault()}
+              onMouseEnter={() => setActive(i)}
               onClick={() => choose(place)}
             >
-              <span className="text-slate-900">{`${place.city}, ${place.state}`}</span>
-              <span className="text-xs text-slate-500">{place.zip}</span>
+              <span className={theme.city}>{`${place.city}, ${place.state}`}</span>
+              <span className={theme.zip}>{place.zip}</span>
             </li>
           ))}
         </ul>
       ) : null}
+    </div>
+  );
+}
+
+/** "City, ST" input with city and ZIP autocomplete. */
+export function CityField({
+  label,
+  name,
+  value = "",
+  required = false,
+  placeholder = "City or ZIP",
+}: {
+  label: string;
+  name: string;
+  value?: string;
+  required?: boolean;
+  placeholder?: string;
+}) {
+  const id = useId();
+  return (
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium text-slate-700">
+        {label}
+      </label>
+      <CityInput
+        id={id}
+        name={name}
+        label={label}
+        value={value}
+        required={required}
+        placeholder={placeholder}
+      />
     </div>
   );
 }
