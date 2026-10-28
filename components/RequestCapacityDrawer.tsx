@@ -63,8 +63,8 @@ export function RequestCapacityProvider({ children }: { children: ReactNode }) {
 /* ------------------------------------------------------------------ */
 
 const inputClass =
-  "w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
-const labelClass = "mb-1 block text-xs font-medium text-slate-300"
+  "w-full rounded border border-navy-foreground/15 bg-navy-foreground/5 px-3 py-2 text-sm text-navy-foreground placeholder:text-navy-foreground/50 outline-none transition focus:border-status-ok-dark focus:ring-1 focus:ring-status-ok-dark"
+const labelClass = "mb-1 block text-xs font-medium text-navy-foreground/70"
 
 const constraints = [
   ["Hard Crane / Install Slot", "Hard Crane / Install Slot (Zero Slack)"],
@@ -190,7 +190,7 @@ export function RequestCapacityDrawer({
     <div className={`fixed inset-0 z-[70] ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}>
       <div
         onClick={onClose}
-        className={`absolute inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`absolute inset-0 bg-navy/80 backdrop-blur-sm transition-opacity duration-300 ${
           open ? "opacity-100" : "opacity-0"
         }`}
       />
@@ -198,15 +198,15 @@ export function RequestCapacityDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Request capacity"
-        className={`absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col justify-between overflow-y-auto border-l border-slate-800 bg-[#0B111E] text-slate-100 shadow-2xl transition-transform duration-300 ease-out ${
+        className={`absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col justify-between overflow-y-auto border-l border-navy-foreground/10 bg-navy-foreground/[0.03] text-navy-foreground shadow-2xl transition-transform duration-300 ease-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div>
           {/* Sticky header */}
-          <div className="sticky top-0 z-20 border-b border-slate-800 bg-[#0B111E]/95 px-6 py-5 backdrop-blur">
+          <div className="sticky top-0 z-20 border-b border-navy-foreground/10 bg-navy-foreground/[0.03]/95 px-6 py-5 backdrop-blur">
             <div className="mb-2 flex items-center justify-between">
-              <span className="rounded border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-widest text-amber-400">
+              <span className="rounded border border-status-ok-dark/20 bg-status-ok-dark/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-widest text-status-ok-dark">
                 5N / Dispatch &amp; Capacity Desk · {site.mc}
               </span>
               <button
@@ -214,20 +214,20 @@ export function RequestCapacityDrawer({
                 type="button"
                 onClick={onClose}
                 aria-label="Close panel"
-                className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-800 hover:text-white"
+                className="rounded-lg p-1.5 text-navy-foreground/60 transition hover:bg-navy-foreground/10 hover:text-navy-foreground"
               >
                 <X size={18} />
               </button>
             </div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">What needs to be there, and when?</h2>
-            <p className="mt-1 text-sm text-slate-400">
+            <h2 className="text-2xl font-bold tracking-tight text-navy-foreground">What needs to be there, and when?</h2>
+            <p className="mt-1 text-sm text-navy-foreground/60">
               No login required. A senior dispatch coordinator confirms vetted capacity and all-in pricing within{" "}
-              <strong className="text-slate-200">60 minutes</strong> (or{" "}
-              <strong className="text-amber-400">15 minutes</strong> for line-down emergencies).
+              <strong className="text-navy-foreground/85">60 minutes</strong> (or{" "}
+              <strong className="text-status-ok-dark">15 minutes</strong> for line-down emergencies).
             </p>
 
             <div
-              className="mt-4 grid grid-cols-3 gap-2 rounded-lg border border-slate-800 bg-slate-900/90 p-1.5"
+              className="mt-4 grid grid-cols-3 gap-2 rounded-lg border border-navy-foreground/10 bg-navy-foreground/5 p-1.5"
               role="tablist"
               aria-label="Request type"
             >
@@ -238,11 +238,11 @@ export function RequestCapacityDrawer({
                 onClick={() => setTab("single")}
                 className={tabButton(
                   "single",
-                  "border-slate-700 bg-slate-800 text-white",
-                  "border-transparent text-slate-400 hover:text-slate-200",
+                  "border-navy-foreground/15 bg-navy-foreground/10 text-navy-foreground",
+                  "border-transparent text-navy-foreground/60 hover:text-navy-foreground/85",
                 )}
               >
-                <div className="font-mono text-[11px] text-amber-400">01 / SPOT &amp; CRITICAL</div>
+                <div className="font-mono text-[11px] text-status-ok-dark">01 / SPOT &amp; CRITICAL</div>
                 <div className="truncate text-xs font-semibold">Spec a Single Move</div>
               </button>
               <button
@@ -252,11 +252,11 @@ export function RequestCapacityDrawer({
                 onClick={() => setTab("upload")}
                 className={tabButton(
                   "upload",
-                  "border-slate-700 bg-slate-800 text-white",
-                  "border-transparent text-slate-400 hover:text-slate-200",
+                  "border-navy-foreground/15 bg-navy-foreground/10 text-navy-foreground",
+                  "border-transparent text-navy-foreground/60 hover:text-navy-foreground/85",
                 )}
               >
-                <div className="font-mono text-[11px] text-slate-400">02 / MULTI-LANE &amp; BOM</div>
+                <div className="font-mono text-[11px] text-navy-foreground/60">02 / MULTI-LANE &amp; BOM</div>
                 <div className="truncate text-xs font-semibold">Upload Spec / RFP</div>
               </button>
               <button
@@ -266,12 +266,12 @@ export function RequestCapacityDrawer({
                 onClick={() => setTab("emergency")}
                 className={tabButton(
                   "emergency",
-                  "border-red-500/40 bg-red-950/50 text-red-100",
-                  "border-transparent text-red-300 hover:text-red-200",
+                  "border-destructive/40 bg-destructive/10 text-navy-foreground",
+                  "border-transparent text-destructive hover:text-navy-foreground",
                 )}
               >
-                <div className="flex items-center gap-1 font-mono text-[11px] text-red-400">
-                  <span className="size-2 animate-pulse rounded-full bg-red-500" aria-hidden="true" /> 03 / HOTSHOT
+                <div className="flex items-center gap-1 font-mono text-[11px] text-destructive">
+                  <span className="size-2 animate-pulse rounded-full bg-destructive" aria-hidden="true" /> 03 / HOTSHOT
                 </div>
                 <div className="truncate text-xs font-semibold">Line-Down Emergency</div>
               </button>
@@ -331,22 +331,22 @@ export function RequestCapacityDrawer({
                     </div>
 
                     <fieldset>
-                      <legend className="mb-2 block text-xs font-medium text-slate-300">
+                      <legend className="mb-2 block text-xs font-medium text-navy-foreground/70">
                         Site Access &amp; Securement Requirements
                       </legend>
-                      <div className="grid grid-cols-2 gap-2 text-xs text-slate-300 sm:grid-cols-3">
+                      <div className="grid grid-cols-2 gap-2 text-xs text-navy-foreground/70 sm:grid-cols-3">
                         {siteRequirements.map(([value, label]) => (
                           <label
                             key={value}
-                            className="flex items-center gap-2 rounded border border-slate-800 bg-slate-900/70 px-3 py-2"
+                            className="flex items-center gap-2 rounded border border-navy-foreground/10 bg-navy-foreground/5 px-3 py-2"
                           >
-                            <input type="checkbox" name="site_req" value={value} className="accent-amber-500" /> {label}
+                            <input type="checkbox" name="site_req" value={value} className="accent-primary" /> {label}
                           </label>
                         ))}
                       </div>
                     </fieldset>
 
-                    <div className="grid grid-cols-1 gap-3 border-t border-slate-800 pt-4 sm:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-3 border-t border-navy-foreground/10 pt-4 sm:grid-cols-3">
                       <input name="name" required placeholder="Your Name *" aria-label="Your name" className={inputClass} />
                       <input name="email" type="email" required placeholder="Work Email *" aria-label="Work email" className={inputClass} />
                       <input name="phone" type="tel" required placeholder="Direct Phone *" aria-label="Direct phone" className={inputClass} />
@@ -357,7 +357,7 @@ export function RequestCapacityDrawer({
                     <button
                       type="submit"
                       disabled={pending}
-                      className="w-full rounded bg-amber-500 px-5 py-3 text-sm font-bold tracking-wide text-slate-950 transition hover:bg-amber-400 disabled:opacity-60"
+                      className="w-full rounded bg-primary px-5 py-3 text-sm font-bold tracking-wide text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
                     >
                       {pending ? "Posting to the board…" : "Confirm Capacity & Pricing (60-Min SLA) →"}
                     </button>
@@ -366,18 +366,18 @@ export function RequestCapacityDrawer({
 
                 {tab === "upload" && (
                   <form onSubmit={handleSubmit("PROJECT-RFP")} className="space-y-4">
-                    <div className="rounded-lg border-2 border-dashed border-slate-700 bg-slate-900/40 p-6 text-center transition hover:border-amber-400">
-                      <p className="mb-1 text-sm font-medium text-slate-200">
+                    <div className="rounded-lg border-2 border-dashed border-navy-foreground/15 bg-navy-foreground/5 p-6 text-center transition hover:border-status-ok-dark">
+                      <p className="mb-1 text-sm font-medium text-navy-foreground/85">
                         Drag &amp; drop your BOM, Packing List, CAD Spec, or Multi-Lane RFP
                       </p>
-                      <p className="mb-3 text-xs text-slate-500">Supports .XLSX, .CSV, .PDF, .DOCX, .PNG (up to 20MB total)</p>
+                      <p className="mb-3 text-xs text-navy-foreground/50">Supports .XLSX, .CSV, .PDF, .DOCX, .PNG (up to 20MB total)</p>
                       <input
                         type="file"
                         name="files"
                         required
                         multiple
                         accept=".xlsx,.xls,.csv,.pdf,.docx,.doc,.png,.jpg,.jpeg,.dwg,.dxf"
-                        className="mx-auto block text-xs text-slate-300 file:mr-3 file:rounded file:border-0 file:bg-amber-500 file:px-4 file:py-2 file:text-xs file:font-semibold file:text-slate-950"
+                        className="mx-auto block text-xs text-navy-foreground/70 file:mr-3 file:rounded file:border-0 file:bg-primary file:px-4 file:py-2 file:text-xs file:font-semibold file:text-primary-foreground"
                       />
                     </div>
                     <textarea
@@ -394,7 +394,7 @@ export function RequestCapacityDrawer({
                     <button
                       type="submit"
                       disabled={pending}
-                      className="w-full rounded bg-amber-500 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-amber-400 disabled:opacity-60"
+                      className="w-full rounded bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
                     >
                       {pending ? "Uploading specs…" : "Submit Project Specs for Pricing →"}
                     </button>
@@ -403,11 +403,11 @@ export function RequestCapacityDrawer({
 
                 {tab === "emergency" && (
                   <form onSubmit={handleSubmit("EMERGENCY-HOTSHOT")} className="space-y-4">
-                    <div className="rounded-lg border border-red-500/40 bg-red-950/40 p-4 text-xs text-slate-200">
-                      <strong className="mb-1 block font-mono uppercase text-red-400">● 24/7 Live Dispatch Escalation</strong>
+                    <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-xs text-navy-foreground/85">
+                      <strong className="mb-1 block font-mono uppercase text-destructive">● 24/7 Live Dispatch Escalation</strong>
                       Pages our on-call senior dispatch coordinator immediately. Expect a phone call within 15 minutes, or
                       call{" "}
-                      <a href={site.phoneHref} className="font-bold text-amber-400 underline">
+                      <a href={site.phoneHref} className="font-bold text-status-ok-dark underline">
                         {site.phone}
                       </a>{" "}
                       now.
@@ -420,7 +420,7 @@ export function RequestCapacityDrawer({
                     <button
                       type="submit"
                       disabled={pending}
-                      className="flex w-full items-center justify-center gap-2 rounded bg-red-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-red-500 disabled:opacity-60"
+                      className="flex w-full items-center justify-center gap-2 rounded bg-destructive px-5 py-3 text-sm font-bold text-navy-foreground transition hover:bg-destructive disabled:opacity-60"
                     >
                       <Zap size={16} aria-hidden="true" />
                       {pending ? "Paging dispatch…" : "Trigger 15-Minute Emergency Callback →"}
@@ -432,15 +432,15 @@ export function RequestCapacityDrawer({
           </div>
         </div>
 
-        <div className="flex flex-col gap-1 border-t border-slate-800 bg-slate-950 px-6 py-4 text-xs text-slate-400 sm:flex-row sm:justify-between">
+        <div className="flex flex-col gap-1 border-t border-navy-foreground/10 bg-navy px-6 py-4 text-xs text-navy-foreground/60 sm:flex-row sm:justify-between">
           <span>
             24/7 Dispatch:{" "}
-            <a href={site.phoneHref} className="text-amber-400">
+            <a href={site.phoneHref} className="text-status-ok-dark">
               {site.phone}
             </a>{" "}
             · <a href={`mailto:${site.dispatchEmail}`}>{site.dispatchEmail}</a>
           </span>
-          <span className="font-mono text-slate-500">Agent of Primary Freight LLC · {site.mc}</span>
+          <span className="font-mono text-navy-foreground/50">Agent of Primary Freight LLC · {site.mc}</span>
         </div>
       </aside>
     </div>
@@ -463,9 +463,9 @@ function ErrorNotice({ message }: { message: string | null }) {
   return (
     <div
       role="alert"
-      className="flex items-start gap-2 rounded border border-red-500/40 bg-red-950/40 px-3 py-2.5 text-sm text-red-100"
+      className="flex items-start gap-2 rounded border border-destructive/40 bg-destructive/10 px-3 py-2.5 text-sm text-navy-foreground"
     >
-      <TriangleAlert className="mt-0.5 size-4 shrink-0 text-red-400" aria-hidden="true" />
+      <TriangleAlert className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden="true" />
       <span>{message}</span>
     </div>
   )
@@ -475,13 +475,13 @@ function Confirmation({ submission, onClose }: { submission: Submission; onClose
   const emergency = submission.mode === "EMERGENCY-HOTSHOT"
   return (
     <div className="space-y-4 py-6" role="status">
-      <div className="inline-block rounded border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-mono text-xs uppercase text-emerald-400">
+      <div className="inline-block rounded border border-status-ok-dark/30 bg-status-ok-dark/10 px-3 py-1 font-mono text-xs uppercase text-status-ok-dark">
         Status: {submission.persisted ? "Received & posted to board" : "Received by dispatch"} · Ref #{submission.reference}
       </div>
-      <h3 className="text-2xl font-bold text-white">
+      <h3 className="text-2xl font-bold text-navy-foreground">
         {emergency ? "Dispatch has been paged." : "Your move is on the board."}
       </h3>
-      <p className="text-sm text-slate-300">
+      <p className="text-sm text-navy-foreground/70">
         {emergency
           ? `Our on-call coordinator is calling you back within 15 minutes. If you don't hear from us, call ${site.phone} directly.`
           : "Our Houston dispatch desk is verifying active equipment availability in your origin lane right now."}
@@ -490,21 +490,21 @@ function Confirmation({ submission, onClose }: { submission: Submission; onClose
         <Link
           href="/portal/customer"
           onClick={onClose}
-          className="rounded border border-amber-500/50 bg-amber-500 px-4 py-2.5 text-xs font-bold text-slate-950 transition hover:bg-amber-400"
+          className="rounded border border-status-ok-dark/50 bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition hover:bg-primary/90"
         >
           Open Shipper Portal →
         </Link>
         <Link
           href="/request-documents"
           onClick={onClose}
-          className="rounded border border-slate-700 bg-slate-800 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-slate-700"
+          className="rounded border border-navy-foreground/15 bg-navy-foreground/10 px-4 py-2.5 text-xs font-semibold text-navy-foreground transition hover:bg-navy-foreground/15"
         >
           Download W-9 / {site.mc} Onboarding Packet
         </Link>
         <button
           type="button"
           onClick={onClose}
-          className="rounded border border-transparent px-4 py-2.5 text-xs font-semibold text-slate-300 transition hover:text-white"
+          className="rounded border border-transparent px-4 py-2.5 text-xs font-semibold text-navy-foreground/70 transition hover:text-navy-foreground"
         >
           Close
         </button>

@@ -105,24 +105,24 @@ export default function RequestDocumentsPage() {
           </div>
         </section>
 
-        <section className="border-b border-border bg-[#080D1A] text-slate-100">
+        <section className="border-b border-border bg-navy text-navy-foreground">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
             <div className="grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-start">
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-amber-400">Credentials on file</p>
-                <h2 className="mt-4 text-balance text-3xl font-semibold tracking-tight text-white">
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-status-ok-dark">Credentials on file</p>
+                <h2 className="mt-4 text-balance text-3xl font-semibold tracking-tight text-navy-foreground">
                   What your vendor-setup form needs.
                 </h2>
-                <p className="mt-4 text-sm leading-relaxed text-slate-400">
+                <p className="mt-4 text-sm leading-relaxed text-navy-foreground/60">
                   Copy these into your vendor master now; the signed documents follow from the compliance desk
                   within one business hour.
                 </p>
               </div>
-              <dl className="divide-y divide-slate-800 overflow-hidden rounded-lg border border-slate-800 bg-[#0B111E]">
+              <dl className="divide-y divide-navy-foreground/10 overflow-hidden rounded-lg border border-navy-foreground/10 bg-navy-foreground/[0.03]">
                 {credentials.map(([k, v]) => (
                   <div key={k} className="grid gap-1 px-5 py-3.5 sm:grid-cols-[180px_1fr] sm:gap-4">
-                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">{k}</dt>
-                    <dd className="font-mono text-sm text-emerald-300">{v}</dd>
+                    <dt className="font-mono text-[11px] uppercase tracking-wider text-navy-foreground/50">{k}</dt>
+                    <dd className="font-mono text-sm text-status-ok-dark">{v}</dd>
                   </div>
                 ))}
               </dl>
