@@ -16,6 +16,7 @@ import { X, TriangleAlert, Zap } from "lucide-react"
 import { notifyQuoteDrawer, type QuoteMode } from "@/app/actions/quote-drawer"
 import { isSupabaseConfigured, newLoadReference, splitCityState, supabase, type LoadInsert } from "@/lib/supabase"
 import { site } from "@/lib/site"
+import { CityInput } from "@/components/portal/city-field"
 
 /* ------------------------------------------------------------------ */
 /* Context — any `Request Capacity` CTA calls openPanel()              */
@@ -65,6 +66,14 @@ export function RequestCapacityProvider({ children }: { children: ReactNode }) {
 const inputClass =
   "w-full rounded border border-navy-foreground/15 bg-navy-foreground/5 px-3 py-2 text-sm text-navy-foreground placeholder:text-navy-foreground/50 outline-none transition focus:border-status-ok-dark focus:ring-1 focus:ring-status-ok-dark"
 const labelClass = "mb-1 block text-xs font-medium text-navy-foreground/70"
+const cityInputTheme = {
+  input: inputClass,
+  list: "border-navy-foreground/15 bg-navy",
+  option: "text-sm",
+  optionActive: "bg-navy-foreground/10",
+  city: "text-navy-foreground",
+  zip: "font-mono text-xs text-navy-foreground/60",
+}
 
 const constraints = [
   ["Hard Crane / Install Slot", "Hard Crane / Install Slot (Zero Slack)"],
@@ -288,10 +297,10 @@ export function RequestCapacityDrawer({
                   <form onSubmit={handleSubmit("STANDARD-SPOT")} className="space-y-6">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="Origin City, State *" htmlFor="q-origin">
-                        <input id="q-origin" name="origin" required placeholder="e.g., Houston, TX" className={inputClass} />
+                        <CityInput id="q-origin" name="origin" label="Origin" required placeholder="e.g., Houston, TX" theme={cityInputTheme} />
                       </Field>
                       <Field label="Destination City, State *" htmlFor="q-dest">
-                        <input id="q-dest" name="destination" required placeholder="e.g., New Albany, OH" className={inputClass} />
+                        <CityInput id="q-dest" name="destination" label="Destination" required placeholder="e.g., New Albany, OH" theme={cityInputTheme} />
                       </Field>
                       <Field label="Pickup Date & Ready Time *" htmlFor="q-pickup">
                         <input id="q-pickup" name="pickup" required placeholder="e.g., Tomorrow 08:00 AM" className={inputClass} />
