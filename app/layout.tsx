@@ -3,6 +3,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { RequestCapacityProvider } from "@/components/RequestCapacityDrawer";
+import { WorkWithUsProvider } from "@/components/WorkWithUsDrawer";
 import "./globals.css";
 import "./redesign.css";
 
@@ -97,7 +98,9 @@ export default function RootLayout({
       <body
         className={`${_geistSans.variable} ${_geistMono.variable} antialiased font-sans`}
       >
-        <RequestCapacityProvider>{children}</RequestCapacityProvider>
+        <RequestCapacityProvider>
+          <WorkWithUsProvider>{children}</WorkWithUsProvider>
+        </RequestCapacityProvider>
         {process.env.NODE_ENV === "production" && (
           <>
             <Analytics />

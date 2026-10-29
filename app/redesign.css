@@ -177,11 +177,22 @@ html {
   font-weight: 500;
   white-space: nowrap;
 }
+.desktop-nav__button,
+.mobile-nav__button {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
 .desktop-nav > a,
+.desktop-nav__button,
 .portal-link,
 .portal-dropdown__trigger {
   transition: color 0.2s;
 }
+.desktop-nav__button:hover,
 .desktop-nav > a:hover,
 .portal-link:hover,
 .portal-dropdown__trigger:hover {
@@ -327,7 +338,10 @@ html {
   padding: 12px 24px 24px;
   border-top: 1px solid var(--line);
 }
-.mobile-nav a {
+.mobile-nav a,
+.mobile-nav .mobile-nav__button {
+  width: 100%;
+  text-align: left;
   display: flex;
   align-items: center;
   justify-content: space-between;

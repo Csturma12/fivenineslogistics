@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import {
   ArrowRight,
-  Mail,
   Phone,
   Briefcase,
   TrendingUp,
@@ -15,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { WorkWithUsButton } from "@/components/work-with-us-trigger"
 import { site } from "@/lib/site"
 
 export const metadata: Metadata = {
@@ -68,21 +68,6 @@ const experience = [
   },
 ]
 
-const applySubject = "Work With Us — Application Interest"
-const applyBody = [
-  "Please share the following so we can route your interest to the right role:",
-  "",
-  "Role of interest (agent / owner-operator / accounting / operations):",
-  "Years of experience:",
-  "Current location:",
-  "Best phone number:",
-  "Email:",
-  "A few sentences about your background:",
-  "",
-  "Please attach your résumé to this email.",
-].join("\n")
-const applyHref = `mailto:${site.infoEmail}?subject=${encodeURIComponent(applySubject)}&body=${encodeURIComponent(applyBody)}`
-
 export default function WorkWithUsPage() {
   return (
     <>
@@ -103,10 +88,10 @@ export default function WorkWithUsPage() {
               freight—accountable, direct, and built to last.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button render={<Link href={applyHref} />} nativeButton={false} size="lg" className="font-medium">
-                <Mail className="size-4" data-icon="inline-start" />
-                Apply / express interest
-              </Button>
+              <WorkWithUsButton size="lg" className="font-medium">
+                <ArrowRight className="size-4" data-icon="inline-start" />
+                Start your application
+              </WorkWithUsButton>
               <Button
                 render={<Link href={site.phoneHref} />}
                 nativeButton={false}
@@ -183,35 +168,37 @@ export default function WorkWithUsPage() {
           </div>
         </section>
 
-        <section>
-          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-            <div className="grid gap-10 rounded-xl border border-border bg-secondary/50 p-6 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-end">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-wider text-primary">Ready when you are</p>
-                <h2 className="mt-3 max-w-2xl text-balance text-3xl font-semibold tracking-tight text-foreground">
-                  Tell us the role, your experience, and attach a résumé.
-                </h2>
-                <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">
-                  Send us your background and contact details. We read every message and follow up on the
-                  ones that fit as the team grows.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <Button render={<Link href={applyHref} />} nativeButton={false} size="lg" className="font-medium">
-                  <Mail className="size-4" data-icon="inline-start" />
-                  Apply / express interest
-                </Button>
-                <Button
-                  render={<Link href={site.phoneHref} />}
-                  nativeButton={false}
-                  size="lg"
-                  variant="outline"
-                  className="font-medium"
-                >
-                  <Phone className="size-4" data-icon="inline-start" />
-                  {site.phone}
-                </Button>
-              </div>
+        <section id="apply" className="scroll-mt-20">
+          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1fr_1.4fr]">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-wider text-primary">Ready when you are</p>
+              <h2 className="mt-3 max-w-2xl text-balance text-3xl font-semibold tracking-tight text-foreground">
+                Tell us the role, your experience, and attach a résumé.
+              </h2>
+              <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">
+                Send us your background and contact details. We read every application and follow up on the
+                ones that fit as the team grows.
+              </p>
+              <Button
+                render={<Link href={site.phoneHref} />}
+                nativeButton={false}
+                size="lg"
+                variant="outline"
+                className="mt-6 font-medium"
+              >
+                <Phone className="size-4" data-icon="inline-start" />
+                {site.phone}
+              </Button>
+            </div>
+            <div className="flex flex-col items-start justify-center gap-4 rounded-lg border border-border bg-secondary/50 p-8">
+              <p className="text-pretty leading-relaxed text-muted-foreground">
+                The full application covers contact details, the position you want, your experience, and references.
+                Attach your résumé and a references document before you submit.
+              </p>
+              <WorkWithUsButton size="lg" className="font-medium">
+                <ArrowRight className="size-4" data-icon="inline-start" />
+                Open the application
+              </WorkWithUsButton>
             </div>
           </div>
         </section>
