@@ -6,12 +6,12 @@ import { FiveNinesForged } from "@/components/five-nines-forged";
 import { FiveNinesMark } from "@/components/five-nines-mark";
 import { FiveNinesFlatbedMark } from "@/components/five-nines-flatbed-mark";
 import { useRequestCapacity } from "@/components/request-capacity-panel";
+import { useWorkWithUs } from "@/components/WorkWithUsDrawer";
 import { site } from "@/lib/site";
 const links = [
   { href: "/who-we-serve", label: "Who We Serve" },
   { href: "/capabilities", label: "Capabilities" },
   { href: "/request-documents", label: "Compliance & Onboarding" },
-  { href: "/work-with-us", label: "Work With Us" },
 ];
 const portalLinks = [
   {
@@ -34,6 +34,7 @@ export function SiteHeader() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const openedByHoverRef = useRef(false);
   const { openPanel } = useRequestCapacity();
+  const { openApplication } = useWorkWithUs();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -110,6 +111,9 @@ export function SiteHeader() {
                 {link.label}
               </Link>
             ))}
+            <button type="button" onClick={openApplication} className="desktop-nav__button">
+              Work With Us
+            </button>
             <div
               ref={dropdownRef}
               className="portal-dropdown"
@@ -221,6 +225,17 @@ export function SiteHeader() {
                 <ArrowUpRight size={18} aria-hidden="true" />
               </Link>
             ))}
+            <button
+              type="button"
+              className="mobile-nav__button"
+              onClick={() => {
+                setOpen(false);
+                openApplication();
+              }}
+            >
+              Work With Us
+              <ArrowUpRight size={18} aria-hidden="true" />
+            </button>
             {portalLinks.map((item) => (
               <Link
                 key={item.href}

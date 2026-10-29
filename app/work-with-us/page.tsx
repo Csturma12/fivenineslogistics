@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
-import { WorkWithUsForm } from "@/components/work-with-us-form"
+import { WorkWithUsButton } from "@/components/work-with-us-trigger"
 import { site } from "@/lib/site"
 
 export const metadata: Metadata = {
@@ -88,10 +88,10 @@ export default function WorkWithUsPage() {
               freight—accountable, direct, and built to last.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button render={<Link href="#apply" />} nativeButton={false} size="lg" className="font-medium">
+              <WorkWithUsButton size="lg" className="font-medium">
                 <ArrowRight className="size-4" data-icon="inline-start" />
-                Apply / express interest
-              </Button>
+                Start your application
+              </WorkWithUsButton>
               <Button
                 render={<Link href={site.phoneHref} />}
                 nativeButton={false}
@@ -190,7 +190,16 @@ export default function WorkWithUsPage() {
                 {site.phone}
               </Button>
             </div>
-            <WorkWithUsForm />
+            <div className="flex flex-col items-start justify-center gap-4 rounded-lg border border-border bg-secondary/50 p-8">
+              <p className="text-pretty leading-relaxed text-muted-foreground">
+                The full application covers contact details, the position you want, your experience, and references.
+                Attach your résumé and a references document before you submit.
+              </p>
+              <WorkWithUsButton size="lg" className="font-medium">
+                <ArrowRight className="size-4" data-icon="inline-start" />
+                Open the application
+              </WorkWithUsButton>
+            </div>
           </div>
         </section>
       </main>

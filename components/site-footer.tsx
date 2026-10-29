@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiveNinesForged } from "@/components/five-nines-forged";
 import { RequestCapacityTrigger } from "@/components/request-capacity-trigger";
+import { WorkWithUsTrigger } from "@/components/work-with-us-trigger";
 import { site } from "@/lib/site";
 const groups = [
   {
@@ -18,7 +19,7 @@ const groups = [
       { href: "/company", label: "Our company" },
       { href: "/who-we-serve", label: "Who we serve" },
       { href: "/growth", label: "Our growth" },
-      { href: "/work-with-us", label: "Work with us" },
+      { href: "/work-with-us", label: "Work with us", apply: true },
     ],
   },
   {
@@ -64,6 +65,10 @@ export function SiteFooter() {
                     <RequestCapacityTrigger key={link.href} className="footer-link-button">
                       {link.label}
                     </RequestCapacityTrigger>
+                  ) : "apply" in link && link.apply ? (
+                    <WorkWithUsTrigger key={link.href} className="footer-link-button">
+                      {link.label}
+                    </WorkWithUsTrigger>
                   ) : (
                     <Link key={link.href} href={link.href}>
                       {link.label}
