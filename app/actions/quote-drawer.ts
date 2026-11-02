@@ -11,8 +11,6 @@ export type QuoteDrawerResult = {
   message?: string
 }
 
-// Inbox that reads production leads; override per environment without a code change.
-const LEAD_INBOX = process.env.LEAD_INBOX_EMAIL || "chriss@primarycompanies.com"
 // Optional email-to-SMS gateway (e.g. 2055550100@vtext.com) that pages the on-call coordinator.
 const DISPATCH_PAGER = process.env.DISPATCH_PAGER_EMAIL
 
@@ -128,7 +126,7 @@ export async function notifyQuoteDrawer(mode: QuoteMode, formData: FormData): Pr
       }
     </div>`
 
-  const to = [LEAD_INBOX]
+  const to = [...site.teamInbox]
   if (mode === "EMERGENCY-HOTSHOT" && DISPATCH_PAGER) to.push(DISPATCH_PAGER)
 
   try {

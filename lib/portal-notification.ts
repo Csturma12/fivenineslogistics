@@ -11,6 +11,12 @@ export function notificationRecipient(event: { recipient: string; subject: strin
     ["New carrier bid", "Carrier reservation - dispatch action required"].includes(event.subject)
     ? PORTAL_DISPATCH_EMAIL : event.recipient;
 }
+
+// Internal alerts fan out to the whole team inbox; carrier-facing mail goes only to the carrier.
+export function notificationRecipients(event: { recipient: string; subject: string }): string[] {
+  const recipient = notificationRecipient(event);
+  return [PORTAL_DISPATCH_EMAIL, LEGACY_INBOX].includes(recipient.toLowerCase()) ? [...site.teamInbox] : [recipient];
+}
 const escape = (value: unknown): string =>
   String(value ?? "Not provided").replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,

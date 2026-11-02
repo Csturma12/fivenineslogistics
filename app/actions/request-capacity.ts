@@ -1,9 +1,9 @@
 "use server"
 
 import { sendMail } from "@/lib/mailer"
+import { site } from "@/lib/site"
 
-// Where production leads land now that the domain is verified.
-const LEAD_INBOX = process.env.LEAD_INBOX_EMAIL || "chriss@primarycompanies.com"
+const LEAD_INBOX = site.teamInbox
 
 export type RequestState = {
   status: "idle" | "success" | "error"
@@ -93,7 +93,7 @@ export async function submitRequestCapacity(
   try {
     await sendMail({
       fromName: "Five Nines Dispatch",
-      to: [LEAD_INBOX],
+      to: [...LEAD_INBOX],
       replyTo: email,
       subject: `${requestType === "consulting" ? "Consultation" : "Capacity"} request ${ticket} · ${company}`,
       html,

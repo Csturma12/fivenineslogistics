@@ -9,7 +9,7 @@ export type DocumentRequestState = {
   message?: string
 }
 
-const LEAD_INBOX = process.env.LEAD_INBOX_EMAIL || "sturma@blbxcritical.com"
+const LEAD_INBOX = site.teamInbox
 
 const escapeHtml = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
@@ -72,7 +72,7 @@ export async function submitDocumentRequest(
   try {
     await sendMail({
       fromName: "Five Nines Compliance",
-      to: [LEAD_INBOX],
+      to: [...LEAD_INBOX],
       replyTo: email,
       subject: `Document request ${ticket} · ${company} · ${audience}`,
       html,
