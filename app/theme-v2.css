@@ -22,8 +22,12 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(90deg, rgb(10 28 50 / 95%) 0%, rgb(10 28 50 / 80%) 48%, rgb(10 28 50 / 35%) 100%),
-    linear-gradient(0deg, rgb(10 28 50 / 85%) 0%, transparent 45%);
+    linear-gradient(90deg, rgb(10 28 50 / 78%) 0%, rgb(10 28 50 / 45%) 45%, rgb(10 28 50 / 0%) 80%),
+    linear-gradient(0deg, rgb(10 28 50 / 55%) 0%, transparent 35%);
+}
+.hero-grid[data-hero] h1,
+.hero-grid[data-hero] p {
+  text-shadow: 0 2px 16px rgb(10 28 50 / 55%);
 }
 .hero-grid[data-hero] > div {
   padding-top: 7rem;

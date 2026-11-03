@@ -36,8 +36,8 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(90deg, rgb(10 28 50 / 94%) 0%, rgb(10 28 50 / 72%) 42%, rgb(10 28 50 / 10%) 75%),
-    linear-gradient(0deg, rgb(10 28 50 / 90%) 0%, transparent 38%);
+    linear-gradient(90deg, rgb(10 28 50 / 80%) 0%, rgb(10 28 50 / 45%) 42%, rgb(10 28 50 / 0%) 72%),
+    linear-gradient(0deg, rgb(10 28 50 / 65%) 0%, transparent 32%);
 }
 .pv-hero__inner {
   display: flex;
@@ -466,7 +466,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(90deg, rgb(10 28 50 / 95%) 0%, rgb(10 28 50 / 80%) 55%, rgb(10 28 50 / 55%) 100%);
+  background: linear-gradient(90deg, rgb(10 28 50 / 85%) 0%, rgb(10 28 50 / 55%) 55%, rgb(10 28 50 / 25%) 100%);
 }
 .pv-closing__inner {
   display: flex;
