@@ -63,16 +63,16 @@ const sectors = [
 
 const steps = [
   {
-    title: "Tell us the window",
-    description: "Lane, freight and the hour it has to land. A real person answers, day or night.",
+    title: "Define the requirement",
+    description: "Share the lane, freight details and required delivery window. Our dispatch team is available 24/7.",
   },
   {
-    title: "Quote in under an hour",
-    description: "A priced plan with equipment, permits and a vetted carrier. No double-brokering, ever.",
+    title: "Receive a formal quote",
+    description: "Within one hour, a priced plan covering equipment, permits and a verified carrier assignment.",
   },
   {
-    title: "Tracked to the dock",
-    description: "Check calls at every handoff, and a POD in your portal the moment it delivers.",
+    title: "Managed through delivery",
+    description: "Status updates at every milestone, with signed proof of delivery available in your portal.",
   },
 ];
 
@@ -102,14 +102,14 @@ export default function HomePreviewPage() {
                 Houston-based · 24/7 dispatch · Quotes in under an hour
               </p>
               <h1 id="pv-hero-title" className="pv-reveal">
-                Critical freight.
+                Critical freight,
                 <br />
-                <span className="pv-hero__accent">Every handoff</span> accounted for
+                <span className="pv-hero__accent">managed with precision</span>
                 <span className="headline-stop">.</span>
               </h1>
               <p className="pv-hero__sub pv-reveal">
-                Data center switchgear, refinery turnarounds and white-label 3PL moves, planned around
-                your install window, not ours.
+                Logistics support for data center, industrial and construction projects, and white-label
+                services for 3PL partners, planned around your project schedule.
               </p>
               <div className="pv-hero__actions pv-reveal">
                 <RequestCapacityTrigger className="design-button pv-cta">
@@ -123,7 +123,7 @@ export default function HomePreviewPage() {
               </div>
               <a href={site.phoneHref} className="pv-hero__call pv-reveal">
                 <Phone size={16} aria-hidden="true" />
-                Talk to dispatch now <strong>{site.phone}</strong>
+                24/7 dispatch <strong>{site.phone}</strong>
               </a>
             </div>
             <div className="pv-hero__board pv-reveal">
@@ -153,11 +153,11 @@ export default function HomePreviewPage() {
         <section className="design-section design-container" aria-labelledby="pv-industries-title">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Who we move for</p>
+              <p className="eyebrow">Industries served</p>
               <h2 id="pv-industries-title">
-                Your deadline is part
+                Freight planned around
                 <br />
-                of a much bigger job.
+                your project schedule.
               </h2>
             </div>
             <Link href="/who-we-serve" className="text-link">
@@ -179,7 +179,7 @@ export default function HomePreviewPage() {
                   <h3>{sector.title}</h3>
                   <p>{sector.description}</p>
                   <span className="pv-sector__link">
-                    See how we move it
+                    Learn more
                     <ArrowUpRight size={16} aria-hidden="true" />
                   </span>
                 </div>
@@ -192,15 +192,15 @@ export default function HomePreviewPage() {
           <div className="design-container">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">How a move runs</p>
+                <p className="eyebrow">Our process</p>
                 <h2 id="pv-steps-title">
-                  From first call
+                  From initial request
                   <br />
-                  to signed POD.
+                  to proof of delivery.
                 </h2>
               </div>
               <p className="pv-standard-line">
-                Five nines means <span>the load shows up.</span> Every time.
+                Five nines means <span>99.999%.</span> The standard we plan every shipment to.
               </p>
             </div>
             <ol className="pv-steps__list">
@@ -230,13 +230,13 @@ export default function HomePreviewPage() {
           <div className="pv-closing__shade" aria-hidden="true" />
           <div className="design-container pv-closing__inner">
             <div>
-              <p className="eyebrow">Let’s get to work</p>
+              <p className="eyebrow">Request capacity</p>
               <h2 id="pv-closing-title">
-                What needs to be there,
+                Plan your next
                 <br />
-                and when?
+                critical shipment.
               </h2>
-              <p>Give us the load, the lane and the delivery window. We’ll work through the rest with you.</p>
+              <p>Provide the freight details, lane and delivery window, and our team will prepare a complete transportation plan.</p>
             </div>
             <div className="pv-closing__actions">
               <RequestCapacityTrigger className="design-button pv-cta">
@@ -244,17 +244,17 @@ export default function HomePreviewPage() {
                 <ArrowUpRight size={20} aria-hidden="true" />
               </RequestCapacityTrigger>
               <a href={site.phoneHref}>{site.phone}</a>
-              <span>Dispatch, around the clock.</span>
+              <span>Dispatch available 24 hours a day.</span>
             </div>
           </div>
         </section>
 
         <div className="carrier-strip design-container">
           <span>
-            <strong>Good carriers. Strong relationships.</strong> Run with Five Nines.
+            <strong>Carrier partnerships.</strong> Qualified carriers are invited to work with Five Nines.
           </span>
           <WorkWithUsTrigger className="text-link">
-            Or join the team
+            Career opportunities
             <ArrowRight size={18} aria-hidden="true" />
           </WorkWithUsTrigger>
         </div>
