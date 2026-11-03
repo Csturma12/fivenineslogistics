@@ -102,14 +102,15 @@ export default function HomePreviewPage() {
                 Houston-based · 24/7 dispatch · Quotes in under an hour
               </p>
               <h1 id="pv-hero-title" className="pv-reveal">
-                Critical freight,
+                Critical freight.
                 <br />
-                <span className="pv-hero__accent">managed with precision</span>
+                <span className="pv-hero__accent">Every handoff accounted for</span>
                 <span className="headline-stop">.</span>
               </h1>
               <p className="pv-hero__sub pv-reveal">
-                Logistics support for data center, industrial and construction projects, and white-label
-                services for 3PL partners, planned around your project schedule.
+                Built for operations that measure downtime in dollars per minute. From data center
+                switchgear and refinery turnarounds to white-label 3PL execution, we engineer every move
+                around hard install windows, verified equipment, and 24/7 human accountability.
               </p>
               <div className="pv-hero__actions pv-reveal">
                 <RequestCapacityTrigger className="design-button pv-cta">
