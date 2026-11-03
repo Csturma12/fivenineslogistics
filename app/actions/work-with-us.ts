@@ -159,7 +159,7 @@ export async function submitApplication(_prev: ApplicationState, formData: FormD
   try {
     await sendMail({
       fromName: "Five Nines Careers",
-      to: [site.dispatchEmail],
+      to: [...site.teamInbox],
       replyTo: required.email,
       subject: `Application · ${required.role} · ${name}`,
       html,

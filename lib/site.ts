@@ -18,6 +18,9 @@ export const site = {
   dispatchEmail: "dispatch@fivenineslogistics.com", // capacity requests
   onboardingEmail: "dispatch@fivenineslogistics.com", // carrier onboarding
   infoEmail: "dispatch@fivenineslogistics.com", // general questions
+  // Internal inboxes that receive every website/portal notification (quotes, capacity,
+  // applications, document requests, portal access, carrier bids). Never shown publicly.
+  teamInbox: ["dispatch@fivenineslogistics.com", "chriss@primarycompanies.com"],
 }
 
 export type Mode = {

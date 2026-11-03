@@ -2,12 +2,9 @@ import { type NextRequest, NextResponse } from "next/server"
 import { publicOrigin } from "@/lib/public-origin"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendPortalEmail } from "@/lib/portal-mail"
+import { site } from "@/lib/site"
 
-
-// Where new carrier/customer access requests are announced. Temporarily routed to
-// chris@shipfivenines.com while portal email delivery is being sorted out; set the
-// PORTAL_ADMIN_EMAIL env var to override this without a code change.
-const ADMIN_TO = process.env.PORTAL_ADMIN_EMAIL || "chris@shipfivenines.com"
+const ADMIN_TO = site.teamInbox
 
 type Role = "customer" | "carrier"
 
@@ -151,7 +148,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { error: adminMailErr } = await sendPortalEmail({
-    to: [ADMIN_TO],
+      to: [...ADMIN_TO],
     replyTo: email,
     subject: `Portal access request — ${email} (${role})`,
     html: adminEmailHtml({ email, role, fullName, company, requestId }),
