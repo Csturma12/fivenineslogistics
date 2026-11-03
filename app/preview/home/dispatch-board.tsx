@@ -51,10 +51,7 @@ export function DispatchBoard() {
   return (
     <div className="pv-board" aria-label="Example dispatch board">
       <div className="pv-board__head">
-        <span className="pv-board__live">
-          <span className="pv-board__pulse" aria-hidden="true" />
-          Dispatch board
-        </span>
+        <span className="pv-board__live">Sample board</span>
         <span className="pv-board__clock" suppressHydrationWarning>
           {clock ?? "--:--:--"} CT
         </span>
@@ -81,7 +78,7 @@ export function DispatchBoard() {
           );
         })}
       </ul>
-      <p className="pv-board__foot">Sample lanes shown for illustration</p>
+      <p className="pv-board__foot">Example lanes for illustration · not live loads</p>
     </div>
   );
 }

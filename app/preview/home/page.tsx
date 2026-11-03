@@ -131,11 +131,9 @@ export default function HomePreviewPage() {
             </div>
           </div>
           <div className="pv-marquee" aria-label="Operating credentials">
-            <ul className="pv-marquee__track">
-              {[...badges, ...badges].map((badge, index) => (
-                <li key={`${badge}-${index}`} aria-hidden={index >= badges.length || undefined}>
-                  {badge}
-                </li>
+            <ul className="design-container pv-marquee__track">
+              {badges.map((badge) => (
+                <li key={badge}>{badge}</li>
               ))}
             </ul>
           </div>

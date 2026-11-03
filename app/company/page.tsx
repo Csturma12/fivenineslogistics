@@ -21,7 +21,7 @@ export default function CompanyPage() {
     <>
       <SiteHeader />
       <main>
-        <section className="hero-grid border-b border-border">
+        <section className="hero-grid border-b border-border" data-hero="company">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
             <span className="font-mono text-xs uppercase tracking-wider text-primary">
               {companyPage.eyebrow}

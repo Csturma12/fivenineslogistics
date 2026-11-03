@@ -6,6 +6,7 @@ import { RequestCapacityProvider } from "@/components/RequestCapacityDrawer";
 import { WorkWithUsProvider } from "@/components/WorkWithUsDrawer";
 import "./globals.css";
 import "./redesign.css";
+import "./theme-v2.css";
 
 const _geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const _geistMono = Geist_Mono({
