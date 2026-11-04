@@ -73,7 +73,7 @@ export default function WorkWithUsPage() {
     <>
       <SiteHeader />
       <main>
-        <section className="hero-grid border-b border-border">
+        <section className="hero-grid border-b border-border" data-hero="work-with-us">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
             <p className="font-mono text-xs uppercase tracking-wider text-primary">Work With Us</p>
             <h1 className="mt-4 max-w-4xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl">

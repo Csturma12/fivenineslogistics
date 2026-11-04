@@ -29,13 +29,13 @@ export default function ModesPage() {
     <>
       <SiteHeader />
       <main>
-        <section className="hero-grid border-b border-border">
+        <section className="hero-grid border-b border-border" data-hero="capabilities">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
             <span className="font-mono text-xs uppercase tracking-wider text-primary">
               Capabilities
             </span>
             <h1 className="mt-4 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl">
-              Twelve modes. Verified equipment. One tolerance for failure.
+              Twelve transportation modes, supported by verified equipment and carriers.
             </h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
               Owned capacity, affiliated carriers, and a vetted nationwide and

@@ -1,0 +1,111 @@
+/*
+  Theme v2: brings the /preview/home look to every public subpage.
+  To switch back to the previous look, remove the `import "./theme-v2.css"` line in app/layout.tsx.
+*/
+
+/* ---------- Photo hero on every subpage ---------- */
+.hero-grid[data-hero] {
+  --hero-photo: url("/images/home/hero-switchgear-dusk.png");
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 0;
+  background-color: var(--navy);
+  background-image: var(--hero-photo);
+  background-size: cover;
+  background-position: 70% center;
+  color: var(--on-dark-heading);
+}
+.hero-grid[data-hero]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgb(10 28 50 / 78%) 0%, rgb(10 28 50 / 45%) 45%, rgb(10 28 50 / 0%) 80%),
+    linear-gradient(0deg, rgb(10 28 50 / 55%) 0%, transparent 35%);
+}
+.hero-grid[data-hero] h1,
+.hero-grid[data-hero] p {
+  text-shadow: 0 2px 16px rgb(10 28 50 / 55%);
+}
+.hero-grid[data-hero] > div {
+  padding-top: 7rem;
+  padding-bottom: 5rem;
+  animation: v2-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.hero-grid[data-hero="who-we-serve"] { --hero-photo: url("/images/home/sector-plant.png"); }
+.hero-grid[data-hero="capabilities"] { --hero-photo: url("/images/home/sector-construction.png"); }
+.hero-grid[data-hero="carriers"],
+.hero-grid[data-hero="carrier-vetting"] { --hero-photo: url("/images/long-haul.png"); }
+.hero-grid[data-hero="company"] { --hero-photo: url("/images/critical-freight.webp"); }
+.hero-grid[data-hero="consulting"],
+.hero-grid[data-hero="request-documents"] { --hero-photo: url("/images/home/sector-3pl.png"); }
+.hero-grid[data-hero="growth"] { --hero-photo: url("/images/home/sector-data-center.png"); }
+.hero-grid[data-hero="work-with-us"] { --hero-photo: url("/images/home/hero-switchgear-dusk.png"); }
+
+.hero-grid[data-hero] h1 {
+  font-weight: 760;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+.hero-grid[data-hero] .text-foreground { color: var(--on-dark-heading); }
+.hero-grid[data-hero] .text-muted-foreground { color: var(--on-dark-body); }
+.hero-grid[data-hero] .text-primary { color: var(--signal-on-dark); }
+.hero-grid[data-hero] .border-primary { border-color: var(--signal-on-dark); }
+
+/* Buttons inside the dark hero */
+.hero-grid[data-hero] [data-slot="button"] {
+  min-height: 48px;
+  padding-inline: 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  transition: box-shadow 0.25s, transform 0.25s, background 0.2s;
+}
+.hero-grid[data-hero] [data-slot="button"].bg-primary:hover {
+  box-shadow: 0 10px 34px rgb(102 217 162 / 30%);
+  transform: translateY(-2px);
+}
+.hero-grid[data-hero] [data-slot="button"].bg-background {
+  background: transparent;
+  border-color: rgb(255 255 255 / 55%);
+  color: var(--on-dark-heading);
+  backdrop-filter: blur(6px);
+}
+.hero-grid[data-hero] [data-slot="button"].bg-background:hover {
+  background: rgb(255 255 255 / 12%);
+  color: var(--on-dark-heading);
+  transform: translateY(-2px);
+}
+
+/* ---------- Content cards below the hero ---------- */
+main:has(.hero-grid[data-hero]) .rounded-xl.border {
+  border-radius: 6px;
+}
+main:has(.hero-grid[data-hero]) .bg-card {
+  transition: background 0.2s;
+}
+main:has(.hero-grid[data-hero]) .bg-border > .bg-card:hover {
+  background: var(--surface-subtle);
+}
+
+@keyframes v2-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .hero-grid[data-hero]::before {
+    background: rgb(10 28 50 / 78%);
+  }
+  .hero-grid[data-hero] > div {
+    padding-top: 5rem;
+    padding-bottom: 3.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-grid[data-hero] > div { animation: none; }
+  .hero-grid[data-hero] [data-slot="button"] { transition: none; }
+}

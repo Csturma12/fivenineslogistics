@@ -53,7 +53,7 @@ export default function RequestDocumentsPage() {
     <>
       <SiteHeader />
       <main>
-        <section className="hero-grid border-b border-border">
+        <section className="hero-grid border-b border-border" data-hero="request-documents">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
             <span className="font-mono text-xs uppercase tracking-wider text-primary">Compliance &amp; onboarding</span>
             <h1 className="mt-4 max-w-3xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl">

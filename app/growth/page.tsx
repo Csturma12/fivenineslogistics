@@ -101,7 +101,7 @@ export default function GrowthPage() {
     <>
       <SiteHeader />
       <main>
-        <section className="hero-grid border-b border-border">
+        <section className="hero-grid border-b border-border" data-hero="growth">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
             <p className="font-mono text-xs uppercase tracking-wider text-primary">Watch Us Grow</p>
             <h1 className="mt-4 max-w-5xl text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">

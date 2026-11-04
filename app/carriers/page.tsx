@@ -24,7 +24,7 @@ export default function CarriersPage() {
     <>
       <SiteHeader />
       <main>
-        <section className="hero-grid border-b border-border">
+        <section className="hero-grid border-b border-border" data-hero="carriers">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
             <span className="font-mono text-xs uppercase tracking-wider text-primary">
               {carriersPage.eyebrow}

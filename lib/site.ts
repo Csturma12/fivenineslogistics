@@ -491,9 +491,9 @@ export const hubGroups: HubGroup[] = [
 
 export const whoWeServePage = {
   eyebrow: "Who we serve",
-  heading: "Freight for operations that measure downtime in dollars per minute.",
+  heading: "Logistics support for schedule-critical operations.",
   intro:
-    "Every shipper says their freight is important. The teams we work for can name the exact cost of a missed window, because it's already written into a commissioning schedule, a turnaround plan, or a launch date. That is the freight we're built for.",
+  "We serve data center, industrial, construction and logistics organizations whose shipments are tied to commissioning schedules, plant turnarounds and project milestones. Each move is planned around your timeline, documented end to end and managed by a dedicated dispatch team.",
   closing: {
     heading: "One tolerance for failure, whatever you move.",
     body: "Most of what we move ends up at the same place: a plant with a window that will not move. Refractory brick, a run of alloy pipe, a skid of valves, a transformer for a data hall — it's the same job to us. The same method of procedure, the same asset-first sourcing, and the same reporting apply to every load.",
@@ -534,9 +534,9 @@ export const whoWeServeInputs = {
 
 export const companyPage = {
   eyebrow: "Company",
-  heading: "Plant-floor roots. Logistics experience. A team built on trust.",
+  heading: "Industrial experience. Disciplined logistics execution.",
   intro:
-    "Five Nines Logistics is a 3PL for businesses that need freight handled right—with straight answers, careful planning and accountable execution. Operating as an agent of Primary Freight LLC, we bring together owned capacity, affiliated carriers and trusted partners nationwide and globally to coordinate transportation, specialized services and warehousing around the job.",
+    "Five Nines Logistics is a third-party logistics provider for organizations that require precise planning, clear communication and accountable execution. Operating as an agent of Primary Freight LLC, we bring together owned capacity, affiliated carriers and trusted partners nationwide and globally to coordinate transportation, specialized services and warehousing around the job.",
 }
 
 export const companyModel = {
@@ -582,9 +582,9 @@ export const credentials: Credential[] = [
 
 export const carriersPage = {
   eyebrow: "Carriers",
-  heading: "Haul for Five Nines.",
+  heading: "Partner with Five Nines as a carrier.",
   intro:
-    "We move critical freight for shippers who don't tolerate surprises, which means we need carriers who run the same way. If you keep your equipment tight, your communication tighter, and you show up when you said you would, we want you on the bench.",
+  "Our shippers depend on reliable, well-documented service for time-sensitive freight, and we hold our carrier partners to the same standard. We work with carriers who maintain compliant equipment, communicate proactively and meet committed pickup and delivery times.",
 }
 
 export type CarrierBenefit = {
@@ -628,9 +628,9 @@ export const carrierPartners = {
 
 export const vettingPage = {
   eyebrow: "Vetting & fraud prevention",
-  heading: "We know who's picking up your freight.",
+  heading: "Verified carriers for every shipment.",
   intro:
-    "Freight fraud, double-brokering, and cargo theft are at record highs, and a stolen or re-brokered critical load isn't a claim — it's a missed turnaround window with a crew standing idle. We vet every carrier with Highway and multiple layers on top of it, but the layer that actually protects your freight is the oldest one: we know the people driving it.",
+  "Freight fraud, double-brokering and cargo theft remain significant risks across the industry, and for schedule-critical freight the cost extends well beyond a claim. Every carrier is verified through Highway and additional internal controls, and we maintain direct, established relationships with the people handling your freight.",
 }
 
 export const vettingSignature = {
