@@ -96,6 +96,9 @@ main:has(.hero-grid[data-hero]) .bg-border > .bg-card:hover {
 }
 
 @media (max-width: 640px) {
+  .hero-grid[data-hero]::before {
+    background: rgb(10 28 50 / 78%);
+  }
   .hero-grid[data-hero] > div {
     padding-top: 5rem;
     padding-bottom: 3.5rem;

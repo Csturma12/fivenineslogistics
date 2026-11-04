@@ -17,6 +17,7 @@ const groups = [
     label: "Five Nines",
     links: [
       { href: "/company", label: "Our company" },
+      { href: "/company/crew", label: "Our team" },
       { href: "/who-we-serve", label: "Who we serve" },
       { href: "/growth", label: "Our growth" },
       { href: "/work-with-us", label: "Work with us", apply: true },

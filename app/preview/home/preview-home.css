@@ -17,7 +17,7 @@
 .pv-hero {
   position: relative;
   isolation: isolate;
-  min-height: min(820px, 92vh);
+  min-height: min(700px, 82vh);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -44,7 +44,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 48px;
-  padding-block: 140px 56px;
+  padding-block: 96px 64px;
 }
 .pv-hero__copy {
   display: flex;
@@ -56,7 +56,7 @@
   color: var(--signal-on-dark);
 }
 .pv-hero h1 {
-  font-size: clamp(2.8rem, 6vw, 5.8rem);
+  font-size: clamp(2.5rem, 5vw, 4.6rem);
   font-weight: 760;
   letter-spacing: -0.058em;
   line-height: 0.98;
@@ -133,8 +133,9 @@
 .pv-hero__copy > .pv-reveal:nth-child(5) { animation-delay: 0.36s; }
 .pv-hero__board.pv-reveal { animation-delay: 0.45s; }
 
+/* Transform-only so hero text stays readable even if the animation stalls or never runs. */
 @keyframes pv-rise {
-  from { opacity: 0; transform: translateY(18px); }
+  from { transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
 @keyframes pv-drift {
@@ -309,17 +310,87 @@
   border-left: 0;
   padding-left: 0;
 }
-.pv-proof strong {
-  font-size: clamp(2rem, 3.4vw, 3rem);
-  font-weight: 760;
-  letter-spacing: -0.045em;
-  line-height: 1;
+.pv-proof__grid {
+  margin-block: 0;
+}
+.pv-proof dt {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--signal-on-dark);
 }
-.pv-proof span {
+.pv-proof dd {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--on-dark-heading);
+}
+.pv-proof__note {
+  padding-block: 0 32px;
+  max-width: 760px;
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--on-dark-body);
+}
+
+/* ---------- Services ---------- */
+.pv-services {
+  padding-block: 96px;
+  border-top: 1px solid var(--line);
+}
+.pv-services__list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.pv-services__list li {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 28px 24px 28px 0;
+  border-bottom: 1px solid var(--line);
+}
+.pv-services__list h3 {
+  font-size: 1.15rem;
+  font-weight: 720;
+  letter-spacing: -0.02em;
+}
+.pv-services__list p {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+
+/* ---------- People ---------- */
+.pv-people {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 48px;
+  align-items: end;
+  padding-block: 96px;
+}
+.pv-people h2 {
+  font-size: clamp(1.9rem, 3.4vw, 3rem);
+  font-weight: 740;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+.pv-people__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+.pv-people__body p {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--muted-foreground);
 }
 
 /* ---------- Sectors (photo cards) ---------- */
@@ -407,11 +478,21 @@
 }
 .pv-steps__list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   list-style: none;
   padding: 0;
   margin: 0;
+}
+.pv-steps__list li:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  top: 50%;
+  right: -14px;
+  transform: translateY(-50%);
+  z-index: 1;
+  font-weight: 700;
+  color: var(--signal-text);
 }
 .pv-steps__list li {
   display: flex;
@@ -525,11 +606,17 @@
 }
 @media (max-width: 900px) {
   .pv-proof__grid,
-  .pv-sectors {
+  .pv-sectors,
+  .pv-services__list,
+  .pv-steps__list {
     grid-template-columns: repeat(2, 1fr);
   }
-  .pv-steps__list {
+  .pv-steps__list li::after {
+    display: none;
+  }
+  .pv-people {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
   .pv-proof__grid > div:nth-child(3) {
     border-left: 0;
@@ -545,8 +632,13 @@
     padding-block: 104px 40px;
   }
   .pv-proof__grid,
-  .pv-sectors {
+  .pv-sectors,
+  .pv-services__list,
+  .pv-steps__list {
     grid-template-columns: 1fr;
+  }
+  .pv-hero__shade {
+    background: linear-gradient(0deg, rgb(10 28 50 / 88%) 0%, rgb(10 28 50 / 62%) 60%, rgb(10 28 50 / 40%) 100%);
   }
   .pv-sector {
     min-height: 340px;

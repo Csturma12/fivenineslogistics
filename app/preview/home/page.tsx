@@ -4,11 +4,8 @@ import Image from "next/image";
 import { ArrowRight, ArrowUpRight, Phone } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { MissionCriticalExecutions } from "@/components/mission-critical-executions";
 import { RequestCapacityTrigger } from "@/components/request-capacity-trigger";
-import { WorkWithUsTrigger } from "@/components/work-with-us-trigger";
 import { site } from "@/lib/site";
-import { DispatchBoard } from "./dispatch-board";
 import "./preview-home.css";
 
 export const metadata: Metadata = {
@@ -16,22 +13,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const badges = [
-  "MC# 841023 / DOT# 2436508",
-  "1-Hour Spot Quote SLA",
-  "TWIC & Plant-PPE Verified",
-  "Zero Double-Brokering",
-  "24/7 Live Dispatch",
-  "50 States + MX/CA",
-  "BMC-84 Bonded",
-  "Backed by Primary Freight",
-];
-
-const proof = [
-  { value: "24/7", label: "Live human dispatch, nights and weekends included" },
-  { value: "< 1 hr", label: "Spot quote turnaround, every request" },
-  { value: "50 + 2", label: "All 50 states plus Mexico and Canada" },
-  { value: "20+ yrs", label: "Plant-floor and North American logistics experience" },
+const credentials = [
+  { label: "Broker authority", value: "Primary Freight LLC" },
+  { label: "MC / DOT", value: "MC# 841023 · DOT# 2436508" },
+  { label: "Surety bond", value: "BMC-84 held by Primary Freight LLC" },
+  { label: "Base of operations", value: "Houston, Texas" },
 ];
 
 const sectors = [
@@ -56,23 +42,36 @@ const sectors = [
   {
     image: "/images/home/sector-3pl.png",
     title: "3PLs & forwarders",
-    description: "White-label OOG transload, heavy haul and jobsite flatbed under blind BOLs.",
+    description: "Domestic execution for OOG transload, heavy haul and jobsite flatbed moves.",
     href: "/who-we-serve#3pl-partners",
   },
 ];
 
+const services = [
+  { name: "Flatbed & open deck", detail: "Flatbed, step deck and RGN for equipment and materials." },
+  { name: "Oversize & heavy haul", detail: "Permitted moves coordinated with escorts and site access." },
+  { name: "Expedited & hotshot", detail: "Time-sensitive parts and line-down freight." },
+  { name: "Drayage & transload", detail: "Port and rail moves through Gulf Coast gateways." },
+  { name: "Dry van & LTL", detail: "Palletized and general freight to plants and job sites." },
+  { name: "Warehousing", detail: "Staging and storage ahead of a scheduled install." },
+];
+
 const steps = [
   {
-    title: "Define the requirement",
-    description: "Share the lane, freight details and required delivery window. Our dispatch team is available 24/7.",
+    title: "Request",
+    description: "Share the lane, freight dimensions and the delivery window you are working toward.",
   },
   {
-    title: "Receive a formal quote",
-    description: "Within one hour, a priced plan covering equipment, permits and a verified carrier assignment.",
+    title: "Plan",
+    description: "We review equipment, permits and site requirements, then return a written quote.",
   },
   {
-    title: "Managed through delivery",
-    description: "Status updates at every milestone, with signed proof of delivery available in your portal.",
+    title: "Dispatch",
+    description: "Once approved, we assign a vetted carrier and confirm pickup and delivery details.",
+  },
+  {
+    title: "Delivery",
+    description: "Milestone updates through delivery, with paperwork returned when the move closes.",
   },
 ];
 
@@ -99,7 +98,7 @@ export default function HomePreviewPage() {
             <div className="pv-hero__copy">
               <p className="eyebrow pv-reveal">
                 <span className="brand-node" aria-hidden="true" />
-                Houston-based · 24/7 dispatch · Quotes in under an hour
+                Inspired by 99.999% reliability
               </p>
               <h1 id="pv-hero-title" className="pv-reveal">
                 Critical freight.
@@ -109,8 +108,8 @@ export default function HomePreviewPage() {
               </h1>
               <p className="pv-hero__sub pv-reveal">
                 Built for operations that measure downtime in dollars per minute. From data center
-                switchgear and refinery turnarounds to white-label 3PL execution, we engineer every move
-                around hard install windows, verified equipment, and 24/7 human accountability.
+                switchgear and refinery turnarounds to white-label 3PL execution, we plan every move
+                around hard install windows, the right equipment and clear accountability.
               </p>
               <div className="pv-hero__actions pv-reveal">
                 <RequestCapacityTrigger className="design-button pv-cta">
@@ -124,31 +123,26 @@ export default function HomePreviewPage() {
               </div>
               <a href={site.phoneHref} className="pv-hero__call pv-reveal">
                 <Phone size={16} aria-hidden="true" />
-                24/7 dispatch <strong>{site.phone}</strong>
+                Dispatch <strong>{site.phone}</strong>
               </a>
             </div>
-            <div className="pv-hero__board pv-reveal">
-              <DispatchBoard />
-            </div>
-          </div>
-          <div className="pv-marquee" aria-label="Operating credentials">
-            <ul className="design-container pv-marquee__track">
-              {badges.map((badge) => (
-                <li key={badge}>{badge}</li>
-              ))}
-            </ul>
           </div>
         </section>
 
-        <section className="pv-proof" aria-label="Five Nines at a glance">
-          <div className="design-container pv-proof__grid">
-            {proof.map((item) => (
-              <div key={item.value}>
-                <strong>{item.value}</strong>
-                <span>{item.label}</span>
+        <section className="pv-proof" aria-label="Authority and credentials">
+          <dl className="design-container pv-proof__grid">
+            {credentials.map((item) => (
+              <div key={item.label}>
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
               </div>
             ))}
-          </div>
+          </dl>
+          <p className="design-container pv-proof__note">
+            Five Nines Logistics operates as an agent of Primary Freight LLC. Customer freight is arranged
+            under Primary Freight&apos;s broker authority, and the operating carrier is identified on the
+            shipment documents.
+          </p>
         </section>
 
         <section className="design-section design-container" aria-labelledby="pv-industries-title">
@@ -189,27 +183,48 @@ export default function HomePreviewPage() {
           </div>
         </section>
 
+        <section className="pv-services" aria-labelledby="pv-services-title">
+          <div className="design-container">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">Capabilities</p>
+                <h2 id="pv-services-title">
+                  Equipment and services
+                  <br />
+                  matched to the freight.
+                </h2>
+              </div>
+              <Link href="/capabilities" className="text-link">
+                Full capabilities
+                <ArrowRight size={17} aria-hidden="true" />
+              </Link>
+            </div>
+            <ul className="pv-services__list">
+              {services.map((service) => (
+                <li key={service.name}>
+                  <h3>{service.name}</h3>
+                  <p>{service.detail}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
         <section className="pv-steps" aria-labelledby="pv-steps-title">
           <div className="design-container">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">Our process</p>
+                <p className="eyebrow">How it works</p>
                 <h2 id="pv-steps-title">
-                  From initial request
+                  From request
                   <br />
-                  to proof of delivery.
+                  to delivery.
                 </h2>
               </div>
-              <p className="pv-standard-line">
-                Five nines means <span>99.999%.</span> The standard we plan every shipment to.
-              </p>
             </div>
             <ol className="pv-steps__list">
-              {steps.map((step, index) => (
+              {steps.map((step) => (
                 <li key={step.title}>
-                  <span className="pv-steps__index" aria-hidden="true">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
                   <h3>{step.title}</h3>
                   <p>{step.description}</p>
                 </li>
@@ -218,7 +233,26 @@ export default function HomePreviewPage() {
           </div>
         </section>
 
-        <MissionCriticalExecutions />
+        <section className="pv-people design-container" aria-labelledby="pv-people-title">
+          <div>
+            <p className="eyebrow">Our team</p>
+            <h2 id="pv-people-title">
+              Plant-floor experience.
+              <br />
+              Freight handled with accountability.
+            </h2>
+          </div>
+          <div className="pv-people__body">
+            <p>
+              Our team knows both sides of the delivery: the work inside the facility and the freight that
+              supports it. Get to know the people behind Five Nines.
+            </p>
+            <Link href="/company/crew" className="text-link">
+              Meet our crew
+              <ArrowRight size={17} aria-hidden="true" />
+            </Link>
+          </div>
+        </section>
 
         <section className="pv-closing" aria-labelledby="pv-closing-title">
           <Image
@@ -237,7 +271,7 @@ export default function HomePreviewPage() {
                 <br />
                 critical shipment.
               </h2>
-              <p>Provide the freight details, lane and delivery window, and our team will prepare a complete transportation plan.</p>
+              <p>Share the freight details, lane and delivery window, and our team will follow up with a plan and a quote.</p>
             </div>
             <div className="pv-closing__actions">
               <RequestCapacityTrigger className="design-button pv-cta">
@@ -245,19 +279,18 @@ export default function HomePreviewPage() {
                 <ArrowUpRight size={20} aria-hidden="true" />
               </RequestCapacityTrigger>
               <a href={site.phoneHref}>{site.phone}</a>
-              <span>Dispatch available 24 hours a day.</span>
             </div>
           </div>
         </section>
 
         <div className="carrier-strip design-container">
           <span>
-            <strong>Carrier partnerships.</strong> Qualified carriers are invited to work with Five Nines.
+            <strong>Carrier partnerships.</strong> Qualified carriers are invited to haul with Five Nines.
           </span>
-          <WorkWithUsTrigger className="text-link">
-            Career opportunities
+          <Link href="/carriers" className="text-link">
+            Join our carrier network
             <ArrowRight size={18} aria-hidden="true" />
-          </WorkWithUsTrigger>
+          </Link>
         </div>
       </main>
       <SiteFooter />
