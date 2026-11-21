@@ -16,6 +16,7 @@ import { FiveNinesFlatbedMark } from "@/components/five-nines-flatbed-mark"
 import { createClient } from "@/lib/supabase/client"
 import { RequestCapacityTrigger } from "@/components/request-capacity-trigger"
 import { isAgentDeskEmail } from "@/lib/portal-access-policy"
+import { portalLoginEmail } from "@/lib/portal-username"
 
 type Role = "customer" | "carrier" | "staff"
 type Mode = "signin" | "register"
@@ -70,7 +71,7 @@ function messageForSignIn(raw: string): string {
     return "Too many attempts. Wait a minute and try again."
   }
   if (/invalid login|invalid credentials|invalid/i.test(raw)) {
-    return "Invalid email or password."
+    return "Invalid username, email or password."
   }
   return "We couldn't sign you in. Try again."
 }
@@ -96,7 +97,10 @@ export function PortalSignIn({ role }: { role: Role }) {
 
   async function handleSignIn() {
     const supabase = createClient()
-    const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
+    const { error: signInErr } = await supabase.auth.signInWithPassword({
+      email: portalLoginEmail(email),
+      password,
+    })
     if (signInErr) {
       setStatus("error")
       setError(messageForSignIn(signInErr.message))
@@ -340,12 +344,13 @@ export function PortalSignIn({ role }: { role: Role }) {
             <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
               <label className="flex flex-col gap-1.5">
                 <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Work email
+                  {mode === "signin" && role === "customer" ? "Username or work email" : "Work email"}
                 </span>
                 <input
-                  type="email"
+                  type={mode === "signin" && role === "customer" ? "text" : "email"}
                   required
-                  autoComplete="email"
+                  autoCapitalize="none"
+                  autoComplete={mode === "signin" ? "username" : "email"}
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder={copy.emailPlaceholder}
