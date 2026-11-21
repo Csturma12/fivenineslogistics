@@ -89,16 +89,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-background">
-      <head>
+      <body
+        className={`${_geistSans.variable} ${_geistMono.variable} antialiased font-sans`}
+      >
+        {/* Rendered in body: tools that inject scripts into <head> would otherwise cause a hydration mismatch. */}
         <script
           type="application/ld+json"
           // JSON-LD is static, server-rendered data; it never includes user input.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
-      </head>
-      <body
-        className={`${_geistSans.variable} ${_geistMono.variable} antialiased font-sans`}
-      >
         <RequestCapacityProvider>
           <WorkWithUsProvider>{children}</WorkWithUsProvider>
         </RequestCapacityProvider>
