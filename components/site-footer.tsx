@@ -106,7 +106,8 @@ export function SiteFooter() {
             </span>
             <span>
               <Link href="/request-documents">W-9, COI & authority packet</Link> ·
-              Zero double-brokering policy.
+              Zero double-brokering policy. ·{" "}
+              <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link>
             </span>
           </div>
         </div>
