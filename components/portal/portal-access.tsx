@@ -71,7 +71,7 @@ function messageForSignIn(raw: string): string {
     return "Too many attempts. Wait a minute and try again."
   }
   if (/invalid login|invalid credentials|invalid/i.test(raw)) {
-    return "Invalid username, email or password."
+    return "Invalid email or password."
   }
   return "We couldn't sign you in. Try again."
 }
@@ -344,9 +344,11 @@ export function PortalSignIn({ role }: { role: Role }) {
             <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
               <label className="flex flex-col gap-1.5">
                 <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                  {mode === "signin" && role === "customer" ? "Username or work email" : "Work email"}
+                  Work email
                 </span>
                 <input
+                  // Still "text" for customer sign-in so the old name logins keep working
+                  // until the TAI contact import replaces them with email logins.
                   type={mode === "signin" && role === "customer" ? "text" : "email"}
                   required
                   autoCapitalize="none"

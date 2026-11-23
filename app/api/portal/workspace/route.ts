@@ -1,4 +1,4 @@
-import { after } from "next/server";
+import { after, NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { portalView } from "@/lib/portal-view";
 import { allPortalRowsAtVersion, carrierEligibilityKey, comparePickupDate, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
@@ -27,6 +27,9 @@ import {
 import { syncOpenLoads, taiCarrierRates } from "@/lib/portal-load-sync";
 import { pickupWindow } from "@/lib/portal-load-window";
 import { isTaiTrailerType } from "@/lib/tai-equipment";
+import { publicOrigin } from "@/lib/public-origin";
+import { sendPortalEmail } from "@/lib/portal-mail";
+import { ContactProblem, parseCustomerInput, provisionCustomer } from "@/lib/portal-customer-contacts";
 
 export const dynamic = "force-dynamic";
 const LOAD_FIELDS =
@@ -506,6 +509,28 @@ export async function POST(request: Request) {
           .update({ status: "completed" })
           .eq("id", uuid(body.id)),
       );
+    } else if (action === "add_customer") {
+      // TAI-style: a customer is saved with its contacts, and each contact gets a login.
+      if (!staff) throw new PortalProblem("Agent desk access required.", 403);
+      let input;
+      try {
+        input = parseCustomerInput(body);
+      } catch (e) {
+        if (e instanceof ContactProblem) throw new PortalProblem(e.message);
+        throw e;
+      }
+      const contacts = await provisionCustomer(db, input, {
+        origin: publicOrigin(new NextRequest(request)),
+        send: sendPortalEmail,
+      });
+      const failed = contacts.filter((c) => c.status === "failed" || !c.invited);
+      return Response.json({
+        ok: failed.length === 0,
+        contacts,
+        message: failed.length
+          ? `Saved ${contacts.length - failed.length} of ${contacts.length}. Check the contacts marked below.`
+          : `Saved ${input.company} with ${contacts.length} contact${contacts.length === 1 ? "" : "s"}. Each one was emailed a link to choose a password.`,
+      });
     } else if (action === "retry_notifications") {
       if (!staff) throw new PortalProblem("Agent desk access required.", 403);
     } else throw new PortalProblem("Unknown action.");
