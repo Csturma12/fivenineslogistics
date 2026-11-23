@@ -67,8 +67,8 @@ export function inviteEmailHtml(input: { name: string; company: string; url: str
       <div style="padding:24px;color:#1b2430;font-size:14px;line-height:1.6;">
         <p style="margin:0 0 12px;font-size:16px;font-weight:600;color:#16233a;">Your Five Nines customer portal login is ready.</p>
         <p style="margin:0 0 20px;">Hi ${esc(input.name)}, we set up portal access for you at ${esc(input.company)}. Your login is this email address. Click below to choose your password, then sign in anytime to see your shipments and send us requests.</p>
-        <a href="${input.url}" style="display:inline-block;background:#16233a;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;">Choose my password</a>
-        <p style="margin:20px 0 0;color:#8a94a3;font-size:12px;">This link expires soon. If it has, go to <a href="${input.signInUrl}" style="color:#8a94a3;">${esc(input.signInUrl)}</a>, enter this email and choose "Forgot password".</p>
+        <a href="${esc(input.url)}" style="display:inline-block;background:#16233a;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;">Choose my password</a>
+        <p style="margin:20px 0 0;color:#8a94a3;font-size:12px;">This link expires soon. If it has, go to <a href="${esc(input.signInUrl)}" style="color:#8a94a3;">${esc(input.signInUrl)}</a>, enter this email and choose "Forgot password".</p>
       </div>
       <div style="padding:16px 24px;border-top:1px solid #eef1f5;color:#8a94a3;font-size:11px;line-height:1.5;">
         Five Nines Logistics · Agent of Primary Freight LLC · MC# 841023 · Houston, TX

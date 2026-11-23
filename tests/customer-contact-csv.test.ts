@@ -24,7 +24,19 @@ test("contact export groups contacts under their TAI customer", () => {
       { name: "Sam Ortiz", email: "sam@acme.example", phone: "" },
     ],
   });
+  assert.deepEqual(out.customers[1], {
+    company: "Blue Kiln Co",
+    accountId: "1302",
+    contacts: [{ name: "Pat Kim", email: "pat@bluekiln.example", phone: "555-0102" }],
+  });
   assert.deepEqual(out.skipped.map((s) => s.line), [5, 6, 7]);
+});
+
+test("skipped rows keep their spreadsheet row numbers across blank lines", () => {
+  const out = customersFromCsv("Company,Customer ID,Contact Name,Email\n\nAcme,1201,,a@acme.example\n");
+  assert.deepEqual(out.skipped, [{ line: 3, reason: "a@acme.example: no contact name" }]);
+  assert.deepEqual(customersFromCsv("Company,Customer ID,Last Name,Email\n").missingColumns, []);
+  assert.deepEqual(customersFromCsv("").missingColumns, ["company", "TAI customer ID", "email", "contact name"]);
 });
 
 test("contact export reports the columns it could not find", () => {

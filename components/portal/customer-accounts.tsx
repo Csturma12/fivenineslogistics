@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Workspace } from "@/lib/portal-contract";
 import { readPortalBody } from "@/lib/portal-upload-client";
 import { customersFromCsv, type CsvResult } from "@/lib/customer-contact-csv";
@@ -35,6 +35,7 @@ export function CustomerAccounts({ data, onSaved, preview = false }: { data: Wor
   const [notice, setNotice] = useState("");
   const [outcomes, setOutcomes] = useState<Outcome[]>([]);
   const [file, setFile] = useState<CsvResult | null>(null);
+  const pickToken = useRef(0);
 
   const customers = new Map<string, { company: string; people: NonNullable<Workspace["profiles"]> }>();
   for (const p of data.customerContacts || data.profiles || []) {
@@ -142,9 +143,13 @@ export function CustomerAccounts({ data, onSaved, preview = false }: { data: Wor
           accept=".csv,.txt,text/csv"
           className={input}
           disabled={busy}
+          aria-label="TAI customer contacts CSV file"
           onChange={async (e) => {
+            // Ignore a slower parse of an earlier pick so the preview always matches the latest file.
+            const token = ++pickToken.current;
             const picked = e.target.files?.[0];
-            setFile(picked ? customersFromCsv(await picked.text()) : null);
+            const parsed = picked ? customersFromCsv(await picked.text()) : null;
+            if (token === pickToken.current) setFile(parsed);
           }}
         />
         {file ? (
@@ -164,7 +169,7 @@ export function CustomerAccounts({ data, onSaved, preview = false }: { data: Wor
                 ))}
               </ul>
             ) : null}
-            <button type="button" className={button} disabled={busy || !file.customers.length} onClick={() => void importFile()}>
+            <button type="button" className={button} disabled={busy || !!file.missingColumns.length || !file.customers.length} onClick={() => void importFile()}>
               {busy ? "Importing…" : "Import and send logins"}
             </button>
           </div>

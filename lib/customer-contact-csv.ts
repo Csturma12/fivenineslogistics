@@ -36,14 +36,18 @@ export function parseCsv(textIn: string): string[][] {
     } else cell += ch
   }
   if (cell || row.length) { row.push(cell); rows.push(row) }
-  return rows.filter((r) => r.some((c) => c.trim()))
+  // Blank rows are kept so skip messages point at the real spreadsheet row.
+  return rows
 }
 
 const norm = (s: string) => s.trim().toLowerCase().replace(/[_\s]+/g, " ")
 
 export function customersFromCsv(text: string): CsvResult {
-  const [header, ...rows] = parseCsv(text)
-  if (!header) return { customers: [], skipped: [], missingColumns: ["company", "email"] }
+  const all = parseCsv(text)
+  const start = all.findIndex((r) => r.some((c) => c.trim()))
+  const header = start < 0 ? undefined : all[start]
+  if (!header) return { customers: [], skipped: [], missingColumns: ["company", "TAI customer ID", "email", "contact name"] }
+  const rows = all.slice(start + 1)
   const heads = header.map(norm)
   const col = (key: keyof typeof ALIASES) => heads.findIndex((h) => ALIASES[key].includes(h))
   const at = { company: col("company"), accountId: col("accountId"), name: col("name"), first: col("first"), last: col("last"), email: col("email"), phone: col("phone") }
@@ -51,13 +55,14 @@ export function customersFromCsv(text: string): CsvResult {
     at.company < 0 ? "company" : "",
     at.accountId < 0 ? "TAI customer ID" : "",
     at.email < 0 ? "email" : "",
-    at.name < 0 && at.first < 0 ? "contact name" : "",
+    at.name < 0 && at.first < 0 && at.last < 0 ? "contact name" : "",
   ].filter(Boolean)
   const byAccount = new Map<string, CustomerInput>()
   const skipped: CsvSkip[] = []
   const seen = new Set<string>()
   rows.forEach((r, i) => {
-    const line = i + 2
+    const line = start + i + 2
+    if (!r.some((c) => c.trim())) return
     const get = (n: number) => (n >= 0 ? (r[n] || "").trim() : "")
     const email = get(at.email).toLowerCase()
     const company = get(at.company)
@@ -65,11 +70,12 @@ export function customersFromCsv(text: string): CsvResult {
     const name = get(at.name) || [get(at.first), get(at.last)].filter(Boolean).join(" ")
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return skipped.push({ line, reason: email ? `"${email}" is not an email` : "no email" })
     if (!/^\d+$/.test(accountId)) return skipped.push({ line, reason: `${email}: no TAI customer ID` })
+    if (!name) return skipped.push({ line, reason: `${email}: no contact name` })
     if (seen.has(email)) return skipped.push({ line, reason: `${email} is listed twice` })
     seen.add(email)
     const entry = byAccount.get(accountId) || { company, accountId, contacts: [] }
     if (!entry.company) entry.company = company
-    entry.contacts.push({ name: name || email, email, phone: get(at.phone) })
+    entry.contacts.push({ name, email, phone: get(at.phone) })
     byAccount.set(accountId, entry)
   })
   const customers = [...byAccount.values()].filter((c) => {

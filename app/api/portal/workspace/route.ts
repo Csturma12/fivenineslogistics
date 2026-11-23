@@ -533,6 +533,7 @@ export async function POST(request: Request) {
         send: sendPortalEmail,
       });
       const failed = contacts.filter((c) => c.status === "failed" || !c.invited);
+      after(flushNotifications);
       return Response.json({
         ok: failed.length === 0,
         contacts,
@@ -555,6 +556,7 @@ export async function POST(request: Request) {
         { origin: publicOrigin({ headers: request.headers, nextUrl: new URL(request.url) }), send: sendPortalEmail },
       );
       if (!sent.invited) throw new PortalProblem(sent.message || "The login email could not be sent.", 502);
+      after(flushNotifications);
       return Response.json({ ok: true, message: `Login email sent to ${email}.` });
     } else if (action === "retry_notifications") {
       if (!staff) throw new PortalProblem("Agent desk access required.", 403);
