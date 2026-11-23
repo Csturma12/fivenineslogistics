@@ -26,7 +26,7 @@ async function addCustomer(body: { company: string; accountId: string; contacts:
  * plus at least one contact, and each contact gets an email login and an invite
  * to choose a password.
  */
-export function CustomerAccounts({ data, onSaved }: { data: Workspace; onSaved: () => void }) {
+export function CustomerAccounts({ data, onSaved, preview = false }: { data: Workspace; onSaved: () => void; preview?: boolean }) {
   const [company, setCompany] = useState("");
   const [accountId, setAccountId] = useState("");
   const [contacts, setContacts] = useState<Contact[]>([blank()]);
@@ -37,7 +37,7 @@ export function CustomerAccounts({ data, onSaved }: { data: Workspace; onSaved: 
   const [file, setFile] = useState<CsvResult | null>(null);
 
   const customers = new Map<string, { company: string; people: NonNullable<Workspace["profiles"]> }>();
-  for (const p of data.profiles || []) {
+  for (const p of data.customerContacts || data.profiles || []) {
     if (p.role !== "customer" || !p.customer_account_id) continue;
     const key = p.customer_account_id;
     const entry = customers.get(key) || { company: p.company, people: [] };
@@ -48,7 +48,35 @@ export function CustomerAccounts({ data, onSaved }: { data: Workspace; onSaved: 
   const setContact = (i: number, patch: Partial<Contact>) =>
     setContacts((rows) => rows.map((row, n) => (n === i ? { ...row, ...patch } : row)));
 
+  const previewBlocked = () => {
+    if (preview) setError("Test mode: nothing was saved and no emails were sent.");
+    return preview;
+  };
+
+  async function resend(email: string) {
+    if (previewBlocked()) return;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    setOutcomes([]);
+    try {
+      const res = await fetch("/api/portal/workspace", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "resend_customer_invite", email }),
+      });
+      const result = (await readPortalBody(res)) as { error?: string; message?: string };
+      if (!res.ok) throw new Error(String(result.error || "Could not send. Try again."));
+      setNotice(String(result.message || "Sent."));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Connection failed. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function run(body: { company: string; accountId: string; contacts: Contact[] }, reset: boolean) {
+    if (previewBlocked()) return;
     setBusy(true);
     setError("");
     setNotice("");
@@ -71,22 +99,28 @@ export function CustomerAccounts({ data, onSaved }: { data: Workspace; onSaved: 
   }
 
   async function importFile() {
-    if (!file?.customers.length) return;
+    if (!file?.customers.length || previewBlocked()) return;
     setBusy(true);
     setError("");
     setNotice("");
     setOutcomes([]);
     const problems: Outcome[] = [];
     let saved = 0;
+    // Small batches keep each request under the server's contact and size limits.
+    const BATCH = 20;
     for (const customer of file.customers) {
-      try {
-        const res = await addCustomer(customer);
-        for (const c of res.contacts) {
-          if (c.status === "failed" || !c.invited) problems.push(c);
-          else saved++;
+      for (let i = 0; i < customer.contacts.length; i += BATCH) {
+        const contacts = customer.contacts.slice(i, i + BATCH);
+        try {
+          const res = await addCustomer({ ...customer, contacts });
+          for (const c of res.contacts) {
+            if (c.status === "failed" || !c.invited) problems.push(c);
+            else saved++;
+          }
+        } catch (e) {
+          const message = e instanceof Error ? e.message : "failed";
+          for (const c of contacts) problems.push({ email: c.email, status: "failed", invited: false, message });
         }
-      } catch (e) {
-        problems.push({ email: customer.company, status: "failed", invited: false, message: e instanceof Error ? e.message : "failed" });
       }
     }
     setNotice(`Import finished: ${saved} contact${saved === 1 ? "" : "s"} saved and emailed.`);
@@ -231,16 +265,7 @@ export function CustomerAccounts({ data, onSaved }: { data: Workspace; onSaved: 
                         type="button"
                         className={secondary}
                         disabled={busy}
-                        onClick={() =>
-                          void run(
-                            {
-                              company: entry.company,
-                              accountId: id,
-                              contacts: [{ name: String(p.details?.contact || p.email), email: p.email, phone: String(p.details?.phone || "") }],
-                            },
-                            false,
-                          )
-                        }
+                        onClick={() => void resend(p.email)}
                       >
                         Resend login email
                       </button>

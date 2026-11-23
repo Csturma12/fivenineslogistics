@@ -29,7 +29,7 @@ import { pickupWindow } from "@/lib/portal-load-window";
 import { isTaiTrailerType } from "@/lib/tai-equipment";
 import { publicOrigin } from "@/lib/public-origin";
 import { sendPortalEmail } from "@/lib/portal-mail";
-import { ContactProblem, parseCustomerInput, provisionCustomer } from "@/lib/portal-customer-contacts";
+import { ContactProblem, parseCustomerInput, provisionCustomer, sendCustomerInvite } from "@/lib/portal-customer-contacts";
 
 export const dynamic = "force-dynamic";
 const LOAD_FIELDS =
@@ -85,6 +85,7 @@ export async function GET(request: Request) {
         requests,
         notifications,
         loads,
+        customerContacts,
       ] = await Promise.all([
         db
           .from("fn_profiles")
@@ -122,6 +123,13 @@ export async function GET(request: Request) {
           .select(`${LOAD_FIELDS},external_id`)
           .order("updated_at", { ascending: false })
           .limit(200),
+        db
+          .from("fn_profiles")
+          .select("user_id,email,role,company,details,status,customer_account_id,version,updated_at")
+          .eq("role", "customer")
+          .not("customer_account_id", "is", null)
+          .order("company")
+          .limit(5000),
       ]);
       return Response.json(
         {
@@ -133,6 +141,7 @@ export async function GET(request: Request) {
           requests: result(requests),
           notifications: result(notifications),
           loads: result(loads),
+          customerContacts: result(customerContacts),
         },
         { headers: { "Cache-Control": "private, no-store" } },
       );
@@ -531,6 +540,22 @@ export async function POST(request: Request) {
           ? `Saved ${contacts.length - failed.length} of ${contacts.length}. Check the contacts marked below.`
           : `Saved ${input.company} with ${contacts.length} contact${contacts.length === 1 ? "" : "s"}. Each one was emailed a link to choose a password.`,
       });
+    } else if (action === "resend_customer_invite") {
+      // Email only: never changes the contact's status, so a suspended login stays suspended.
+      if (!staff) throw new PortalProblem("Agent desk access required.", 403);
+      const email = text(body.email, 254).toLowerCase();
+      const p = result(
+        await db.from("fn_profiles").select("role,status,company,details").eq("email", email).maybeSingle(),
+      ) as { role: string; status: string; company: string; details: Record<string, unknown> } | null;
+      if (!p || p.role !== "customer") throw new PortalProblem("No customer login for that email.", 404);
+      if (p.status === "suspended") throw new PortalProblem("That login is suspended. Re-approve it before sending a login email.");
+      const sent = await sendCustomerInvite(
+        db,
+        { email, name: String(p.details?.contact || email), company: p.company },
+        { origin: publicOrigin({ headers: request.headers, nextUrl: new URL(request.url) }), send: sendPortalEmail },
+      );
+      if (!sent.invited) throw new PortalProblem(sent.message || "The login email could not be sent.", 502);
+      return Response.json({ ok: true, message: `Login email sent to ${email}.` });
     } else if (action === "retry_notifications") {
       if (!staff) throw new PortalProblem("Agent desk access required.", 403);
     } else throw new PortalProblem("Unknown action.");

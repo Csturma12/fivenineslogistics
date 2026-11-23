@@ -331,7 +331,7 @@ export function PortalWorkspace({
               </button>
             </div>
             {desk && selected === "Customers & logins" ? (
-              <CustomerAccounts data={data} onSaved={() => void refresh(true).catch(() => undefined)} />
+              <CustomerAccounts data={data} preview={!!previewData} onSaved={() => void refresh(true).catch(() => undefined)} />
             ) : desk ? (
               <WorkspaceDesk
                 data={data}

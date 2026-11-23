@@ -136,7 +136,7 @@ async function provisionContact(
   if (!userId) throw new ContactProblem("Could not find or create this login.")
 
   const { data: existing, error: readErr } = await db
-    .from("fn_profiles").select("role,version,details").eq("user_id", userId).maybeSingle()
+    .from("fn_profiles").select("role,status,version,details").eq("user_id", userId).maybeSingle()
   if (readErr) throw new ContactProblem("Could not read this contact's portal profile.")
   if (existing && existing.role !== "customer")
     throw new ContactProblem(`${contact.email} already has a ${existing.role} portal login.`)
@@ -147,37 +147,59 @@ async function provisionContact(
   }
 
   const details = { ...((existing?.details as Record<string, unknown>) || {}), contact: contact.name, phone: contact.phone }
+  // Re-adding a suspended contact re-links them but does not lift the suspension.
+  const suspended = existing?.status === "suspended"
   const row = {
     user_id: userId,
     email: contact.email,
     role: "customer",
     company: customer.company,
     customer_account_id: customer.accountId,
-    status: "approved",
+    status: suspended ? "suspended" : "approved",
     details,
     updated_at: new Date().toISOString(),
   }
-  const { error: saveErr } = existing
-    ? await db.from("fn_profiles").update({ ...row, version: (existing.version ?? 1) + 1 }).eq("user_id", userId)
-    : await db.from("fn_profiles").insert(row)
-  if (saveErr) throw new ContactProblem("Could not save this contact's portal profile.")
+  if (existing) {
+    // Only write over the version we read, so a save made meanwhile is not lost.
+    const { data: saved, error } = await db
+      .from("fn_profiles")
+      .update({ ...row, version: (existing.version ?? 1) + 1 })
+      .eq("user_id", userId)
+      .eq("version", existing.version ?? 1)
+      .select("user_id")
+    if (error) throw new ContactProblem("Could not save this contact's portal profile.")
+    if (!saved?.length) throw new ContactProblem("This contact's profile changed while saving. Try again.")
+  } else {
+    const { error } = await db.from("fn_profiles").insert(row)
+    if (error) throw new ContactProblem("Could not save this contact's portal profile.")
+  }
 
+  if (suspended)
+    return { email: contact.email, status, invited: false, message: "Saved, but this login is suspended. Re-approve it in Setup reviews first." }
   if (opts.invite === false) return { email: contact.email, status, invited: false }
+  const sent = await sendCustomerInvite(db, { email: contact.email, name: contact.name, company: customer.company }, opts)
+  return { email: contact.email, status, ...sent }
+}
 
+/** Emails a contact a link to choose their password. Changes nothing about their access. */
+export async function sendCustomerInvite(
+  db: SupabaseClient,
+  contact: { email: string; name: string; company: string },
+  opts: { origin: string; send: SendMail },
+): Promise<{ invited: boolean; message?: string }> {
   const { data: link, error: linkErr } = await db.auth.admin.generateLink({
     type: "recovery",
     email: contact.email,
     options: { redirectTo: `${opts.origin}/auth/confirm` },
   })
   const hashed = link?.properties?.hashed_token
-  if (linkErr || !hashed)
-    return { email: contact.email, status, invited: false, message: "Login saved, but the invite link could not be made. Use Resend." }
+  if (linkErr || !hashed) return { invited: false, message: "Login saved, but the invite link could not be made. Use Resend." }
   const url = `${opts.origin}/auth/confirm?token_hash=${hashed}&type=recovery&next=${encodeURIComponent("/portal/reset-password")}`
   const { error: mailErr } = await opts.send({
     to: [contact.email],
     subject: "Your Five Nines customer portal login",
-    html: inviteEmailHtml({ name: contact.name, company: customer.company, url, signInUrl: `${opts.origin}/portal/customer` }),
+    html: inviteEmailHtml({ name: contact.name, company: contact.company, url, signInUrl: `${opts.origin}/portal/customer` }),
   })
-  if (mailErr) return { email: contact.email, status, invited: false, message: "Login saved, but the invite email failed. Use Resend." }
-  return { email: contact.email, status, invited: true }
+  if (mailErr) return { invited: false, message: "Login saved, but the invite email failed. Use Resend." }
+  return { invited: true }
 }
