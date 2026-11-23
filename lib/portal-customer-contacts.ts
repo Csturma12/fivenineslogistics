@@ -78,15 +78,21 @@ export function inviteEmailHtml(input: { name: string; company: string; url: str
   </div>`
 }
 
+function randomPassword(): string {
+  const bytes = new Uint8Array(32)
+  globalThis.crypto.getRandomValues(bytes)
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")
+}
+
 type SendMail = (args: { to: string[]; subject: string; html: string }) => Promise<{ error: { message: string } | null }>
 
-async function findUserId(db: SupabaseClient, email: string): Promise<string | undefined> {
+async function findUser(db: SupabaseClient, email: string): Promise<{ id: string; confirmed: boolean } | undefined> {
   // The admin API has no lookup by email; page through (the portal has a few hundred users).
   for (let page = 1; page <= 20; page++) {
     const { data, error } = await db.auth.admin.listUsers({ page, perPage: 1000 })
     if (error) throw new ContactProblem("Could not look up existing logins. Try again.")
     const hit = data.users.find((u) => u.email?.toLowerCase() === email)
-    if (hit) return hit.id
+    if (hit) return { id: hit.id, confirmed: !!hit.email_confirmed_at }
     if (data.users.length < 1000) return undefined
   }
   return undefined
@@ -121,6 +127,7 @@ async function provisionContact(
 ): Promise<ContactOutcome> {
   const app_metadata = { role: "customer", company: customer.company }
   let userId: string | undefined
+  let unconfirmed = false
   let status: ContactOutcome["status"] = "created"
 
   const { data: created, error: createErr } = await db.auth.admin.createUser({
@@ -132,7 +139,9 @@ async function provisionContact(
   if (created?.user) userId = created.user.id
   else if (createErr && /already|registered|exists/i.test(createErr.message)) {
     status = "updated"
-    userId = await findUserId(db, contact.email)
+    const found = await findUser(db, contact.email)
+    userId = found?.id
+    unconfirmed = !!found && !found.confirmed
   } else if (createErr) throw new ContactProblem(createErr.message)
   if (!userId) throw new ContactProblem("Could not find or create this login.")
 
@@ -143,7 +152,13 @@ async function provisionContact(
     throw new ContactProblem(`${contact.email} already has a ${existing.role} portal login.`)
 
   if (status === "updated") {
-    const { error } = await db.auth.admin.updateUserById(userId, { app_metadata, email_confirm: true })
+    // An unconfirmed signup's password was chosen by whoever registered the address,
+    // not proven to be the contact. Replace it with a random one before confirming, so
+    // only the person who opens the emailed invite link can set a usable password.
+    const { error } = await db.auth.admin.updateUserById(userId, {
+      app_metadata,
+      ...(unconfirmed ? { email_confirm: true, password: randomPassword() } : {}),
+    })
     if (error) throw new ContactProblem("Could not update this login.")
   }
 
