@@ -38,7 +38,8 @@ export function parseCustomerInput(raw: unknown): CustomerInput {
   if (!/^\d+$/.test(accountId)) throw new ContactProblem("Enter the customer's TAI customer ID (numbers only).")
   if (!Array.isArray(body.contacts) || body.contacts.length === 0)
     throw new ContactProblem("Add at least one contact. Each contact gets their own portal login.")
-  if (body.contacts.length > 50) throw new ContactProblem("Add up to 50 contacts at a time.")
+  // Each contact is several Auth, database and email calls, so keep one request short.
+  if (body.contacts.length > 20) throw new ContactProblem("Add up to 20 contacts at a time.")
   const seen = new Set<string>()
   const contacts = body.contacts.map((c, i) => {
     const row = (c && typeof c === "object" ? c : {}) as Record<string, unknown>
@@ -142,7 +143,7 @@ async function provisionContact(
     throw new ContactProblem(`${contact.email} already has a ${existing.role} portal login.`)
 
   if (status === "updated") {
-    const { error } = await db.auth.admin.updateUserById(userId, { app_metadata })
+    const { error } = await db.auth.admin.updateUserById(userId, { app_metadata, email_confirm: true })
     if (error) throw new ContactProblem("Could not update this login.")
   }
 

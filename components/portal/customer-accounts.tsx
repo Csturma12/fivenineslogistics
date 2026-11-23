@@ -108,7 +108,7 @@ export function CustomerAccounts({ data, onSaved, preview = false }: { data: Wor
     const problems: Outcome[] = [];
     let saved = 0;
     // Small batches keep each request under the server's contact and size limits.
-    const BATCH = 20;
+    const BATCH = 5;
     for (const customer of file.customers) {
       for (let i = 0; i < customer.contacts.length; i += BATCH) {
         const contacts = customer.contacts.slice(i, i + BATCH);
