@@ -12,7 +12,10 @@ function isLocalHost(host: string) {
  * request origin can be `localhost`, which is unreachable from the
  * recipient's device, so prefer the forwarded host and never emit localhost.
  */
-export function publicOrigin(req: NextRequest): string {
+// Structural so a route that already read its body can pass `{ headers, nextUrl: new URL(url) }`.
+type OriginSource = Pick<NextRequest, "headers"> & { nextUrl: { host: string; protocol: string } }
+
+export function publicOrigin(req: OriginSource): string {
   const forwardedHost = req.headers.get("x-forwarded-host")?.split(",")[0]?.trim()
   const host = forwardedHost || req.headers.get("host") || req.nextUrl.host
 

@@ -1,4 +1,4 @@
-import { after, NextRequest } from "next/server";
+import { after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { portalView } from "@/lib/portal-view";
 import { allPortalRowsAtVersion, carrierEligibilityKey, comparePickupDate, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
@@ -520,7 +520,7 @@ export async function POST(request: Request) {
         throw e;
       }
       const contacts = await provisionCustomer(db, input, {
-        origin: publicOrigin(new NextRequest(request)),
+        origin: publicOrigin({ headers: request.headers, nextUrl: new URL(request.url) }),
         send: sendPortalEmail,
       });
       const failed = contacts.filter((c) => c.status === "failed" || !c.invited);
