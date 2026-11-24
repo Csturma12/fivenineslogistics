@@ -1,11 +1,13 @@
 import "server-only";
 import { centralToday } from "@/lib/portal-contract";
+import { allPortalRows, PORTAL_PAGE_SIZE } from "@/lib/portal-pages";
 import { createLoadsAdminClient } from "@/lib/supabase/loads-admin";
 import { addDays, buildTruckNeeds, TRUCK_NEEDS_DAYS, type TruckNeedRow, type TruckNeeds } from "@/lib/truck-needs";
 
-// No rate, weight, load number or note columns. customer_name is read only so
-// hidden customers can be left out; buildTruckNeeds never returns it.
-const COLUMNS = "status,carrier_name,customer_name,from_city,from_state,to_city,to_state,ship_date,equipment_type";
+// No rate, weight, load number or note columns. `id` is only the paging cursor
+// and customer_name is read only so hidden customers can be left out;
+// buildTruckNeeds returns neither.
+const COLUMNS = "id,status,carrier_name,customer_name,from_city,from_state,to_city,to_state,ship_date,equipment_type";
 
 /**
  * Open pickups for the public Carriers page. Returns null when the operations
@@ -14,19 +16,27 @@ const COLUMNS = "status,carrier_name,customer_name,from_city,from_state,to_city,
  */
 export async function getTruckNeeds(today = centralToday()): Promise<TruckNeeds | null> {
   try {
-    const { data, error } = await createLoadsAdminClient()
-      .from("shipments")
-      .select(COLUMNS)
-      .eq("status", "Committed")
-      // TAI writes uncovered shipments with an empty carrier string rather than null.
-      .or("carrier_name.is.null,carrier_name.eq.")
-      // ship_date is text; ISO dates compare correctly as strings.
-      .gte("ship_date", today)
-      .lt("ship_date", addDays(today, TRUCK_NEEDS_DAYS))
-      .limit(1000);
-    if (error) return null;
-    return buildTruckNeeds((data ?? []) as TruckNeedRow[], today);
-  } catch {
+    const client = createLoadsAdminClient();
+    const until = addDays(today, TRUCK_NEEDS_DAYS);
+    // Page by id so a response cap can never silently understate the counts.
+    const rows = await allPortalRows<TruckNeedRow & { id: string | number }>((afterId) => {
+      const query = client
+        .from("shipments")
+        .select(COLUMNS, { count: "exact" })
+        .eq("status", "Committed")
+        // TAI writes uncovered shipments with an empty carrier string rather than null.
+        .or("carrier_name.is.null,carrier_name.eq.")
+        // ship_date is text; ISO dates compare correctly as strings.
+        .gte("ship_date", today)
+        .lt("ship_date", until)
+        .order("id", { ascending: true })
+        .limit(PORTAL_PAGE_SIZE);
+      return afterId == null ? query : query.gt("id", afterId);
+    });
+    return buildTruckNeeds(rows, today);
+  } catch (error) {
+    // The message names the failure only; it never holds shipment data or keys.
+    console.error("Truck needs could not be read:", error instanceof Error ? error.message : "unknown error");
     return null;
   }
 }
