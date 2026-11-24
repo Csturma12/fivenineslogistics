@@ -71,8 +71,7 @@ export function TruckNeeds({ needs }: { needs: TruckNeedsData | null }) {
                     count > 0 ? (
                       <span
                         key={days[index]}
-                        className="rounded-md px-2 py-1 text-xs font-semibold tabular-nums"
-                        style={{ backgroundColor: "#52d999", color: "#0b1f3a" }}
+                        className="rounded-md bg-status-ok-dark px-2 py-1 text-xs font-semibold tabular-nums text-navy"
                       >
                         {dayParts(days[index]).weekday} {dayParts(days[index]).monthDay} · {count}
                       </span>
@@ -124,8 +123,8 @@ export function TruckNeeds({ needs }: { needs: TruckNeedsData | null }) {
                       <td key={days[index]} className="px-1 py-3 text-center">
                         {count > 0 ? (
                           <span
-                            className="inline-flex size-8 items-center justify-center rounded-md font-semibold tabular-nums"
-                            style={{ backgroundColor: "#52d999", color: "#0b1f3a" }}
+                            role="img"
+                            className="inline-flex size-8 items-center justify-center rounded-md bg-status-ok-dark font-semibold tabular-nums text-navy"
                             aria-label={`${count} ${count === 1 ? "truck" : "trucks"} needed ${dayParts(days[index]).monthDay}`}
                           >
                             {count}
