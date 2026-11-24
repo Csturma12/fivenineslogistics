@@ -78,7 +78,7 @@ test("the lane list is capped, soonest pickup first, and the section hides witho
   assert.equal(needs.totalPickups, 5);
   assert.equal(renderToStaticMarkup(createElement(TruckNeeds, { needs: null })), "");
   const empty = renderToStaticMarkup(createElement(TruckNeeds, { needs: buildTruckNeeds([], "2026-11-24") }));
-  assert.match(empty, /is covered right now/);
+  assert.match(empty, /No open pickups are posted/);
   assert.equal(empty.includes("<table"), false);
   assert.equal(empty.includes("<ul"), false);
 });

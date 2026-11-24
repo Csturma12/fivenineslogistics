@@ -15,11 +15,12 @@ const COLUMNS = "id,status,carrier_name,customer_name,from_city,from_state,to_ci
  * instead of failing.
  */
 export async function getTruckNeeds(today = centralToday()): Promise<TruckNeeds | null> {
+  let readError = "";
   try {
     const client = createLoadsAdminClient();
     const until = addDays(today, TRUCK_NEEDS_DAYS);
     // Page by id so a response cap can never silently understate the counts.
-    const rows = await allPortalRows<TruckNeedRow & { id: string | number }>((afterId) => {
+    const rows = await allPortalRows<TruckNeedRow & { id: string | number }>(async (afterId) => {
       const query = client
         .from("shipments")
         .select(COLUMNS, { count: "exact" })
@@ -31,12 +32,15 @@ export async function getTruckNeeds(today = centralToday()): Promise<TruckNeeds 
         .lt("ship_date", until)
         .order("id", { ascending: true })
         .limit(PORTAL_PAGE_SIZE);
-      return afterId == null ? query : query.gt("id", afterId);
+      const response = await (afterId == null ? query : query.gt("id", afterId));
+      // The paging helper replaces the database's reason with a generic one; keep it for the log.
+      if (response.error) readError = response.error.message;
+      return response;
     });
     return buildTruckNeeds(rows, today);
   } catch (error) {
-    // The message names the failure only; it never holds shipment data or keys.
-    console.error("Truck needs could not be read:", error instanceof Error ? error.message : "unknown error");
+    // The reason names the failure only; it never holds shipment data or keys.
+    console.error("Truck needs could not be read:", readError || (error instanceof Error ? error.message : "unknown error"));
     return null;
   }
 }

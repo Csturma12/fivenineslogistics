@@ -33,7 +33,7 @@ export function TruckNeeds({ needs }: { needs: TruckNeedsData | null }) {
             <p className="mt-3 text-pretty leading-relaxed text-muted-foreground">
               {totalPickups > 0
                 ? `${totalPickups} booked ${totalPickups === 1 ? "pickup still needs" : "pickups still need"} a truck, ${first.monthDay} through ${last.monthDay}. Updated from our dispatch board every few minutes.`
-                : `Every pickup from ${first.monthDay} through ${last.monthDay} is covered right now. Get set up so you see the next one first.`}
+                : `No open pickups are posted for ${first.monthDay} through ${last.monthDay} right now. Get set up so you see the next one first.`}
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
