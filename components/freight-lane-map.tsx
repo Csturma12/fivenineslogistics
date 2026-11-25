@@ -70,13 +70,13 @@ const laneWeight = (n: number) => 2 + n / 8
 
 export function FreightLaneMap() {
   const { openLane } = useRequestCapacity()
-  const [selectedId, setSelectedId] = useState<string>(localMarkets[0].id)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [status, setStatus] = useState<MapStatus>(MAPS_KEY ? "loading" : "unavailable")
   const mapEl = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
   const overlays = useRef(new Map<string, { setSelected: (on: boolean) => void }>())
 
-  const selected = allLanes.find((l) => l.id === selectedId) ?? localMarkets[0]
+  const selected = allLanes.find((l) => l.id === selectedId)
 
   useEffect(() => {
     if (!MAPS_KEY || !mapEl.current) return
@@ -194,7 +194,14 @@ export function FreightLaneMap() {
     const map = mapRef.current
     const maps = window.google?.maps
     if (!map || !maps) return
-    if (selected.kind === "local") {
+    if (!selected) {
+      const bounds = new maps.LatLngBounds()
+      for (const lane of allLanes) {
+        bounds.extend({ lat: lane.origin.lat, lng: lane.origin.lng })
+        bounds.extend({ lat: lane.destination.lat, lng: lane.destination.lng })
+      }
+      map.fitBounds(bounds, 40)
+    } else if (selected.kind === "local") {
       map.panTo({ lat: selected.origin.lat, lng: selected.origin.lng })
       map.setZoom(8)
     } else {
@@ -248,19 +255,23 @@ export function FreightLaneMap() {
         </div>
       </div>
 
-      <div className="lane-map-detail" aria-live="polite">
-        <div>
-          <span className="lane-map-kind">{selected.kind === "local" ? "Local move" : "Intercity lane"}</span>
-          <strong>{laneTitle(selected)}</strong>
-          <span className="lane-map-count">
-            {selected.shipments} {selected.shipments === 1 ? "shipment" : "shipments"} · {laneSnapshot.period}
-          </span>
+      {selected ? (
+        <div className="lane-map-detail" aria-live="polite">
+          <div>
+            <span className="lane-map-kind">{selected.kind === "local" ? "Local move" : "Intercity lane"}</span>
+            <strong>{laneTitle(selected)}</strong>
+            <span className="lane-map-count">
+              {selected.shipments} {selected.shipments === 1 ? "shipment" : "shipments"} · {laneSnapshot.period}
+            </span>
+          </div>
+          <button type="button" className="design-button" onClick={() => request(selected)}>
+            Request capacity on this lane
+            <ArrowUpRight size={18} aria-hidden="true" />
+          </button>
         </div>
-        <button type="button" className="design-button" onClick={() => request(selected)}>
-          Request capacity on this lane
-          <ArrowUpRight size={18} aria-hidden="true" />
-        </button>
-      </div>
+      ) : (
+        <p className="lane-map-meta">Select a local move or lane to request capacity.</p>
+      )}
     </div>
   )
 }
@@ -273,7 +284,7 @@ function LaneGroup({
 }: {
   title: string
   lanes: FreightLane[]
-  selectedId: string
+  selectedId: string | null
   onSelect: (id: string) => void
 }) {
   return (
