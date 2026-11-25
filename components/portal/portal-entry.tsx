@@ -10,6 +10,7 @@ import { canUsePortalSamples } from "@/lib/portal-sample-access";
 import { PortalSignIn } from "./portal-access";
 import { PortalWorkspace } from "./workspace";
 import { ResetPasswordForm } from "./reset-password-form";
+import { PORTAL_USERNAME_DOMAIN } from "@/lib/portal-username";
 
 export async function PortalEntry({ role }: { role: PortalRole }) {
   let identity: Awaited<ReturnType<typeof portalIdentity>> | null = null;
@@ -33,6 +34,9 @@ export async function PortalEntry({ role }: { role: PortalRole }) {
 
   if (user && !staff && role === "customer" && accountRole === "customer" &&
       user.app_metadata?.role === "customer" && user.app_metadata?.company &&
+      // Only logins staff made (TAI-linked contacts, or the legacy name logins with a
+      // password we handed out). Self-signups already chose their own password.
+      (profile?.customer_account_id || user.email?.endsWith(`@${PORTAL_USERNAME_DOMAIN}`)) &&
       user.user_metadata?.portal_password_reviewed !== true) {
     return <main>
       <SiteHeader />
