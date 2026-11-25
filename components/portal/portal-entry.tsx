@@ -9,6 +9,8 @@ import { PortalProblem, type PortalRole } from "@/lib/portal-contract";
 import { canUsePortalSamples } from "@/lib/portal-sample-access";
 import { PortalSignIn } from "./portal-access";
 import { PortalWorkspace } from "./workspace";
+import { ResetPasswordForm } from "./reset-password-form";
+import { PORTAL_USERNAME_DOMAIN } from "@/lib/portal-username";
 
 export async function PortalEntry({ role }: { role: PortalRole }) {
   let identity: Awaited<ReturnType<typeof portalIdentity>> | null = null;
@@ -29,6 +31,21 @@ export async function PortalEntry({ role }: { role: PortalRole }) {
   const staff = identity?.staff ?? false;
   if (user && !staff && accountRole === "customer" && role === "carrier") redirect("/portal/customer");
   if (user && !staff && accountRole === "carrier" && role === "customer") redirect("/portal");
+
+  if (user && !staff && role === "customer" && accountRole === "customer" &&
+      user.app_metadata?.role === "customer" && user.app_metadata?.company &&
+      // Only logins staff made (TAI-linked contacts, or the legacy name logins with a
+      // password we handed out). Self-signups already chose their own password.
+      (profile?.customer_account_id || user.email?.endsWith(`@${PORTAL_USERNAME_DOMAIN}`)) &&
+      user.user_metadata?.portal_password_reviewed !== true) {
+    return <main>
+      <SiteHeader />
+      <section className="mx-auto max-w-xl px-4 py-14">
+        <ResetPasswordForm firstSignIn />
+      </section>
+      <SiteFooter />
+    </main>;
+  }
 
   return (
     <main>
