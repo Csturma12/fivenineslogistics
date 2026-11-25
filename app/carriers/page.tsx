@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { Capacity } from "@/components/capacity"
+import { TruckNeeds } from "@/components/truck-needs"
+import { getTruckNeeds } from "@/lib/truck-needs-data"
 import {
   carriersPage,
   carrierBenefits,
@@ -19,7 +21,11 @@ export const metadata: Metadata = {
     "Run clean, communicate, and show up — and get on the bench for steady, planned freight with dispatch that answers, fair rates, and quick-pay. Partner with Five Nines Logistics.",
 }
 
-export default function CarriersPage() {
+// Open pickups change through the day; rebuild this page at most every five minutes.
+export const revalidate = 300
+
+export default async function CarriersPage() {
+  const truckNeeds = await getTruckNeeds()
   return (
     <>
       <SiteHeader />
@@ -67,6 +73,8 @@ export default function CarriersPage() {
             </div>
           </div>
         </section>
+
+        <TruckNeeds needs={truckNeeds} />
 
         <section className="border-b border-border">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
