@@ -117,6 +117,8 @@ export type Workspace = {
   historyLoads?: PortalLoad[];
   highwayUrl: string | null;
   profiles?: Profile[];
+  /** Agent desk: every customer contact linked to a TAI customer, not just the recent 200 profiles. */
+  customerContacts?: Profile[];
   notifications?: { id: string; subject: string; last_error: string | null }[];
 };
 export class PortalProblem extends Error {

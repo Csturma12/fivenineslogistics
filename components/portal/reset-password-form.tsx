@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client"
 
 type State = "checking" | "ready" | "invalid" | "submitting" | "error"
 
-export function ResetPasswordForm() {
+export function ResetPasswordForm({ firstSignIn = false }: { firstSignIn?: boolean }) {
   const router = useRouter()
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
@@ -39,15 +39,23 @@ export function ResetPasswordForm() {
       return
     }
 
+    await saveChoice(password)
+  }
+
+  async function saveChoice(newPassword?: string) {
+    if (state === "submitting" || (!newPassword && !firstSignIn)) return
     setState("submitting")
     setError("")
 
     const supabase = createClient()
-    const { error: updateErr } = await supabase.auth.updateUser({ password })
+    const { error: updateErr } = await supabase.auth.updateUser({
+      ...(newPassword ? { password: newPassword } : {}),
+      data: { portal_password_reviewed: true },
+    })
 
     if (updateErr) {
       setState("error")
-      setError(updateErr.message || "Could not update your password. Try the link again.")
+      setError(updateErr.message || "Could not save your choice. Please try again.")
       return
     }
 
@@ -58,7 +66,7 @@ export function ResetPasswordForm() {
   if (state === "checking") {
     return (
       <div className="rounded-xl border border-border bg-card p-6 sm:p-8" aria-live="polite">
-        <p className="text-sm text-muted-foreground">Verifying your reset link…</p>
+        <p className="text-sm text-muted-foreground">Checking your session…</p>
       </div>
     )
   }
@@ -86,10 +94,16 @@ export function ResetPasswordForm() {
 
   return (
     <div className="rounded-xl border border-border bg-card p-6 sm:p-8">
-      <h2 className="text-2xl font-semibold tracking-tight text-foreground">Choose a new password</h2>
+      <h2 className="text-2xl font-semibold tracking-tight text-foreground">{firstSignIn ? "Keep or change your password" : "Choose a new password"}</h2>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        Enter a new password for your Five Nines portal account. You&apos;ll be signed in right after.
+        {firstSignIn ? "Continue with the password you received, or enter a new one below." : "Enter a new password for your Five Nines portal account."}
       </p>
+      {firstSignIn && (
+        <button type="button" disabled={state === "submitting"} onClick={() => void saveChoice()}
+          className="mt-4 min-h-11 rounded-lg border border-input px-4 py-2 text-sm font-medium hover:bg-accent">
+          Keep my password and continue
+        </button>
+      )}
 
       <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
         <label className="flex flex-col gap-1.5">

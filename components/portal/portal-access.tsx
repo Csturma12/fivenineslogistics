@@ -71,7 +71,7 @@ function messageForSignIn(raw: string): string {
     return "Too many attempts. Wait a minute and try again."
   }
   if (/invalid login|invalid credentials|invalid/i.test(raw)) {
-    return "Invalid username, email or password."
+    return "Invalid email or password."
   }
   return "We couldn't sign you in. Try again."
 }

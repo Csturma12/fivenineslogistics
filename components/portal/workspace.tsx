@@ -10,6 +10,7 @@ import { FiveNinesFlatbedMark } from "@/components/five-nines-flatbed-mark";
 import { ProfileForm, LoadRequestForm, UploadForm } from "./workspace-forms";
 import { CarrierBoard } from "./carrier-board";
 import { WorkspaceDesk } from "./workspace-desk";
+import { CustomerAccounts } from "./customer-accounts";
 import { ShipmentBoard } from "./shipment-board";
 import { ReadOnlyPortalView } from "./read-only-portal-view";
 import {
@@ -155,6 +156,7 @@ export function PortalWorkspace({
   const tabs = desk
     ? [
         "Setup reviews",
+        "Customers & logins",
         "Bids & bookings",
         "Customer requests",
         "Documents & email",
@@ -227,6 +229,11 @@ export function PortalWorkspace({
                   href={desk ? "/portal/home" : "/agent-desk"}
                 >
                   {desk ? "My portal" : "Review portal submissions"}
+                </Link>
+              ) : null}
+              {!previewData && !desk ? (
+                <Link className={secondary} href="/portal/reset-password">
+                  Change password
                 </Link>
               ) : null}
               {!previewData ? <SignOutButton redirectTo={desk ? "/agent-desk" : "/portal"} /> : null}
@@ -323,7 +330,9 @@ export function PortalWorkspace({
                 Refresh ���
               </button>
             </div>
-            {desk ? (
+            {desk && selected === "Customers & logins" ? (
+              <CustomerAccounts data={data} preview={!!previewData} onSaved={() => void refresh(true).catch(() => setError("Saved, but the customer list could not refresh. Refresh the page."))} />
+            ) : desk ? (
               <WorkspaceDesk
                 data={data}
                 tab={selected}
