@@ -9,6 +9,7 @@ import { PortalProblem, type PortalRole } from "@/lib/portal-contract";
 import { canUsePortalSamples } from "@/lib/portal-sample-access";
 import { PortalSignIn } from "./portal-access";
 import { PortalWorkspace } from "./workspace";
+import { ResetPasswordForm } from "./reset-password-form";
 
 export async function PortalEntry({ role }: { role: PortalRole }) {
   let identity: Awaited<ReturnType<typeof portalIdentity>> | null = null;
@@ -29,6 +30,18 @@ export async function PortalEntry({ role }: { role: PortalRole }) {
   const staff = identity?.staff ?? false;
   if (user && !staff && accountRole === "customer" && role === "carrier") redirect("/portal/customer");
   if (user && !staff && accountRole === "carrier" && role === "customer") redirect("/portal");
+
+  if (user && !staff && role === "customer" && accountRole === "customer" &&
+      user.app_metadata?.role === "customer" && user.app_metadata?.company &&
+      user.user_metadata?.portal_password_reviewed !== true) {
+    return <main>
+      <SiteHeader />
+      <section className="mx-auto max-w-xl px-4 py-14">
+        <ResetPasswordForm firstSignIn />
+      </section>
+      <SiteFooter />
+    </main>;
+  }
 
   return (
     <main>

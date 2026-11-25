@@ -344,11 +344,9 @@ export function PortalSignIn({ role }: { role: Role }) {
             <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
               <label className="flex flex-col gap-1.5">
                 <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Work email
+                  {mode === "signin" && role === "customer" ? "Username or work email" : "Work email"}
                 </span>
                 <input
-                  // Still "text" for customer sign-in so the old name logins keep working
-                  // until the TAI contact import replaces them with email logins.
                   type={mode === "signin" && role === "customer" ? "text" : "email"}
                   required
                   autoCapitalize="none"

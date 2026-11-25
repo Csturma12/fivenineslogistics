@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import type { Workspace } from "@/lib/portal-contract";
 import { readPortalBody } from "@/lib/portal-upload-client";
 import { customersFromCsv, type CsvResult } from "@/lib/customer-contact-csv";
+import { PORTAL_USERNAME_DOMAIN } from "@/lib/portal-username";
 import { Badge, button, input, Panel, secondary } from "./workspace-ui";
 
 type Contact = { name: string; email: string; phone: string };
@@ -39,8 +40,8 @@ export function CustomerAccounts({ data, onSaved, preview = false }: { data: Wor
 
   const customers = new Map<string, { company: string; people: NonNullable<Workspace["profiles"]> }>();
   for (const p of data.customerContacts || data.profiles || []) {
-    if (p.role !== "customer" || !p.customer_account_id) continue;
-    const key = p.customer_account_id;
+    if (p.role !== "customer") continue;
+    const key = p.customer_account_id || `unlinked:${p.user_id}`;
     const entry = customers.get(key) || { company: p.company, people: [] };
     entry.people.push(p);
     customers.set(key, entry);
@@ -258,22 +259,22 @@ export function CustomerAccounts({ data, onSaved, preview = false }: { data: Wor
             {[...customers.entries()].map(([id, entry]) => (
               <details key={id} className="rounded-lg border p-4">
                 <summary className="cursor-pointer font-medium">
-                  {entry.company || "Customer"} · TAI {id} · {entry.people.length} contact{entry.people.length === 1 ? "" : "s"}
+                  {entry.company || "Customer"} · {entry.people[0].customer_account_id ? `TAI ${id}` : "No TAI account linked"} · {entry.people.length} contact{entry.people.length === 1 ? "" : "s"}
                 </summary>
                 <ul className="mt-4 divide-y text-sm">
                   {entry.people.map((p) => (
                     <li key={p.user_id} className="flex flex-wrap items-center justify-between gap-3 py-2">
                       <span>
-                        {String(p.details?.contact || "") || p.email} · {p.email} <Badge value={p.status} />
+                        {p.details?.contact ? `${p.details.contact} · ` : ""}{p.email.endsWith(`@${PORTAL_USERNAME_DOMAIN}`) ? p.email.split("@")[0] : p.email} <Badge value={p.status} />
                       </span>
-                      <button
+                      {!p.email.endsWith(`@${PORTAL_USERNAME_DOMAIN}`) && p.customer_account_id && <button
                         type="button"
                         className={secondary}
                         disabled={busy}
                         onClick={() => void resend(p.email)}
                       >
                         Resend login email
-                      </button>
+                      </button>}
                     </li>
                   ))}
                 </ul>

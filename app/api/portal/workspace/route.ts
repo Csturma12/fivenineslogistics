@@ -127,7 +127,6 @@ export async function GET(request: Request) {
           .from("fn_profiles")
           .select("user_id,email,role,company,details,status,customer_account_id,version,updated_at")
           .eq("role", "customer")
-          .not("customer_account_id", "is", null)
           .order("company")
           .limit(5000),
       ]);
