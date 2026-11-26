@@ -1,15 +1,14 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import useSWR from "swr"
 import { ArrowUpRight, MapPin, MoveRight } from "lucide-react"
 import { useRequestCapacity } from "@/components/request-capacity-panel"
 import {
-  allLanes,
+  feedPeriod,
+  type FreightFeed,
   cityLabel,
-  intercityLanes,
-  laneSnapshot,
   laneTitle,
-  localMarkets,
   type FreightLane,
 } from "@/lib/freight-lanes"
 
@@ -68,12 +67,22 @@ const quietStyles = [
 const markerScale = (n: number) => 7 + Math.sqrt(n) * 1.6
 const laneWeight = (n: number) => 2 + n / 8
 
+const emptyLanes: FreightLane[] = []
+async function fetchFeed(url: string): Promise<FreightFeed> {
+  const response = await fetch(url)
+  if (!response.ok) throw new Error("Freight data unavailable")
+  return response.json()
+}
+
 export function FreightLaneMap() {
+  const { data, error } = useSWR<FreightFeed>("/api/freight-map", fetchFeed, { refreshInterval: 60_000 })
+  const allLanes = data?.lanes ?? emptyLanes
+  const period = data ? feedPeriod(data) : ""
   const { openLane } = useRequestCapacity()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [status, setStatus] = useState<MapStatus>(MAPS_KEY ? "loading" : "unavailable")
   const mapEl = useRef<HTMLDivElement>(null)
-  const mapRef = useRef<any>(null)
+  const [map, setMap] = useState<any>(null)
   const overlays = useRef(new Map<string, { setSelected: (on: boolean) => void }>())
 
   const selected = allLanes.find((l) => l.id === selectedId)
@@ -96,85 +105,7 @@ export function FreightLaneMap() {
           gestureHandling: "cooperative",
           clickableIcons: false,
         })
-        mapRef.current = map
-        const Advanced = MAP_ID ? maps.marker?.AdvancedMarkerElement : null
-
-        for (const lane of intercityLanes) {
-          const path = [
-            { lat: lane.origin.lat, lng: lane.origin.lng },
-            { lat: lane.destination.lat, lng: lane.destination.lng },
-          ]
-          const arrow = { path: maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 3, strokeWeight: 1, fillOpacity: 1 }
-          const line = new maps.Polyline({
-            path,
-            geodesic: true,
-            map,
-            clickable: true,
-            strokeOpacity: 0.85,
-            icons: [{ icon: arrow, offset: "62%" }],
-          })
-          const ends = [lane.origin, lane.destination].map(
-            (c) =>
-              new maps.Circle({
-                map,
-                center: { lat: c.lat, lng: c.lng },
-                radius: 14000,
-                strokeWeight: 0,
-                fillOpacity: 1,
-                clickable: false,
-              }),
-          )
-          const setSelected = (on: boolean) => {
-            const color = on ? COLORS.signal : COLORS.blue
-            line.setOptions({
-              strokeColor: color,
-              strokeWeight: laneWeight(lane.shipments) + (on ? 2 : 0),
-              zIndex: on ? 20 : 1,
-              icons: [{ icon: { ...arrow, strokeColor: color, fillColor: color, scale: on ? 4 : 3 }, offset: "62%" }],
-            })
-            ends.forEach((e) => e.setOptions({ fillColor: on ? COLORS.signal : COLORS.ink, zIndex: on ? 21 : 2 }))
-          }
-          line.addListener("click", () => setSelectedId(lane.id))
-          overlays.current.set(lane.id, { setSelected })
-        }
-
-        for (const market of localMarkets) {
-          const position = { lat: market.origin.lat, lng: market.origin.lng }
-          const title = `${laneTitle(market)}: ${market.shipments} shipments`
-          let setSelected: (on: boolean) => void
-
-          if (Advanced) {
-            const pin = document.createElement("div")
-            pin.className = "lane-map-pin"
-            pin.textContent = String(market.shipments)
-            const size = Math.round(markerScale(market.shipments) * 2.2)
-            pin.style.width = pin.style.height = `${size}px`
-            const marker = new Advanced({ map, position, title, content: pin, gmpClickable: true })
-            marker.addListener("click", () => setSelectedId(market.id))
-            setSelected = (on) => {
-              pin.dataset.selected = String(on)
-              marker.zIndex = on ? 30 : 10
-            }
-          } else {
-            const marker = new maps.Marker({ map, position, title, optimized: true })
-            marker.addListener("click", () => setSelectedId(market.id))
-            setSelected = (on) =>
-              marker.setOptions({
-                zIndex: on ? 30 : 10,
-                label: { text: String(market.shipments), color: "#ffffff", fontSize: "11px", fontWeight: "600" },
-                icon: {
-                  path: maps.SymbolPath.CIRCLE,
-                  scale: markerScale(market.shipments) + (on ? 2 : 0),
-                  fillColor: on ? COLORS.signal : COLORS.ink,
-                  fillOpacity: 0.95,
-                  strokeColor: "#ffffff",
-                  strokeWeight: 2,
-                },
-              })
-          }
-          overlays.current.set(market.id, { setSelected })
-        }
-
+        setMap(map)
         setStatus("ready")
       })
       .catch(() => {
@@ -183,34 +114,126 @@ export function FreightLaneMap() {
 
     return () => {
       cancelled = true
-      overlays.current.clear()
-      mapRef.current = null
+      delete window.gm_authFailure
     }
   }, [])
 
   useEffect(() => {
+    if (!map || !window.google?.maps) return
+    const maps = window.google.maps
+    const Advanced = MAP_ID ? maps.marker?.AdvancedMarkerElement : null
+    const cleanup: (() => void)[] = []
+    const activeOverlays = overlays.current
+    for (const lane of allLanes.filter(lane => lane.kind === "intercity")) {
+      if (!lane.origin.position || !lane.destination.position) continue
+      const path = [lane.origin.position, lane.destination.position]
+      const arrow = { path: maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 3, strokeWeight: 1, fillOpacity: 1 }
+      const line = new maps.Polyline({
+        path,
+        geodesic: true,
+        map,
+        clickable: true,
+        strokeOpacity: 0.85,
+        icons: [{ icon: arrow, offset: "62%" }],
+      })
+      const ends = path.map(
+        (c) =>
+          new maps.Circle({
+            map,
+            center: c,
+            radius: 14000,
+            strokeWeight: 0,
+            fillOpacity: 1,
+            clickable: false,
+          }),
+      )
+      const setSelected = (on: boolean) => {
+        const color = on ? COLORS.signal : COLORS.blue
+        line.setOptions({
+          strokeColor: color,
+          strokeWeight: laneWeight(lane.shipments) + (on ? 2 : 0),
+          zIndex: on ? 20 : 1,
+          icons: [{ icon: { ...arrow, strokeColor: color, fillColor: color, scale: on ? 4 : 3 }, offset: "62%" }],
+        })
+        ends.forEach((e) => e.setOptions({ fillColor: on ? COLORS.signal : COLORS.ink, zIndex: on ? 21 : 2 }))
+      }
+      const listener = line.addListener("click", () => setSelectedId(lane.id))
+      cleanup.push(() => { listener.remove(); line.setMap(null); ends.forEach(e => e.setMap(null)) })
+      overlays.current.set(lane.id, { setSelected })
+    }
+
+    for (const market of allLanes.filter(lane => lane.kind === "local")) {
+      const position = market.origin.position
+      if (!position) continue
+      const title = `${laneTitle(market)}: ${market.shipments} shipments`
+      let setSelected: (on: boolean) => void
+
+      if (Advanced) {
+        const pin = document.createElement("div")
+        pin.className = "lane-map-pin"
+        pin.textContent = String(market.shipments)
+        const size = Math.round(markerScale(market.shipments) * 2.2)
+        pin.style.width = pin.style.height = `${size}px`
+        const marker = new Advanced({ map, position, title, content: pin, gmpClickable: true })
+        const listener = marker.addListener("click", () => setSelectedId(market.id))
+        cleanup.push(() => { listener.remove(); marker.map = null })
+        setSelected = (on) => {
+          pin.dataset.selected = String(on)
+          marker.zIndex = on ? 30 : 10
+        }
+      } else {
+        const marker = new maps.Marker({ map, position, title, optimized: true })
+        const listener = marker.addListener("click", () => setSelectedId(market.id))
+        cleanup.push(() => { listener.remove(); marker.setMap(null) })
+        setSelected = (on) =>
+          marker.setOptions({
+            zIndex: on ? 30 : 10,
+            label: { text: String(market.shipments), color: "#ffffff", fontSize: "11px", fontWeight: "600" },
+            icon: {
+              path: maps.SymbolPath.CIRCLE,
+              scale: markerScale(market.shipments) + (on ? 2 : 0),
+              fillColor: on ? COLORS.signal : COLORS.ink,
+              fillOpacity: 0.95,
+              strokeColor: "#ffffff",
+              strokeWeight: 2,
+            },
+          })
+      }
+      overlays.current.set(market.id, { setSelected })
+    }
+
+    return () => {
+      cleanup.forEach(remove => remove())
+      activeOverlays.clear()
+    }
+  }, [map, allLanes])
+
+  useEffect(() => {
     if (status !== "ready") return
     overlays.current.forEach((o, id) => o.setSelected(id === selectedId))
-    const map = mapRef.current
     const maps = window.google?.maps
     if (!map || !maps) return
     if (!selected) {
       const bounds = new maps.LatLngBounds()
       for (const lane of allLanes) {
-        bounds.extend({ lat: lane.origin.lat, lng: lane.origin.lng })
-        bounds.extend({ lat: lane.destination.lat, lng: lane.destination.lng })
+        if (lane.origin.position && lane.destination.position) {
+          bounds.extend(lane.origin.position)
+          bounds.extend(lane.destination.position)
+        }
       }
-      map.fitBounds(bounds, 40)
+      if (!bounds.isEmpty()) map.fitBounds(bounds, 40)
+    } else if (!selected.origin.position || !selected.destination.position) {
+      return
     } else if (selected.kind === "local") {
-      map.panTo({ lat: selected.origin.lat, lng: selected.origin.lng })
+      map.panTo(selected.origin.position)
       map.setZoom(8)
     } else {
       const bounds = new maps.LatLngBounds()
-      bounds.extend({ lat: selected.origin.lat, lng: selected.origin.lng })
-      bounds.extend({ lat: selected.destination.lat, lng: selected.destination.lng })
+      bounds.extend(selected.origin.position)
+      bounds.extend(selected.destination.position)
       map.fitBounds(bounds, 64)
     }
-  }, [status, selectedId, selected])
+  }, [map, status, allLanes, selectedId, selected])
 
   const request = (lane: FreightLane) =>
     openLane({ origin: cityLabel(lane.origin), destination: cityLabel(lane.destination) })
@@ -221,12 +244,13 @@ export function FreightLaneMap() {
         <div>
           <p className="eyebrow">
             <span className="brand-node" aria-hidden="true" />
-            {laneSnapshot.label}
+            Five Nines freight
           </p>
           <h3>Where our freight is moving now.</h3>
         </div>
         <p className="lane-map-meta">
-          {laneSnapshot.period} · {laneSnapshot.basis}. City-level aggregates only.
+          {data ? `${period} · Five Nines shipments by city.` : error ? "Freight data is temporarily unavailable." : "Loading freight data…"}
+          {error && data ? " Showing the last available update." : ""}
         </p>
       </div>
 
@@ -250,8 +274,8 @@ export function FreightLaneMap() {
         </div>
 
         <div className="lane-map-list">
-          <LaneGroup title="Local markets" lanes={localMarkets} selectedId={selectedId} onSelect={setSelectedId} />
-          <LaneGroup title="Intercity lanes" lanes={intercityLanes} selectedId={selectedId} onSelect={setSelectedId} />
+          <LaneGroup title="Local markets" lanes={allLanes.filter(l => l.kind === "local")} selectedId={selectedId} onSelect={setSelectedId} />
+          <LaneGroup title="Intercity lanes" lanes={allLanes.filter(l => l.kind === "intercity")} selectedId={selectedId} onSelect={setSelectedId} />
         </div>
       </div>
 
@@ -261,7 +285,7 @@ export function FreightLaneMap() {
             <span className="lane-map-kind">{selected.kind === "local" ? "Local move" : "Intercity lane"}</span>
             <strong>{laneTitle(selected)}</strong>
             <span className="lane-map-count">
-              {selected.shipments} {selected.shipments === 1 ? "shipment" : "shipments"} · {laneSnapshot.period}
+              {selected.shipments} {selected.shipments === 1 ? "shipment" : "shipments"} · {period}
             </span>
           </div>
           <button type="button" className="design-button" onClick={() => request(selected)}>
@@ -270,7 +294,7 @@ export function FreightLaneMap() {
           </button>
         </div>
       ) : (
-        <p className="lane-map-meta">Select a local move or lane to request capacity.</p>
+        <p className="lane-map-meta">{data && !allLanes.length ? "No qualifying shipments in this period." : "Select a local move or lane to request capacity."}</p>
       )}
     </div>
   )
