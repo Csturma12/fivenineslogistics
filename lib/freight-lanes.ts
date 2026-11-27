@@ -15,5 +15,8 @@ export const laneTitle = (lane: FreightLane) =>
   lane.kind === "local" ? `${cityLabel(lane.origin)} local` : `${cityLabel(lane.origin)} → ${cityLabel(lane.destination)}`
 
 const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
-export const feedPeriod = (feed: FreightFeed) =>
-  dateFormat.formatRange(new Date(feed.from + "T00:00:00Z"), new Date(feed.through + "T00:00:00Z"))
+export function feedPeriod(feed: FreightFeed) {
+  const start = Date.parse(feed.from + "T00:00:00Z")
+  const end = Date.parse(feed.through + "T00:00:00Z")
+  return Number.isFinite(start) && Number.isFinite(end) && start <= end ? dateFormat.formatRange(start, end) : ""
+}

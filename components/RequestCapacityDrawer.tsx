@@ -51,11 +51,13 @@ export function RequestCapacityProvider({ children }: { children: ReactNode }) {
   const [prefill, setPrefill] = useState<LanePrefill | null>(null)
   const [prefillKey, setPrefillKey] = useState(0)
   const openTab = useCallback((tab: Tab) => {
-    setPrefill(null)
-    setPrefillKey((k) => k + 1)
+    if (prefill) {
+      setPrefill(null)
+      setPrefillKey((k) => k + 1)
+    }
     setInitialTab(tab)
     setOpen(true)
-  }, [])
+  }, [prefill])
   const openLane = useCallback((lane: LanePrefill) => {
     setPrefill(lane)
     setPrefillKey((k) => k + 1)

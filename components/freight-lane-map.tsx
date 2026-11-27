@@ -75,7 +75,23 @@ async function fetchFeed(url: string): Promise<FreightFeed> {
 }
 
 export function FreightLaneMap() {
-  const { data, error } = useSWR<FreightFeed>("/api/freight-map", fetchFeed, { refreshInterval: 60_000 })
+  const container = useRef<HTMLDivElement>(null)
+  const [nearby, setNearby] = useState(false)
+  useEffect(() => {
+    if (!container.current || !("IntersectionObserver" in window)) {
+      setNearby(true)
+      return
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setNearby(true)
+        observer.disconnect()
+      }
+    }, { rootMargin: "500px" })
+    observer.observe(container.current)
+    return () => observer.disconnect()
+  }, [])
+  const { data, error } = useSWR<FreightFeed>(nearby ? "/api/freight-map" : null, fetchFeed, { refreshInterval: 60_000 })
   const allLanes = data?.lanes ?? emptyLanes
   const period = data ? feedPeriod(data) : ""
   const { openLane } = useRequestCapacity()
@@ -83,12 +99,13 @@ export function FreightLaneMap() {
   const [status, setStatus] = useState<MapStatus>(MAPS_KEY ? "loading" : "unavailable")
   const mapEl = useRef<HTMLDivElement>(null)
   const [map, setMap] = useState<any>(null)
+  const lastViewport = useRef<{ map: any; laneId: string | null } | null>(null)
   const overlays = useRef(new Map<string, { setSelected: (on: boolean) => void }>())
 
   const selected = allLanes.find((l) => l.id === selectedId)
 
   useEffect(() => {
-    if (!MAPS_KEY || !mapEl.current) return
+    if (!nearby || !MAPS_KEY || !mapEl.current) return
     let cancelled = false
     window.gm_authFailure = () => setStatus("unavailable")
 
@@ -116,7 +133,7 @@ export function FreightLaneMap() {
       cancelled = true
       delete window.gm_authFailure
     }
-  }, [])
+  }, [nearby])
 
   useEffect(() => {
     if (!map || !window.google?.maps) return
@@ -213,6 +230,9 @@ export function FreightLaneMap() {
     overlays.current.forEach((o, id) => o.setSelected(id === selectedId))
     const maps = window.google?.maps
     if (!map || !maps) return
+    const laneId = selected?.id ?? null
+    const previous = lastViewport.current
+    if (previous && previous.map === map && previous.laneId === laneId) return
     if (!selected) {
       const bounds = new maps.LatLngBounds()
       for (const lane of allLanes) {
@@ -221,7 +241,8 @@ export function FreightLaneMap() {
           bounds.extend(lane.destination.position)
         }
       }
-      if (!bounds.isEmpty()) map.fitBounds(bounds, 40)
+      if (bounds.isEmpty()) return
+      map.fitBounds(bounds, 40)
     } else if (!selected.origin.position || !selected.destination.position) {
       return
     } else if (selected.kind === "local") {
@@ -233,13 +254,14 @@ export function FreightLaneMap() {
       bounds.extend(selected.destination.position)
       map.fitBounds(bounds, 64)
     }
+    lastViewport.current = { map, laneId }
   }, [map, status, allLanes, selectedId, selected])
 
   const request = (lane: FreightLane) =>
     openLane({ origin: cityLabel(lane.origin), destination: cityLabel(lane.destination) })
 
   return (
-    <div className="lane-map">
+    <div ref={container} className="lane-map">
       <div className="lane-map-header">
         <div>
           <p className="eyebrow">
@@ -294,7 +316,7 @@ export function FreightLaneMap() {
           </button>
         </div>
       ) : (
-        <p className="lane-map-meta">{data && !allLanes.length ? "No qualifying shipments in this period." : "Select a local move or lane to request capacity."}</p>
+        <p className="lane-map-hint">{data && !allLanes.length ? "No qualifying shipments in this period." : "Select a local move or lane to request capacity."}</p>
       )}
     </div>
   )
