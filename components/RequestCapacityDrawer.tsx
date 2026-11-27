@@ -30,8 +30,12 @@ type RequestCapacityContextValue = {
   openPanel: () => void
   /** Opens the drawer on a specific tab, e.g. the line-down emergency form. */
   openTab: (tab: Tab) => void
+  /** Opens the single-move form with editable origin and destination prefilled. */
+  openLane: (lane: LanePrefill) => void
   closePanel: () => void
 }
+
+export type LanePrefill = { origin: string; destination: string }
 
 const RequestCapacityContext = createContext<RequestCapacityContextValue | null>(null)
 
@@ -44,17 +48,33 @@ export function useRequestCapacity() {
 export function RequestCapacityProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
   const [initialTab, setInitialTab] = useState<Tab>("single")
+  const [prefill, setPrefill] = useState<LanePrefill | null>(null)
+  const [prefillKey, setPrefillKey] = useState(0)
   const openTab = useCallback((tab: Tab) => {
+    setPrefill(null)
+    setPrefillKey((k) => k + 1)
     setInitialTab(tab)
+    setOpen(true)
+  }, [])
+  const openLane = useCallback((lane: LanePrefill) => {
+    setPrefill(lane)
+    setPrefillKey((k) => k + 1)
+    setInitialTab("single")
     setOpen(true)
   }, [])
   const openPanel = useCallback(() => openTab("single"), [openTab])
   const closePanel = useCallback(() => setOpen(false), [])
 
   return (
-    <RequestCapacityContext.Provider value={{ open, openPanel, openTab, closePanel }}>
+    <RequestCapacityContext.Provider value={{ open, openPanel, openTab, openLane, closePanel }}>
       {children}
-      <RequestCapacityDrawer open={open} initialTab={initialTab} onClose={closePanel} />
+      <RequestCapacityDrawer
+        open={open}
+        initialTab={initialTab}
+        prefill={prefill}
+        prefillKey={prefillKey}
+        onClose={closePanel}
+      />
     </RequestCapacityContext.Provider>
   )
 }
@@ -106,10 +126,14 @@ type Submission = { reference: string; mode: QuoteMode; persisted: boolean }
 export function RequestCapacityDrawer({
   open,
   initialTab = "single",
+  prefill = null,
+  prefillKey = 0,
   onClose,
 }: {
   open: boolean
   initialTab?: Tab
+  prefill?: LanePrefill | null
+  prefillKey?: number
   onClose: () => void
 }) {
   const [tab, setTab] = useState<Tab>(initialTab)
@@ -297,10 +321,28 @@ export function RequestCapacityDrawer({
                   <form onSubmit={handleSubmit("STANDARD-SPOT")} className="space-y-6">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="Origin City, State *" htmlFor="q-origin">
-                        <CityInput id="q-origin" name="origin" label="Origin" required placeholder="e.g., Houston, TX" theme={cityInputTheme} />
+                        <CityInput
+                          key={`origin-${prefillKey}`}
+                          id="q-origin"
+                          name="origin"
+                          label="Origin"
+                          required
+                          value={prefill?.origin ?? ""}
+                          placeholder="e.g., Houston, TX"
+                          theme={cityInputTheme}
+                        />
                       </Field>
                       <Field label="Destination City, State *" htmlFor="q-dest">
-                        <CityInput id="q-dest" name="destination" label="Destination" required placeholder="e.g., New Albany, OH" theme={cityInputTheme} />
+                        <CityInput
+                          key={`dest-${prefillKey}`}
+                          id="q-dest"
+                          name="destination"
+                          label="Destination"
+                          required
+                          value={prefill?.destination ?? ""}
+                          placeholder="e.g., New Albany, OH"
+                          theme={cityInputTheme}
+                        />
                       </Field>
                       <Field label="Pickup Date & Ready Time *" htmlFor="q-pickup">
                         <input id="q-pickup" name="pickup" required placeholder="e.g., Tomorrow 08:00 AM" className={inputClass} />
