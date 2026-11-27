@@ -20,6 +20,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { CapabilityExplorer } from "@/components/capability-explorer";
 import { FiveNinesStandard } from "@/components/five-nines-standard";
 import { MissionCriticalExecutions } from "@/components/mission-critical-executions";
+import { FreightLaneMap } from "@/components/freight-lane-map";
 import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title:
@@ -365,6 +366,7 @@ export default function Page() {
               One point of contact across every leg.
             </div>
           </div>
+          <FreightLaneMap />
         </section>
         <section className="closing-section">
           <div className="design-container closing-inner">
