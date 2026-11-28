@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { FreightLaneMap } from "@/components/freight-lane-map";
+import { EmptyTrucks } from "./empty-trucks";
 import { FiveNinesMark } from "@/components/five-nines-mark";
 import { FiveNinesFlatbedMark } from "@/components/five-nines-flatbed-mark";
 import { portalIdentity, profileFor } from "@/lib/portal-service";
@@ -110,6 +111,7 @@ export async function PortalEntry({ role }: { role: PortalRole }) {
       )}
       <section aria-label="Five Nines freight activity" className="mx-auto max-w-6xl px-4 pb-10 sm:px-6 sm:pb-14">
         <FreightLaneMap />
+        {(process.env.VERCEL_ENV === "preview" || process.env.NODE_ENV === "development") && <EmptyTrucks />}
       </section>
       <SiteFooter />
     </main>
